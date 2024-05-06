@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">siloam-caregiver</string>
+    <string name="no_internet_connection">Please check your internet connection!</string>
+    <string name="hospital_unit">Hospital Unit</string>
+    <string name="caregiver">Caregiver</string>
+    <string name="search_patient_name">Search by patient name</string>
+    <string name="permission_to_gallery">Please give permission to access gallery</string>
+    <string name="info_group">Info Group</string>
+    <string name="phone">Phone</string>
+    <string name="room">Room</string>
+    <string name="payer">Payer</string>
+    <string name="view_medical_record">View Medical Record</string>
+    <string name="gambar_document"><![CDATA[Gambar & Dokumen]]></string>
+    <string name="partisipan">%1$s Partisipan</string>
+    <string name="group_role">●  %1$s</string>
+    <string name="sub_header_group_detail">MR NO: %1$s | ADMISSION NO: %2$s</string>
+    <string name="picture_document"><![CDATA[Image & Document]]></string>
+    <string name="picture">Image</string>
+    <string name="document">Document</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="select_hospital_units">Select Hospital Units</string>
+    <string name="filter">Filter</string>
+    <string name="ward">Ward</string>
+    <string name="apply_filter">Apply Filter</string>
+    <string name="empty_chat">Sorry, you don\'t have chat</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="medical_record">Medical Record</string>
+    <string name="share">Share</string>
+    <string name="share_message">Share this link to chat room ?</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel\n</string>
+    <string name="link">Go to link - %1$s</string>
+
+</resources>

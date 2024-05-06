@@ -1,0 +1,84 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+    </style>
+
+    <style name="BaseTheme.BottomSheet" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="bottomSheetStyle">@style/BaseTheme.BottomSheet.Style</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="BaseTheme.BottomSheet.ShapeAppearanceOverlay" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyTopRight">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/large</item>
+        <item name="cornerSizeTopRight">@dimen/large</item>
+        <item name="cornerSizeBottomLeft">@dimen/empty</item>
+        <item name="cornerSizeBottomRight">@dimen/empty</item>
+    </style>
+
+    <style name="BaseTheme.BottomSheet.Style" parent="@style/Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">
+            @style/BaseTheme.BottomSheet.ShapeAppearanceOverlay
+        </item>
+    </style>
+
+    <style name="CoreTheme" parent="BaseTheme" />
+
+    <style name="CoreTheme.BottomSheet" parent="BaseTheme.BottomSheet" />
+
+    <style name="CoreTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
+
+    <style name="CoreTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <!--    Button Style-->
+    <style name="Widget.CoreTheme.ButtonRadius" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">@dimen/medium_fit</item>
+    </style>
+
+    <style name="Widget.CoreTheme.Button.Secondary" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.CoreTheme.Button.Secondary</item>
+    </style>
+
+    <style name="ThemeOverlay.CoreTheme.Button.Secondary" parent="">
+        <item name="colorPrimary">@color/colorSecondaryBase</item>
+    </style>
+
+    <style name="Theme.CaregiverApp" parent="CoreTheme" />
+
+    <!--  Toolbar Menu Button  -->
+    <style name="Widget.App.Toolbar.MenuButton" parent="Widget.MaterialComponents.Toolbar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="actionMenuTextColor">@color/menu_color</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.AppCompat.Subhead</item>
+    </style>
+    <!-- region datePicker-->
+
+    <style name="SpinnerDatePickerDialog" parent="@android:style/Theme.Holo.Light.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:calendarViewShown">false</item>
+        <item name="android:datePickerMode">spinner</item>
+    </style>
+
+    <style name="CalendarToolbarTheme" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="colorControlNormal">@color/colorTextIdle</item>
+    </style>
+
+
+    <!--endregion-->
+</resources>

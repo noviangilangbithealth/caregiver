@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/medium">
+
+    <ImageButton
+        android:id="@+id/btn_close_dialog_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/smsp_transparent_color"
+        android:src="@drawable/ic_close"
+        app:layout_constraintBottom_toBottomOf="@id/tv_filter_schedule_history_rmo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_filter_schedule_history_rmo"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_filter_schedule_history_rmo"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/large"
+        android:text="@string/filter"
+        android:textFontWeight="500"
+        app:layout_constraintStart_toEndOf="@id/btn_close_dialog_filter"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_close_dialog_filter">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_hospital_unit"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_fit"
+            android:hint="@string/hospital_unit">
+
+            <AutoCompleteTextView
+                android:id="@+id/atv_hospital_unit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/colorBlackGrade"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_ward"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium"
+            android:hint="@string/ward">
+
+            <AutoCompleteTextView
+                android:id="@+id/atv_ward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/colorBlackGrade"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_apply_filter"
+            style="@style/Widget.CoreTheme.ButtonRadius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/huge"
+            android:layout_marginEnd="@dimen/small"
+            android:paddingTop="@dimen/small_fit"
+            android:paddingBottom="@dimen/small_fit"
+            android:text="@string/apply_filter"
+            android:textAllCaps="true"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/text_small"
+            app:backgroundTint="@color/colorSecondaryBase" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <include
+        android:id="@+id/top_bar_room_type"
+        layout="@layout/top_bar_room_type" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_room"
+        android:layout_below="@id/top_bar_room_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_room_type" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_loading_roomtype"
+        android:layout_width="@dimen/very_large_fit"
+        android:layout_height="@dimen/very_large_fit"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loading_animation"
+        tools:ignore="ContentDescription" />
+
+
+
+
+</RelativeLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/filter"
+        app:showAsAction="ifRoom"
+        android:contentDescription="Dropdown Hospitals"
+        android:icon="@drawable/ic_filter_caregiver_chat"
+        android:title="Dropdown Hospitals"/>
+</menu>

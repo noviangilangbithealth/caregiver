@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+    android:layout_width="match_parent"
+    android:id="@+id/tv_picture_date"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/medium"
+    android:paddingVertical="@dimen/small"
+    android:textColor="@color/colorBlack54"
+    android:textSize="@dimen/text_small"
+    android:textStyle="bold"
+    tools:text="Terbaru" />

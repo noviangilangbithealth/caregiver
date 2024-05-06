@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_unit"
+        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="14dp"
+        android:paddingHorizontal="@dimen/medium"
+        android:textColor="@color/colorBlack87"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:drawablePadding="@dimen/medium"
+        android:drawableStart="@drawable/ic_atom_icon_a_icon_hospital_primary"
+        tools:text="SHLV" />
+
+</FrameLayout>

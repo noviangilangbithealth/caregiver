@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/groupDetailFragment2"
+    android:id="@+id/nav_groupdetail">
+
+    <fragment
+        android:id="@+id/groupDetailFragment2"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailFragment"
+        android:label="fragment_group_detail"
+        tools:layout="@layout/fragment_group_detail" >
+        <action
+            android:id="@+id/action_groupDetailFragment2_to_pictureDocumentFragment2"
+            app:destination="@id/pictureDocumentFragment2" />
+        <action
+            android:id="@+id/action_groupDetailFragment2_to_emrIpdWebViewFragment"
+            app:destination="@id/emrIpdWebViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pictureDocumentFragment2"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.PictureDocumentFragment"
+        android:label="fragment_picture_document"
+        tools:layout="@layout/fragment_picture_document" />
+    <fragment
+        android:id="@+id/emrIpdWebViewFragment"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.EmrIpdWebViewFragment"
+        android:label="fragment_emr_ipd_web_view"
+        tools:layout="@layout/fragment_emr_ipd_web_view" />
+
+</navigation>

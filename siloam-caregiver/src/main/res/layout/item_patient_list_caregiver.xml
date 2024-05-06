@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_item_patient_list_dashboard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/medium"
+    android:paddingVertical="@dimen/small">
+
+    <LinearLayout
+        android:id="@+id/ll_patient_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_patient_name_caregiver_patient_list"
+            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:textColor="@color/colorBlackGrade"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            tools:text="Rina Gunawan" />
+
+        <ImageView
+            android:id="@+id/iv_gender_caregiver_patient_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small"
+            android:src="@drawable/ic_label_male"
+            tools:ignore="ContentDescription" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_caregiver_patient_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="00:15"
+            android:textColor="@color/colorBlackGrade"
+            android:textSize="@dimen/text_very_small" />
+
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_patient_info_caregiver_dashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller"
+        android:letterSpacing="0.15"
+        android:lineHeight="14sp"
+        android:textAllCaps="true"
+        android:textColor="@color/colorBlack54"
+        android:textFontWeight="400"
+        android:textSize="@dimen/text_tiny"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_patient_header"
+        tools:text="MR No: SHLV.901021  |  Admission No: IPA5000255000  | Ward: 1 Ephelia | Room No: 555-1" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_tag_caregiver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller"
+        android:visibility="gone"
+        tools:listitem="@layout/item_tag_chat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_patient_info_caregiver_dashboard" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

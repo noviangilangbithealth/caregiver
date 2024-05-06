@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:backgroundTint="@color/colorWhite"
+    android:layout_marginTop="@dimen/medium"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/large"
+    android:padding="@dimen/medium">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_count_partisipan"
+        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/partisipan"
+        android:textColor="@color/colorBlack54"
+        android:textSize="@dimen/text_medium"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_partisipan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_group_detail_partisipan"
+        android:layout_marginTop="@dimen/small"/>
+
+</LinearLayout>

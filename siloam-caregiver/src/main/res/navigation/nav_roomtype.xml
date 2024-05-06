@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_roomtype"
+    app:startDestination="@id/roomTypeCaregiverFragment2">
+
+    <fragment
+        android:id="@+id/roomTypeCaregiverFragment2"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.roomtype.RoomTypeCaregiverFragment"
+        android:label="RoomTypeCaregiverFragment" />
+</navigation>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_item_room_type"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/medium"
+    android:paddingVertical="@dimen/small">
+
+    <LinearLayout
+        android:id="@+id/ll_room_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_room_type"
+            android:layout_width="@dimen/medium_fit"
+            android:layout_height="@dimen/medium_fit"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_label_male" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_room_type_name"
+            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small"
+            android:ellipsize="end"
+            android:textColor="@color/colorBlackGrade"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            tools:text="General" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_room_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="00:15"
+            android:textColor="@color/colorBlackGrade"
+            android:textSize="@dimen/text_very_small" />
+
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_last_message_room_type"
+        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/very_small"
+        android:layout_marginEnd="@dimen/smaller"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/colorBlackGrade"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ll_ic_room_type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_room_type"
+        tools:text="dr. Antonia Anna Lukito, SpJP: OK, nanti siang saya visit ya." />
+
+
+    <LinearLayout
+        android:id="@+id/ll_ic_room_type"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/very_small"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_room_type">
+
+        <ImageView
+            android:id="@+id/iv_urgent_room_type"
+            android:layout_width="@dimen/medium_fit"
+            android:layout_height="@dimen/medium_fit"
+            android:src="@drawable/ic_urgent_caregiver"
+            tools:ignore="ContentDescription" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/badge_room_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/smaller"
+            android:background="@drawable/background_badge_red"
+            android:paddingHorizontal="@dimen/small"
+            android:paddingVertical="@dimen/very_small"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/text_tiny"
+            tools:text="2" />
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

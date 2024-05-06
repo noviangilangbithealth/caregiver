@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/white"
+    android:padding="@dimen/medium">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_gd_patient_name"
+        style="@style/TextAppearance.MaterialComponents.Headline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="320dp"
+        android:textSize="@dimen/text_large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Rina Gunawan" />
+
+    <ImageView
+        android:id="@+id/iv_gender"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small"
+        android:src="@drawable/ic_label_female"
+        app:layout_constraintBottom_toBottomOf="@id/tv_gd_patient_name"
+        app:layout_constraintStart_toEndOf="@id/tv_gd_patient_name"
+        app:layout_constraintTop_toTopOf="@id/tv_gd_patient_name" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_adm"
+        style="@style/TextAppearance.MaterialComponents.Overline"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorBlack38"
+        android:textSize="@dimen/text_tiny"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name"/>
+
+    <LinearLayout
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium_fit"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_adm">
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/phone"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack54"
+            android:textSize="@dimen/text_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_phone"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack87"
+            android:textSize="@dimen/text_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name"
+            tools:text="-" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_fit"
+            android:text="@string/room"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack54"
+            android:textSize="@dimen/text_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_room"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack87"
+            android:textSize="@dimen/text_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name"
+            tools:text="-" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_fit"
+            android:text="@string/payer"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack54"
+            android:textSize="@dimen/text_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_payer"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack87"
+            android:textSize="@dimen/text_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name"
+            tools:text="-" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_detail_view_medical_record"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_fit"
+            android:layout_marginBottom="@dimen/small"
+            android:paddingVertical="@dimen/medium"
+            android:text="@string/view_medical_record"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorWhite"
+            app:cornerRadius="@dimen/medium_fit"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="@dimen/tiny" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
