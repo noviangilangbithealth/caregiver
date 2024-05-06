@@ -5,11 +5,27 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id ("maven-publish")
 }
 
 val keystorePropertiesFile = rootProject.file("../keys_caregiver/keystore.properties")
 val keystoreProperties = Properties().apply {
     load(keystorePropertiesFile.inputStream())
+}
+
+buildscript {
+    val kotlin_version  = "1.7.20"
+
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal() // Add this line
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.1.3")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
 }
 
 android {
@@ -87,6 +103,19 @@ android {
 
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)        // << --- ADD This
+    }
+}
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17            // << --- ADD This
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -152,4 +181,22 @@ dependencies {
     //lottie
     implementation("com.airbnb.android:lottie:5.2.0")
 
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.noviangilangbithealth"
+            artifactId = "caregiver"
+            version = "1.5"
+
+            pom {
+                description.set("Caregiver Library")
+            }
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
 }
