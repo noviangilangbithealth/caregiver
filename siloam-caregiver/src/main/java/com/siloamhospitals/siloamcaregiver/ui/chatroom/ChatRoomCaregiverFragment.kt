@@ -153,7 +153,7 @@ class ChatRoomCaregiverFragment : Fragment() {
 
     private fun setupView() {
         binding.run {
-            etInputChat.setText(preferences.findPreference("key_${viewModel.channelId}", ""))
+            etInputChat.setText(preferences.findPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", ""))
             tvTitleChat.text = viewModel.roomName
             tvPatientName.text = viewModel.patientName
             Glide.with(requireContext()).load(viewModel.urlIcon).into(ivRoomChat)
@@ -198,7 +198,7 @@ class ChatRoomCaregiverFragment : Fragment() {
         viewModel.uploadFiles.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is BaseHandleResponse.ERROR -> {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                    Logger.d(response.message)
                 }
 
                 is BaseHandleResponse.LOADING -> {}
@@ -275,7 +275,7 @@ class ChatRoomCaregiverFragment : Fragment() {
             }
 
             etInputChat.addTextChangedListener(afterTextChanged = { text ->
-                preferences.putPreference("key_${viewModel.channelId}", text.toString())
+                preferences.putPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", text.toString())
             })
 
             ivBtnSend.setOnClickListener {
@@ -300,7 +300,7 @@ class ChatRoomCaregiverFragment : Fragment() {
 
             ivMic.setOnLongClickListener {
                 if (superCheckPermission()) {
-                    Toast.makeText(requireContext(), "Recording Start", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), "Recording Start", Toast.LENGTH_SHORT).show()
                     recordMode(true)
                     startTimer()
                     startRecording()
@@ -312,7 +312,7 @@ class ChatRoomCaregiverFragment : Fragment() {
             ivMic.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_UP && superCheckPermission()) {
                     // Handle the finger lifted action (optional)
-                    Toast.makeText(requireContext(), "Recording Stop", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), "Recording Stop", Toast.LENGTH_SHORT).show()
                     stopTimer()
                     recordMode(false)
                     stopRecording()
@@ -323,6 +323,7 @@ class ChatRoomCaregiverFragment : Fragment() {
                             adapterChatRoom.add(
                                 0, CaregiverChatRoomUi(
                                     isVoiceNote = true,
+                                    isSelfSender = true,
                                     url = outputFile.orEmpty()
                                 )
                             )
@@ -556,7 +557,7 @@ class ChatRoomCaregiverFragment : Fragment() {
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val file = File("${mediaStorageDir.path}${File.separator}AUDIO_$timeStamp.aac")
-        Toast.makeText(requireContext(), file.extension, Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireContext(), file.extension, Toast.LENGTH_SHORT).show()
         return file
     }
 
@@ -606,8 +607,8 @@ class ChatRoomCaregiverFragment : Fragment() {
         if (file.exists()) {
             val delete = file.delete()
             if (delete) {
-                Toast.makeText(requireContext(), "Delete record successfully", Toast.LENGTH_SHORT)
-                    .show()
+//                Toast.makeText(requireContext(), "Delete record successfully", Toast.LENGTH_SHORT)
+//                    .show()
             }
         }
     }

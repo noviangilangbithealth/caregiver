@@ -66,7 +66,6 @@ class CaregiverButtons private constructor(app: Application) :
             fab?.setOnClickListener {
                 // Perform your onClick action here
                 SiloamCaregiverUI.getInstances().openCaregiver(activity)
-                Toast.makeText(activity, "Clicked", Toast.LENGTH_SHORT).show()
             }
         } else {
             // If the activity is in the list of activities where the FAB should be hidden,

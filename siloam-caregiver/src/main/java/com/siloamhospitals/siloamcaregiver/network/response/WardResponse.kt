@@ -16,7 +16,14 @@ data class WardDataResponse(
 @JsonClass(generateAdapter = true)
 data class WardDataDataResponse(
     @SerializedName("ward_list")
-    val wardList: List<WardListResponse> = emptyList()
+    val wardList: List<WardListResponse> = emptyList(),
+    @SerializedName("hospital_code")
+    val hospitalCode: String? = null,
+    @SerializedName("organization_name")
+    val orgName: String? = null,
+    @SerializedName("organization_id")
+    val orgId: Long? = null
+
 )
 
 @JsonClass(generateAdapter = true)

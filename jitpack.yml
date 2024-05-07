@@ -5,4 +5,4 @@ before_install:
   - ./scripts/prepareJitpackEnvironment.sh
 install:
   - FILE="-Dfile=siloam-caregiver-debug.aar"
-  - mvn install:install-file $FILE -DgroupId=com.github.noviangilangbithealth -DartifactId=caregiver -Dversion=1.5 -Dpackaging=aar -DgeneratePom=true
+  - mvn install:install-file $FILE -DgroupId=com.github.noviangilangbithealth -DartifactId=caregiver -Dversion=1.6 -Dpackaging=aar -DgeneratePom=true

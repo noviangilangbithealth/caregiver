@@ -69,6 +69,7 @@ class CaregiverPatientListViewModel(
                     _caregiverList.postValue(data)
                     errorHasBeenConsumed = false
                 } else {
+                    Logger.d(data)
                     errorHasBeenConsumed = false
                     _error.postValue(error)
                 }
@@ -118,7 +119,7 @@ class CaregiverPatientListViewModel(
     private val _ward = MutableLiveData<BaseHandleResponse<WardResponse>>()
     val ward: LiveData<BaseHandleResponse<WardResponse>> = _ward
 
-    fun getWard(hospitalId: Long) {
+    fun getWard(hospitalId: Long = orgId) {
         viewModelScope.launch {
             val response = repository.getWard(hospitalId)
             if (response.isSuccessful) {

@@ -160,7 +160,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                             else -> "${item.role} - ${item.senderName}:${item.lastMessage}"
                         }
 
-                        val draftMessage = preferences.findPreference("key_${item.channelId}", "")
+                        val draftMessage = preferences.findPreference("key_${item.caregiverId}_${item.channelId}", "")
                         val spannableDraftMessage = SpannableStringBuilder("Draft: $draftMessage")
                         spannableDraftMessage.setSpan(
                             ForegroundColorSpan(

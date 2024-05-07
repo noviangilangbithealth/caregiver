@@ -36,18 +36,18 @@
         android:text="Lampirkan Gambar dari Galeri"
         android:drawableStart="@drawable/ic_image_caregiver"/>
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tb_urgent_chat"
-        style="@style/TextAppearance.MaterialComponents.Body2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="14dp"
-        android:paddingHorizontal="16dp"
-        android:gravity="center_vertical"
-        android:drawablePadding="12dp"
-        android:text="Buat Pesan Mendesak"
-        android:layout_marginBottom="20dp"
-        android:drawableStart="@drawable/ic_urgent_caregiver"/>
+<!--    <com.google.android.material.textview.MaterialTextView-->
+<!--        android:id="@+id/tb_urgent_chat"-->
+<!--        style="@style/TextAppearance.MaterialComponents.Body2"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingVertical="14dp"-->
+<!--        android:paddingHorizontal="16dp"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:drawablePadding="12dp"-->
+<!--        android:text="Buat Pesan Mendesak"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:drawableStart="@drawable/ic_urgent_caregiver"/>-->
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

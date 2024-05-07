@@ -29,6 +29,8 @@ import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.invisible
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
+import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
+import com.siloamhospitals.siloamcaregiver.network.response.UserShowHospitalResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.ListCaregiverPatient
 import com.siloamhospitals.siloamcaregiver.ui.NotificationIcon
@@ -86,6 +88,12 @@ class CaregiverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.run {
+            emitGetCaregiver()
+            listenCaregiverList()
+            listenBadgeNotif()
+        }
 
         childFragmentManager.setFragmentResultListener(
             SelectUnitDialogFragment.KEY_RESULT,
@@ -176,36 +184,51 @@ class CaregiverFragment : Fragment() {
 
     private fun observeUserShow() {
         viewModel.userShow.observe(viewLifecycleOwner) {
-            val data = it.data?.data
-            if (viewModel.firsLoadFilter) {
-                if (viewModel.hospitals.isEmpty()) {
-                    viewModel.hospitals.addAll(it.data?.data?.hospital?.sortedBy { e -> e.hospitalHopeId }
-                        ?: emptyList())
+            when(it) {
+                is BaseHandleResponse.ERROR -> {
+                    Logger.e(it.message.orEmpty(), it.message)
                 }
-                if (viewModel.hospitals.isNotEmpty()) {
-                    val hospital = viewModel.hospitals.first()
-                    viewModel.orgId = hospital.hospitalHopeId.toLong()
-                    viewModel.orgCode = hospital.alias
-                    if (data?.specializationId != "7") {
-                        viewModel.emitGetCaregiver {
-                            binding.run {
-                                lottieLoadingPatientList.visible()
-                                rvPatientListCaregiver.gone()
+                is BaseHandleResponse.LOADING -> { }
+                is BaseHandleResponse.SUCCESS -> {
+                    val data = it.data?.data
+                    if (viewModel.firsLoadFilter) {
+                        if (viewModel.hospitals.isEmpty()) {
+                            viewModel.hospitals.addAll(it.data?.data?.hospital?.sortedBy { e -> e.hospitalHopeId }
+                                ?: emptyList())
+                        }
+                        if (viewModel.hospitals.isNotEmpty()) {
+                            val hospital = viewModel.hospitals.first()
+                            viewModel.orgId = hospital.hospitalHopeId.toLong()
+                            viewModel.orgCode = hospital.alias
+                            if (data?.specializationId != "7") {
+                                viewModel.emitGetCaregiver {
+                                    binding.run {
+                                        lottieLoadingPatientList.visible()
+                                        rvPatientListCaregiver.gone()
+                                    }
+                                }
+                                viewModel.emitGetBadgeNotif()
+                                viewModel.listenCaregiverList()
+                                binding.chipHospital.text = hospital.alias
+                                binding.chipWard.gone()
+                            } else {
+                                viewModel.isSpecialist = false
+                                viewModel.orgId = hospital.hospitalHopeId.toLong()
+                                viewModel.getWard(hospital.hospitalHopeId.toLong())
+                                binding.chipHospital.text = hospital.alias
+                                observeWard()
                             }
                         }
-                        viewModel.emitGetBadgeNotif()
-                        viewModel.listenCaregiverList()
-                        binding.chipHospital.text = hospital.alias
-                        binding.chipWard.gone()
-                    } else {
+                    }
+
+                    if(data == null) {
                         viewModel.isSpecialist = false
-                        viewModel.orgId = hospital.hospitalHopeId.toLong()
-                        viewModel.getWard(hospital.hospitalHopeId.toLong())
-                        binding.chipHospital.text = hospital.alias
+                        viewModel.getWard()
                         observeWard()
                     }
                 }
             }
+
         }
     }
 
@@ -213,13 +236,29 @@ class CaregiverFragment : Fragment() {
         viewModel.ward.observe(viewLifecycleOwner) {
             if (viewModel.firsLoadFilter) {
                 val data = it.data?.data?.data?.first()?.wardList
+                val dataHospital = it.data?.data?.data?.first()
+                if(viewModel.hospitals.isEmpty()) {
+                    viewModel.hospitals.add(UserShowHospitalResponse(
+                        hospitalHopeId = dataHospital?.orgId?.toInt() ?: 0,
+                        alias = dataHospital?.hospitalCode.orEmpty(),
+                        name = dataHospital?.orgName.orEmpty()
+                    ))
+                    viewModel.orgId = dataHospital?.orgId ?: 0
+                    viewModel.orgCode = dataHospital?.hospitalCode.orEmpty()
+                    binding.chipHospital.text = dataHospital?.hospitalCode.orEmpty()
+                }
                 viewModel.firsLoadFilter = false
                 if (!data.isNullOrEmpty()) {
                     viewModel.wards.clear()
                     viewModel.wards.addAll(data)
-                    viewModel.wardId = data.first().wardId
-                    viewModel.wardName = data.first().wardName
-                    binding.chipWard.text = data.first().wardName
+                    if(data.find { it.wardId == viewModel.wardId} != null) {
+                        viewModel.wardName = data.find { it.wardId == viewModel.wardId}?.wardName.orEmpty()
+                        binding.chipWard.text = data.find { it.wardId == viewModel.wardId}?.wardName.orEmpty()
+                    } else {
+                        viewModel.wardId = data.first().wardId
+                        viewModel.wardName = data.first().wardName
+                        binding.chipWard.text = data.first().wardName
+                    }
                     binding.chipWard.isVisible = !viewModel.isSpecialist
                     viewModel.emitGetCaregiver {
                         binding.run {

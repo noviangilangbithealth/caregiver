@@ -370,6 +370,7 @@ class ChatRoomCaregiverAdapter(
     override fun getItemViewType(position: Int): Int {
         val data = chatRoomUis[position]
         return when {
+            data.isVoiceNote && data.isSelfSender -> VN_RIGHT_CHAT
             data.isVoiceNote -> VN_LEFT_CHAT
             data.isDateLimit -> DATE_CHAT
             data.isSelfSender -> RIGHT_CHAT

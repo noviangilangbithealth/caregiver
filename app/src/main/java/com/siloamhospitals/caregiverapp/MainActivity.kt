@@ -20,7 +20,8 @@ class MainActivity : AppCompatActivity() {
         //setup initial user
         // todo add more parameter for fullfill the requirement
         SiloamCaregiver.init(this)
-        SiloamCaregiver.initUser(userId = 2000000761, organizationId = 2, this)
+        SiloamCaregiver.init(this)
+        SiloamCaregiver.initUser(userId = 29000000134, organizationId = 2, wardId = 30, context = this)
 //        2000000834 eka
 //        2000000761 andreas
         binding.buttonOpenCaregiver.setOnClickListener {
