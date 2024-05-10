@@ -34,13 +34,13 @@ class SiloamCaregiverUI {
         patientName: String,
         caregiverId: String,
         channelId: String,
-        doctorHopeId: String,
+        doctorHopeId: Long,
         icon: String
     ) {
         val mPreference by lazy {
             AppPreferences(context)
         }
-        mPreference.userId = doctorHopeId.toLong()
+        mPreference.userId = doctorHopeId
         mPreference.notifChannelId = channelId
         mPreference.notifCaregiverId = caregiverId
         mPreference.notifRoomName = roomName

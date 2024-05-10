@@ -198,7 +198,6 @@ class CaregiverFragment : Fragment() {
                 val newText = it.toString()
                 if (newText != viewModel.keyword) {
                     viewModel.keyword = newText
-                    viewModel.scrollPosition = 0
                     viewModel.emitGetCaregiver {
                         binding.run {
                             lottieLoadingPatientList.visible()
@@ -367,7 +366,6 @@ class CaregiverFragment : Fragment() {
                 Logger.d(newData)
                 viewModel.roomPatientList.clear()
                 viewModel.roomPatientList.addAll(newData)
-                binding.rvPatientListCaregiver.scrollToPosition(viewModel.scrollPosition)
                 onDataLoaded()
                 binding.tvEmpty.gone()
                 binding.ivEmpty.gone()
@@ -435,11 +433,6 @@ class CaregiverFragment : Fragment() {
 
                 }
                 onChildViewClick(CaregiverPatientListViewHolder::layoutCard) { index, _ ->
-                    val layoutManager =
-                        binding.rvPatientListCaregiver.layoutManager as LinearLayoutManager
-                    val firstVisibleItemPosition =
-                        layoutManager.findFirstCompletelyVisibleItemPosition()
-                    viewModel.scrollPosition = firstVisibleItemPosition
                     roomTypeLauncher.launch(
                         RoomTypeCaregiverActivity.getIntent(
                             requireContext(),

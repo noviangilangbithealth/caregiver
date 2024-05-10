@@ -27,16 +27,16 @@ class MainActivity : AppCompatActivity() {
 //        2000000761 andreas
         binding.buttonOpenCaregiver.setOnClickListener {
             //navigate activity
-            SiloamCaregiverUI().openChatRoom(
-                this,
-                roomName = "General",
-                patientName = "ROCK LEE",
-                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
-                channelId = "0d9bf688-82c4-4b2c-b954-7358162044b5",
-                doctorHopeId = "2000000827",
-                icon = ""
-            )
-//            startActivity(Intent(this, SecondActivity::class.java))
+//            SiloamCaregiverUI().openChatRoom(
+//                this,
+//                roomName = "General",
+//                patientName = "ROCK LEE",
+//                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
+//                channelId = "0d9bf688-82c4-4b2c-b954-7358162044b5",
+//                doctorHopeId = 2000000827,
+//                icon = ""
+//            )
+            startActivity(Intent(this, SecondActivity::class.java))
         }
 
     }

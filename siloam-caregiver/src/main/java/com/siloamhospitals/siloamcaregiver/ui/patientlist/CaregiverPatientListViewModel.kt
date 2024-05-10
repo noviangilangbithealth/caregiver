@@ -37,7 +37,6 @@ class CaregiverPatientListViewModel(
 
     var currentPage = 1
     var keyword = ""
-    var scrollPosition = 0
     var firsLoadFilter = true
 
     val roomPatientList = mutableListOf<ListCaregiverPatient>()
