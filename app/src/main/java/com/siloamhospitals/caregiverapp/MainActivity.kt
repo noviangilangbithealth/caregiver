@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
 import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
+import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiverUI
 import com.siloamhospitals.siloamcaregiver.ui.button.CaregiverButtons
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 //        2000000761 andreas
         binding.buttonOpenCaregiver.setOnClickListener {
             //navigate activity
-            SiloamCaregiver.openChatRoom(
+            SiloamCaregiverUI().openChatRoom(
                 this,
                 roomName = "General",
                 patientName = "ROCK LEE",
