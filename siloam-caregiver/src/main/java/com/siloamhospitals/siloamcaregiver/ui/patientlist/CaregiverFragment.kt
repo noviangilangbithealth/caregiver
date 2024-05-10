@@ -91,6 +91,7 @@ class CaregiverFragment : Fragment() {
         viewModel.run {
             emitGetCaregiver()
             listenCaregiverList()
+            listenNewCaregiver()
             listenBadgeNotif()
         }
 
@@ -122,7 +123,21 @@ class CaregiverFragment : Fragment() {
         observeUserShow()
         setupCheckRecent()
         observeConnection()
+        observeNewCaregiver()
         viewModel.listenBadgeNotif()
+    }
+
+    private fun observeNewCaregiver() {
+        viewModel.newCaregiver.observe(viewLifecycleOwner) {
+            if (it != null) {
+                viewModel.emitGetCaregiver {
+                    binding.run {
+                        lottieLoadingPatientList.visible()
+                        rvPatientListCaregiver.gone()
+                    }
+                }
+            }
+        }
     }
 
     private fun observeConnection() {

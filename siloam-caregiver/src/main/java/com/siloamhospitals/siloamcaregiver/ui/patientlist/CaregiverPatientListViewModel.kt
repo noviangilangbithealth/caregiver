@@ -9,6 +9,7 @@ import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverListData
+import com.siloamhospitals.siloamcaregiver.network.response.CaregiverPatientListData
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowHospitalResponse
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
@@ -62,6 +63,9 @@ class CaregiverPatientListViewModel(
     private var _caregiverList = MutableLiveData<CaregiverListData>()
     var caregiverList: LiveData<CaregiverListData> = _caregiverList
 
+    private var _newCaregiver = MutableLiveData<CaregiverPatientListData>()
+    var newCaregiver: LiveData<CaregiverPatientListData> = _newCaregiver
+
     private var _error = MutableLiveData<String>()
     var error: LiveData<String> = _error
     var errorHasBeenConsumed = false
@@ -72,6 +76,22 @@ class CaregiverPatientListViewModel(
                 if (error.isEmpty()) {
                     Logger.d(data)
                     _caregiverList.postValue(data)
+                    errorHasBeenConsumed = false
+                } else {
+                    Logger.d(data)
+                    errorHasBeenConsumed = false
+                    _error.postValue(error)
+                }
+            }
+        }
+    }
+
+    fun listenNewCaregiver() {
+        viewModelScope.launch {
+            repository.listenNewCaregiver() { data, error ->
+                if (error.isEmpty()) {
+                    Logger.d(data)
+                    _newCaregiver.postValue(data)
                     errorHasBeenConsumed = false
                 } else {
                     Logger.d(data)

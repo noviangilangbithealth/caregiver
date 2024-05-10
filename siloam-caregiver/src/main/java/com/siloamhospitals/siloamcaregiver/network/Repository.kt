@@ -12,6 +12,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatListData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverList
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverListData
+import com.siloamhospitals.siloamcaregiver.network.response.CaregiverPatientListData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverRoomTypeData
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotification
@@ -34,6 +35,7 @@ class Repository(
     companion object {
         private const val GET_CAREGIVER_EMIT_EVENT = "get-caregiver"
         private const val CAREGIVER_LIST_ON_EVENT = "caregiver-listener"
+        private const val NEW_CAREGIVER_LISTENER = "new-caregiver-listener"
         private const val GET_ROOM_EMIT_EVENT = "get-room"
         private const val ROOM_LIST_ON_EVENT = "room-listener"
         private const val GET_MESSAGE_EMIT_EVENT = "get-message"
@@ -90,6 +92,31 @@ class Repository(
         } catch (e: Exception) {
             Logger.d(e.toString())
             action.invoke(CaregiverListData(), e.toString())
+        }
+
+    }
+
+    fun listenNewCaregiver(action: ((CaregiverPatientListData, String) -> Unit)) {
+        try {
+            mSocket.onEvent(NEW_CAREGIVER_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val caregiverList =
+                        Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
+                    val decryptedData = caregiverList.data.decrypt(IV, KEY)
+                    val adapter = Gson().getAdapter(CaregiverPatientListData::class.java)
+                    val newData = adapter.fromJson(decryptedData)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(CaregiverPatientListData(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(CaregiverPatientListData(), error)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.d(e.toString())
+            action.invoke(CaregiverPatientListData(), e.toString())
         }
 
     }
