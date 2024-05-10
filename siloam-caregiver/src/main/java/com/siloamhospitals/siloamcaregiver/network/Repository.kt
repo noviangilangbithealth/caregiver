@@ -38,6 +38,7 @@ class Repository(
         private const val NEW_CAREGIVER_LISTENER = "new-caregiver-listener"
         private const val GET_ROOM_EMIT_EVENT = "get-room"
         private const val ROOM_LIST_ON_EVENT = "room-listener"
+        private const val NEW_ROOM_LISTENER = "new-room-listener"
         private const val GET_MESSAGE_EMIT_EVENT = "get-message"
         private const val MESSAGE_LIST_ON_EVENT = "message-listener"
         private const val NEW_MESSAGE_LIST_ON_EVENT = "new-message-listener"
@@ -150,6 +151,28 @@ class Repository(
             }
         } catch (e: Exception) {
             action.invoke(emptyList(), e.toString())
+        }
+    }
+
+    fun listenNewRoom( action: ((CaregiverRoomTypeData, String) -> Unit)) {
+        try {
+            mSocket.onEvent(NEW_ROOM_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val encryptedData = data as JSONObject
+                    val decryptedData = encryptedData.getString("data").decrypt(IV, KEY)
+                    val type = object : TypeToken<CaregiverRoomTypeData>() {}.type
+                    val newData = Gson().fromJson<CaregiverRoomTypeData>(decryptedData, type)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(CaregiverRoomTypeData(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(CaregiverRoomTypeData(), error)
+                }
+            }
+        } catch (e: Exception) {
+            action.invoke(CaregiverRoomTypeData(), e.toString())
         }
     }
 

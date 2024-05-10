@@ -129,8 +129,16 @@ class RoomTypeCaregiverFragment : Fragment() {
         viewModel.emitRoom()
         binding.lottieLoadingRoomtype.visible()
         viewModel.listenRoom()
+        viewModel.listenNewRoom()
 
         observerRoomType()
+        observerNewRoom()
+    }
+
+    private fun observerNewRoom() {
+        viewModel.newRoom.observe(viewLifecycleOwner) { data ->
+            viewModel.emitRoom()
+        }
     }
 
     private fun observerRoomType() {
