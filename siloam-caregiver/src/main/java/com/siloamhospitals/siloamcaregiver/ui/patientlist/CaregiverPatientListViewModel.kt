@@ -65,6 +65,9 @@ class CaregiverPatientListViewModel(
     private var _newCaregiver = MutableLiveData<CaregiverPatientListData>()
     var newCaregiver: LiveData<CaregiverPatientListData> = _newCaregiver
 
+    private var _deleteCaregiver = MutableLiveData<CaregiverPatientListData>()
+    var deleteCaregiver: LiveData<CaregiverPatientListData> = _deleteCaregiver
+
     private var _error = MutableLiveData<String>()
     var error: LiveData<String> = _error
     var errorHasBeenConsumed = false
@@ -91,6 +94,22 @@ class CaregiverPatientListViewModel(
                 if (error.isEmpty()) {
                     Logger.d(data)
                     _newCaregiver.postValue(data)
+                    errorHasBeenConsumed = false
+                } else {
+                    Logger.d(data)
+                    errorHasBeenConsumed = false
+                    _error.postValue(error)
+                }
+            }
+        }
+    }
+
+    fun listenDeleteCaregiver() {
+        viewModelScope.launch {
+            repository.listenNewCaregiver() { data, error ->
+                if (error.isEmpty()) {
+                    Logger.d(data)
+                    _deleteCaregiver.postValue(data)
                     errorHasBeenConsumed = false
                 } else {
                     Logger.d(data)

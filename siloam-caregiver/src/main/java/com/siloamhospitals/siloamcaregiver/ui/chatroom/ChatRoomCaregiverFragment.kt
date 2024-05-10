@@ -198,11 +198,13 @@ class ChatRoomCaregiverFragment : Fragment() {
         viewModel.run {
             newMessage.observe(viewLifecycleOwner) {
                 it.getContentIfNotHandled()?.let { data ->
-                    val result = adapterChatRoom.getList().find { it.id == data.id }
-                    if (result == null) {
-                        adapterChatRoom.add(0, data.generateNewChatUI())
-                        binding.rvChatCaregiver.smoothScrollToPosition(0)
-                        setReadMessage()
+                    if (data.channelId == viewModel.channelId && data.caregiverId == viewModel.caregiverId) {
+                        val result = adapterChatRoom.getList().find { it.id == data.id }
+                        if (result == null) {
+                            adapterChatRoom.add(0, data.generateNewChatUI())
+                            binding.rvChatCaregiver.smoothScrollToPosition(0)
+                            setReadMessage()
+                        }
                     }
                 }
             }

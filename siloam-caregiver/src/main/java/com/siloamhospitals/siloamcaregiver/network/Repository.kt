@@ -36,6 +36,7 @@ class Repository(
         private const val GET_CAREGIVER_EMIT_EVENT = "get-caregiver"
         private const val CAREGIVER_LIST_ON_EVENT = "caregiver-listener"
         private const val NEW_CAREGIVER_LISTENER = "new-caregiver-listener"
+        private const val DELETE_CAREGIVER_LISTENER = "delete-caregiver-listener"
         private const val GET_ROOM_EMIT_EVENT = "get-room"
         private const val ROOM_LIST_ON_EVENT = "room-listener"
         private const val NEW_ROOM_LISTENER = "new-room-listener"
@@ -100,6 +101,31 @@ class Repository(
     fun listenNewCaregiver(action: ((CaregiverPatientListData, String) -> Unit)) {
         try {
             mSocket.onEvent(NEW_CAREGIVER_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val caregiverList =
+                        Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
+                    val decryptedData = caregiverList.data.decrypt(IV, KEY)
+                    val adapter = Gson().getAdapter(CaregiverPatientListData::class.java)
+                    val newData = adapter.fromJson(decryptedData)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(CaregiverPatientListData(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(CaregiverPatientListData(), error)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.d(e.toString())
+            action.invoke(CaregiverPatientListData(), e.toString())
+        }
+
+    }
+
+    fun listenDeleteCaregiver(action: ((CaregiverPatientListData, String) -> Unit)) {
+        try {
+            mSocket.onEvent(DELETE_CAREGIVER_LISTENER) { data, error ->
                 if (error.isEmpty()) {
                     val caregiverList =
                         Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
