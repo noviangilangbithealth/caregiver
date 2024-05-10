@@ -18,6 +18,7 @@ class SocketIoManager(
     init {
         try {
             val options = IO.Options()
+            options.reconnection = true
             options.forceNew = true
             options.query = "userId=${preferences.userId}"
             options.path = "/caregiver-ws/"

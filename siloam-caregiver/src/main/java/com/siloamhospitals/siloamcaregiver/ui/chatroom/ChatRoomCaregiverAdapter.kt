@@ -278,6 +278,9 @@ class ChatRoomCaregiverAdapter(
                             ivPlay.setImageResource(R.drawable.ic_play_media)
                         }
                     } else {
+                        mediaPlayer = MediaPlayer()
+                        mediaPlayer?.setDataSource(item.url)
+                        mediaPlayer?.prepare()
                         mediaPlayer?.start()
                         runSeeker()
                         root.post {
@@ -362,6 +365,8 @@ class ChatRoomCaregiverAdapter(
             root.post {
                 ivPlay.setImageResource(R.drawable.ic_play_media)
                 seekbarVoiceNote.progress = 0
+                mediaPlayer?.release()
+                mediaPlayer = null
             }
         }
     }
