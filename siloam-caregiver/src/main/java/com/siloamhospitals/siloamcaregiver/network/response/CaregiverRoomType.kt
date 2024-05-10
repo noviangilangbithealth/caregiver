@@ -17,6 +17,8 @@ data class CaregiverRoomTypeData(
     val countUnreadMessage: String? = "",
     @SerializedName("is_urgent_message")
     val isUrgentMessage: Boolean = false,
+    @SerializedName("latest_message_at")
+    val latestMessageAt: String? = null,
     val message: List<CaregiverRoomTypeLastMessage> = emptyList()
 )
 

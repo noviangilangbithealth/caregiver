@@ -141,6 +141,7 @@ class Repository(
                     val newData = Gson().fromJson<List<CaregiverRoomTypeData>>(decryptedData, type)
                     if (newData != null) {
                         action.invoke(newData, "")
+                        Logger.d(newData)
                     } else {
                         action.invoke(emptyList(), "Empty Data")
                     }

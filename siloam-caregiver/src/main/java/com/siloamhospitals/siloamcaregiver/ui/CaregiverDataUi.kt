@@ -31,6 +31,7 @@ data class CaregiverRoomTypeUi(
     val countUnread:String = "",
     val isUrgent: Boolean = false,
     val lastMessage:String = "",
+    val latestMessageAt:String = "",
     val date:String = "",
     val role:String ="",
     val senderName:String = "",

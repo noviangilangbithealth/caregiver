@@ -146,6 +146,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                         countUnread = it.countUnreadMessage ?: "",
                         isUrgent = it.isUrgentMessage,
                         lastMessage = it.message.firstOrNull()?.message ?: "",
+                        latestMessageAt = it.latestMessageAt ?:"",
                         date = it.message.firstOrNull()?.createAt ?: "",
                         icon = it.icon.urlExt ?: "",
                         role = it.message.firstOrNull()?.user?.role?.name ?: "",
@@ -153,6 +154,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                     )
                 )
             }
+            viewModel.listRoomType.sortByDescending { it.latestMessageAt.toLocalDateTime() }
             onDataLoaded()
         }
     }
