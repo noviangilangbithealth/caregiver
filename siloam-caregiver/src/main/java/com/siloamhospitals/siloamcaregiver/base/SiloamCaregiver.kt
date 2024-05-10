@@ -53,27 +53,5 @@ class SiloamCaregiver(
             mPreference.wardId = wardId
         }
 
-        fun openChatRoom(
-            context: Context,
-            roomName: String,
-            patientName: String,
-            caregiverId: String,
-            channelId: String,
-            doctorHopeId: String,
-            icon: String
-        ) {
-            val mPreference by lazy {
-                AppPreferences(context)
-            }
-            mPreference.userId = doctorHopeId.toLong()
-            mPreference.notifChannelId = channelId
-            mPreference.notifCaregiverId = caregiverId
-            mPreference.notifRoomName = roomName
-            mPreference.notifPatientName = patientName
-            mPreference.notifIcon = icon
-            mPreference.isFromNotif = true
-            ChatroomCaregiverActivity.start(context)
-        }
-
     }
 }

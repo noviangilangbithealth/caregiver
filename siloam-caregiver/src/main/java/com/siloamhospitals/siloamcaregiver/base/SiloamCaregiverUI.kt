@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverActivity
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatroomCaregiverActivity
 
 class SiloamCaregiverUI {
 
@@ -25,6 +26,28 @@ class SiloamCaregiverUI {
 
     fun openCaregiver(context: Context) {
         CaregiverActivity.start(context)
+    }
+
+    fun openChatRoom(
+        context: Context,
+        roomName: String,
+        patientName: String,
+        caregiverId: String,
+        channelId: String,
+        doctorHopeId: String,
+        icon: String
+    ) {
+        val mPreference by lazy {
+            AppPreferences(context)
+        }
+        mPreference.userId = doctorHopeId.toLong()
+        mPreference.notifChannelId = channelId
+        mPreference.notifCaregiverId = caregiverId
+        mPreference.notifRoomName = roomName
+        mPreference.notifPatientName = patientName
+        mPreference.notifIcon = icon
+        mPreference.isFromNotif = true
+        ChatroomCaregiverActivity.start(context)
     }
 
 }
