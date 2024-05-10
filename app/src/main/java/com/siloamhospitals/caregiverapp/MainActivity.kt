@@ -21,12 +21,21 @@ class MainActivity : AppCompatActivity() {
         // todo add more parameter for fullfill the requirement
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
-        SiloamCaregiver.initUser(userId = 29000000134, organizationId = 2, wardId = 30, context = this)
+        SiloamCaregiver.initUser(userId = 2000000827, organizationId = 2, wardId = 30, context = this)
 //        2000000834 eka
 //        2000000761 andreas
         binding.buttonOpenCaregiver.setOnClickListener {
             //navigate activity
-            startActivity(Intent(this, SecondActivity::class.java))
+            SiloamCaregiver.openChatRoom(
+                this,
+                roomName = "General",
+                patientName = "ROCK LEE",
+                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
+                channelId = "0d9bf688-82c4-4b2c-b954-7358162044b5",
+                doctorHopeId = "2000000827",
+                icon = ""
+            )
+//            startActivity(Intent(this, SecondActivity::class.java))
         }
 
     }

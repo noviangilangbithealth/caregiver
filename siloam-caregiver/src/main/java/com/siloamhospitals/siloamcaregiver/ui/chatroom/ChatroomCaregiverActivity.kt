@@ -93,11 +93,20 @@ class ChatroomCaregiverActivity : AppCompatActivity() {
     private fun initDataExtra() {
         chatRoomViewModel.run {
             intent.run {
-                caregiverId = getStringExtra(CAREGIVER_ID).orEmpty()
-                channelId = getStringExtra(CHANNEL_ID).orEmpty()
-                roomName = getStringExtra(ROOM_NAME).orEmpty()
-                urlIcon = getStringExtra(URL_ICON).orEmpty()
-                patientName = getStringExtra(PATIENT_NAME).orEmpty()
+                if (mPreference.isFromNotif) {
+                    caregiverId = mPreference.notifCaregiverId
+                    channelId = mPreference.notifChannelId
+                    patientName = mPreference.notifPatientName
+                    roomName = mPreference.notifRoomName
+                    urlIcon = mPreference.notifIcon
+                    mPreference.isFromNotif = false
+                } else {
+                    caregiverId = getStringExtra(CAREGIVER_ID).orEmpty()
+                    channelId = getStringExtra(CHANNEL_ID).orEmpty()
+                    roomName = getStringExtra(ROOM_NAME).orEmpty()
+                    urlIcon = getStringExtra(URL_ICON).orEmpty()
+                    patientName = getStringExtra(PATIENT_NAME).orEmpty()
+                }
             }
         }
     }

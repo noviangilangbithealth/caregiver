@@ -53,6 +53,13 @@ class AppPreferences(val context: Context) {
         private const val WARD_ID_RECENT = "recentWardid"
         private const val WARD_NAME_RECENT = "recentWardName"
         private const val IS_FROM_RECENT = "isFromRecent"
+
+        private const val NOTIF_CAREGIVER_ID = "notifCaregiverId"
+        private const val NOTIF_CHANNEL_ID = "notifChannelId"
+        private const val NOTIF_PATIENT_NAME = "notifPatientName"
+        private const val NOTIF_ROOM_NAME = "notifRoomName"
+        private const val NOTIF_ICON = "notifIcon"
+        private const val NOTIF = "isFromNotif"
     }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -164,6 +171,41 @@ class AppPreferences(val context: Context) {
         }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    var isFromNotif: Boolean
+        get() = findPreference(NOTIF, false)
+        set(value) {
+            putPreference(NOTIF, value)
+        }
+
+    var notifCaregiverId: String
+        get() = findPreference(NOTIF_CAREGIVER_ID, "")
+        set(value) {
+            putPreference(NOTIF_CAREGIVER_ID, value)
+        }
+
+    var notifChannelId: String
+        get() = findPreference(NOTIF_CHANNEL_ID, "")
+        set(value) {
+            putPreference(NOTIF_CHANNEL_ID, value)
+        }
+
+    var notifRoomName: String
+        get() = findPreference(NOTIF_ROOM_NAME, "")
+        set(value) {
+            putPreference(NOTIF_ROOM_NAME, value)
+        }
+
+    var notifIcon: String
+        get() = findPreference(NOTIF_ICON, "")
+        set(value) {
+            putPreference(NOTIF_ICON, value)
+        }
+
+    var notifPatientName: String
+        get() = findPreference(NOTIF_PATIENT_NAME, "")
+        set(value) {
+            putPreference(NOTIF_PATIENT_NAME, value)
+        }
 
     var userId: Long
         get() = findPreference(USER_ID, 0)
