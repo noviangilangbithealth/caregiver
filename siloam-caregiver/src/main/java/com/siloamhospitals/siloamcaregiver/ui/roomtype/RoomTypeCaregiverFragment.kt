@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -62,6 +63,17 @@ class RoomTypeCaregiverFragment : Fragment() {
         callSocket()
         initHeader()
         setupCheckRecent()
+        observeConnection()
+    }
+
+    private fun observeConnection() {
+        viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
+            if(isConnected) {
+                viewModel.listenRoom()
+            } else {
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupCheckRecent() {

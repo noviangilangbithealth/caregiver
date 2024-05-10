@@ -121,7 +121,25 @@ class CaregiverFragment : Fragment() {
         onDataLoaded()
         observeUserShow()
         setupCheckRecent()
+        observeConnection()
         viewModel.listenBadgeNotif()
+    }
+
+    private fun observeConnection() {
+        viewModel.isConnected.observe(viewLifecycleOwner) {
+            if(it) {
+                viewModel.getUserShow()
+                observeUserShow()
+                observeWard()
+                viewModel.run {
+                    listenCaregiverList()
+                    listenBadgeNotif()
+                }
+
+            } else {
+                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupCheckRecent() {

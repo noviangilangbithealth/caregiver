@@ -11,6 +11,7 @@ import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTime
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTimeOrNow
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
 import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
+import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
@@ -52,6 +53,10 @@ class ChatRoomCaregiverViewModel(
     var currentPage = 1
     var isLastPage = false
 
+    val isConnected: LiveData<Boolean> by lazy {
+        ConnectivityLiveData(preferences.context)
+    }
+
     val doctorHopeId get() = preferences.userId.toString()
 
 //    val _uploadFiles = MutableLiveData<ApiEvent<List<ImageDoctorFeedback>>?>()
@@ -62,17 +67,21 @@ class ChatRoomCaregiverViewModel(
 
     fun uploadFiles(documentFiles: List<File>, isVoiceNote: Boolean = false) =
         viewModelScope.launch {
-            _uploadFiles.postValue(BaseHandleResponse.LOADING())
-            val response = repository.postUploadAttachment(documentFiles, isVoiceNote)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    com.orhanobut.logger.Logger.d(it)
-                    _uploadFiles.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                _uploadFiles.postValue(BaseHandleResponse.LOADING())
+                val response = repository.postUploadAttachment(documentFiles, isVoiceNote)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        com.orhanobut.logger.Logger.d(it)
+                        _uploadFiles.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    val message = response.message()
+                    val error = response.errorBody()?.string()
+                    _uploadFiles.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                val message = response.message()
-                val error = response.errorBody()?.string()
-                _uploadFiles.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _uploadFiles.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }
 
@@ -86,12 +95,12 @@ class ChatRoomCaregiverViewModel(
 //    }
 
 
-    fun emitGetMessage(loadMore: Boolean = false, action: (()->Unit)? = null) {
+    fun emitGetMessage(loadMore: Boolean = false, action: (() -> Unit)? = null) {
         if (loadMore) currentPage++
         repository.emitGetMessage(
             page = currentPage, limit = 20, caregiverId = caregiverId, channelId = channelId, user = preferences.userId.toString()
         )
-        if(!loadMore) action?.invoke()
+        if (!loadMore) action?.invoke()
     }
 
     fun setReadMessage() {
@@ -117,22 +126,26 @@ class ChatRoomCaregiverViewModel(
 
     fun sendChat(message: String = "", type: Int = 1, attachments: List<AttachmentCaregiver> = emptyList()) =
         viewModelScope.launch {
-            _sendMessage.postValue(BaseHandleResponse.LOADING())
-            val response = repository.sendChatCaregiver(
-                caregiverID = caregiverId,
-                channelID = channelId,
-                senderID = doctorHopeId,
-                sentAt = NOW.withFormat("yyyy-MM-dd HH:mm:ss"),
-                message = message,
-                type = type.toString(),
-                attachment = attachments
-            )
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _sendMessage.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                _sendMessage.postValue(BaseHandleResponse.LOADING())
+                val response = repository.sendChatCaregiver(
+                    caregiverID = caregiverId,
+                    channelID = channelId,
+                    senderID = doctorHopeId,
+                    sentAt = NOW.withFormat("yyyy-MM-dd HH:mm:ss"),
+                    message = message,
+                    type = type.toString(),
+                    attachment = attachments
+                )
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _sendMessage.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _sendMessage.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                _sendMessage.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _sendMessage.postValue(BaseHandleResponse.ERROR("No Internet Connection"))
             }
         }
 
@@ -180,7 +193,8 @@ class ChatRoomCaregiverViewModel(
                         isRead = it.isReaded ?: false,
                         isSelfSender = it.user?.hopeUserID == doctorHopeId,
                         isUrgent = (it.type ?: 1).toInt() == 2,
-                        isVoiceNote = if(it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty().last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
+                        isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty()
+                            .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
                     )
                 )
             }

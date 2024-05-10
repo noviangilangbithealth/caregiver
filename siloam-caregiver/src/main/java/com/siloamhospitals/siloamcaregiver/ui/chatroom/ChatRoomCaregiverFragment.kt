@@ -180,6 +180,18 @@ class ChatRoomCaregiverFragment : Fragment() {
         observeMessageList()
         observeNewMessage()
         observeUploadPhotos()
+        observeConnection()
+    }
+
+    private fun observeConnection() {
+        viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
+            if (!isConnected) {
+                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+            } else {
+                viewModel.listenNewMessageList()
+            }
+        }
+
     }
 
     private fun observeNewMessage() {
@@ -247,7 +259,7 @@ class ChatRoomCaregiverFragment : Fragment() {
         viewModel.sendMessage.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is BaseHandleResponse.ERROR -> {
-                    Logger.d(response.message)
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
 
                 is BaseHandleResponse.LOADING -> {}

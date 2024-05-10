@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverRoomType
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverRoomTypeData
@@ -24,6 +25,11 @@ class RoomTypeViewModel(
     val doctorId = preferences.userId
 
     var listRoomType = mutableListOf<CaregiverRoomTypeUi>()
+
+    val isConnected: LiveData<Boolean> by lazy {
+        ConnectivityLiveData(preferences.context)
+    }
+
 
     fun emitRoom() {
         repository.emitGetRoom(caregiverId, doctorId.toString())

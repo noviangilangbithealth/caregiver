@@ -33,26 +33,34 @@ class GroupDetailViewModel(
 
     fun getGroupInfo(caregiverId: String) {
         viewModelScope.launch {
-            val response = repository.getGroupInfo(caregiverId)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _groupInfo.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                val response = repository.getGroupInfo(caregiverId)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _groupInfo.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _groupInfo.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                _groupInfo.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _groupInfo.postValue(BaseHandleResponse.ERROR("No Internet Connection"))
             }
         }
     }
 
     fun getEmrIpdWebView(caregiverId: String) {
         viewModelScope.launch {
-            val response = repository.getEmrIpdWebView(caregiverId)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _emrIpdWebView.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                val response = repository.getEmrIpdWebView(caregiverId)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _emrIpdWebView.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _emrIpdWebView.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                _emrIpdWebView.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _emrIpdWebView.postValue(BaseHandleResponse.ERROR("No Internet Connection"))
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
+import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverListData
@@ -21,6 +22,10 @@ class CaregiverPatientListViewModel(
     private val repository: Repository,
     preferences: AppPreferences
 ) : ViewModel() {
+
+    val isConnected: LiveData<Boolean> by lazy {
+        ConnectivityLiveData(preferences.context)
+    }
 
     val doctorId = preferences.userId
     var orgId = preferences.organizationId
@@ -43,7 +48,7 @@ class CaregiverPatientListViewModel(
     val hospitals = mutableListOf<UserShowHospitalResponse>()
     val wards = mutableListOf<WardListResponse>()
 
-    fun emitGetCaregiver(action: (()->Unit)? = null) {
+    fun emitGetCaregiver(action: (() -> Unit)? = null) {
         repository.emitGetCaregiver(
             page = currentPage,
             keyword = keyword,
@@ -105,13 +110,17 @@ class CaregiverPatientListViewModel(
 
     fun getUserShow() {
         viewModelScope.launch {
-            val response = repository.getUserShow(doctorId)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _userShow.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                val response = repository.getUserShow(doctorId)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _userShow.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _userShow.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                _userShow.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _userShow.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }
     }
@@ -121,13 +130,17 @@ class CaregiverPatientListViewModel(
 
     fun getWard(hospitalId: Long = orgId) {
         viewModelScope.launch {
-            val response = repository.getWard(hospitalId)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _ward.postValue(BaseHandleResponse.SUCCESS(it))
+            try {
+                val response = repository.getWard(hospitalId)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _ward.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _ward.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
-            } else {
-                _ward.postValue(BaseHandleResponse.ERROR(response.message()))
+            } catch (e: Exception) {
+                _ward.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }
     }
