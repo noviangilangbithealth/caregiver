@@ -15,43 +15,5 @@
         android:name="com.siloamhospitals.siloamcaregiver.ui.patientlist.CaregiverFragment"
         android:label="fragment_caregiver"
         tools:layout="@layout/fragment_caregiver" >
-        <action
-            android:id="@+id/action_caregiverFragment_to_roomTypeCaregiverFragment"
-            app:destination="@id/roomTypeCaregiverFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/roomTypeCaregiverFragment"
-        android:name="com.siloamhospitals.siloamcaregiver.ui.roomtype.RoomTypeCaregiverFragment"
-        android:label="fragment_room_type_caregiver"
-        tools:layout="@layout/fragment_room_type_caregiver" >
-        <action
-            android:id="@+id/action_roomTypeCaregiverFragment_to_chatRoomCaregiverFragment"
-            app:destination="@id/chatRoomCaregiverFragment" />
-        <action
-            android:id="@+id/action_roomTypeCaregiverFragment_to_groupDetailFragment"
-            app:destination="@id/groupDetailFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/chatRoomCaregiverFragment"
-        android:name="com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatRoomCaregiverFragment"
-        android:label="fragment_chat_room_caregiver"
-        tools:layout="@layout/fragment_chat_room_caregiver" >
-        <action
-            android:id="@+id/action_chatRoomCaregiverFragment_to_groupDetailFragment"
-            app:destination="@id/groupDetailFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/groupDetailFragment"
-        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailFragment"
-        android:label="fragment_group_detail"
-        tools:layout="@layout/fragment_group_detail" >
-        <action
-            android:id="@+id/action_groupDetailFragment_to_pictureDocumentFragment"
-            app:destination="@id/pictureDocumentFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/pictureDocumentFragment"
-        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.PictureDocumentFragment"
-        android:label="fragment_picture_document"
-        tools:layout="@layout/fragment_picture_document" />
+       </fragment>
 </navigation>

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_item_patient_list_dashboard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingHorizontal="@dimen/medium"
     android:paddingVertical="@dimen/small">
 
@@ -24,6 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:singleLine="true"
+            android:maxWidth="230dp"
             android:textColor="@color/colorBlackGrade"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold"
@@ -75,9 +78,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/smaller"
         android:visibility="gone"
-        tools:listitem="@layout/item_tag_chat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_patient_info_caregiver_dashboard" />
+        app:layout_constraintTop_toBottomOf="@id/tv_patient_info_caregiver_dashboard"
+        tools:listitem="@layout/item_tag_chat" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:background="@color/colorBlackGrade"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/small"
+        android:layout_height="@dimen/very_tiny"/>
+
+
+</LinearLayout>

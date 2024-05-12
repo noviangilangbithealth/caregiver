@@ -248,7 +248,6 @@ class RoomTypeCaregiverFragment : Fragment() {
                 }
             }
         }
-        binding.rvRoom.addDivider()
     }
 
     override fun onResume() {

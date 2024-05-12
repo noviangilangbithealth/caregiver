@@ -455,7 +455,6 @@ class CaregiverFragment : Fragment() {
             }
         }
 
-        binding.rvPatientListCaregiver.addDivider()
     }
 
     override fun onDestroyView() {
