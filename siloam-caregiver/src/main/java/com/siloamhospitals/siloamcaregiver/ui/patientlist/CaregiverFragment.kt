@@ -69,11 +69,14 @@ class CaregiverFragment : Fragment() {
                 }
                 emitGetBadgeNotif()
                 listenCaregiverList()
-                emitGetBadgeNotif()
+                listenDeleteCaregiver()
+                listenBadgeNotif()
                 binding.chipHospital.text = viewModel.orgCode
                 binding.chipWard.text = viewModel.wardName
             }
             preferences.isFromRecent = false
+        } else {
+            viewModel.emitGetCaregiver()
         }
     }
 
@@ -93,6 +96,7 @@ class CaregiverFragment : Fragment() {
             listenCaregiverList()
             listenNewCaregiver()
             listenBadgeNotif()
+            listenDeleteCaregiver()
         }
 
         childFragmentManager.setFragmentResultListener(
@@ -124,18 +128,22 @@ class CaregiverFragment : Fragment() {
         setupCheckRecent()
         observeConnection()
         observeNewCaregiver()
+        observeDeleteCaregiver()
         viewModel.listenBadgeNotif()
+    }
+
+    private fun observeDeleteCaregiver() {
+        viewModel.deleteCaregiver.observe(viewLifecycleOwner) {
+            if (it != null) {
+                viewModel.emitGetCaregiver()
+            }
+        }
     }
 
     private fun observeNewCaregiver() {
         viewModel.newCaregiver.observe(viewLifecycleOwner) {
             if (it != null) {
-                viewModel.emitGetCaregiver {
-                    binding.run {
-                        lottieLoadingPatientList.visible()
-                        rvPatientListCaregiver.gone()
-                    }
-                }
+                viewModel.emitGetCaregiver()
             }
         }
     }
@@ -354,7 +362,7 @@ class CaregiverFragment : Fragment() {
                         room = it.roomNo ?: "",
                         gender = it.gender ?: 5,
                         isUrgent = it.isUrgent ?: false,
-                        date = it.createAt ?: "",
+                        date = it.latestMessageAt ?: "",
                         hospitalCode = it.orgCode ?: "",
                         notification = it.notifications.map { e ->
                             NotificationIcon(

@@ -181,6 +181,8 @@ dependencies {
     //lottie
     implementation("com.airbnb.android:lottie:5.2.0")
 
+    implementation("com.arthenica:mobile-ffmpeg-full:4.4")
+
 }
 
 publishing {
@@ -188,7 +190,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.noviangilangbithealth"
             artifactId = "caregiver"
-            version = "1.11"
+            version = "1.15"
 
             pom {
                 description.set("Caregiver Library")

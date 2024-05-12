@@ -3,8 +3,6 @@ package com.siloamhospitals.siloamcaregiver.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
@@ -40,11 +38,6 @@ class CaregiverActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StrictMode.ThreadPolicy.Builder()
-            .detectAll() // Detect all violations
-            .penaltyLog() // Log violations to Logcat
-            .build()
-            .let(StrictMode::setThreadPolicy)
         mPreference = AppPreferences(this)
         setContentView(binding.root)
         initViewModel()

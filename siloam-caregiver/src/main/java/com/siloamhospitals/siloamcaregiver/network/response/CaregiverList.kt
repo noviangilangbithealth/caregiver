@@ -64,6 +64,8 @@ data class CaregiverPatientListData(
     val unreadMessage: String? = "",
     @SerializedName("is_urgent_message")
     val isUrgent: Boolean? = false,
+    @SerializedName("latest_message_at")
+    val latestMessageAt: String? = "",
     val notifications: List<CaregiverPatientNotification> = emptyList()
 )
 

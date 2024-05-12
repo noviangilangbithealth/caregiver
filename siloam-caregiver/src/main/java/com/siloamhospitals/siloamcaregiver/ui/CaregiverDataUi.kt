@@ -35,7 +35,8 @@ data class CaregiverRoomTypeUi(
     val date:String = "",
     val role:String ="",
     val senderName:String = "",
-    val caregiverId:String =""
+    val caregiverId:String ="",
+    val isAttachment: Boolean = false
 )
 
 

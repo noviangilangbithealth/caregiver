@@ -125,8 +125,16 @@ class RoomTypeCaregiverFragment : Fragment() {
         viewModel.emitRoom()
         binding.lottieLoadingRoomtype.visible()
         viewModel.listenRoom()
+        viewModel.listenNewRoom()
 
         observerRoomType()
+        observerNewRoom()
+    }
+
+    private fun observerNewRoom() {
+        viewModel.newRoom.observe(viewLifecycleOwner) { data ->
+            viewModel.emitRoom()
+        }
     }
 
     private fun observerRoomType() {
@@ -136,6 +144,7 @@ class RoomTypeCaregiverFragment : Fragment() {
             data.map {
                 viewModel.listRoomType.add(
                     CaregiverRoomTypeUi(
+                        isAttachment = it.message.firstOrNull()?.attachment?.isNotEmpty() ?: false,
                         channelId = it.id ?: "",
                         caregiverId = viewModel.caregiverId,
                         roomName = it.name ?: "",
@@ -165,9 +174,16 @@ class RoomTypeCaregiverFragment : Fragment() {
                         Glide.with(requireContext()).load(item.icon).into(ivRoomType)
                         tvRoomName.text = item.roomName
 
-                        val lastMessage = when (item.role) {
+                        var lastMessage = when (item.role) {
                             "Doctor" -> "${item.senderName}: ${item.lastMessage}"
-                            else -> "${item.role} - ${item.senderName}:${item.lastMessage}"
+                            else -> "${item.role} - ${item.senderName}: ${item.lastMessage}"
+                        }
+
+                        if(item.isAttachment) {
+                            lastMessage = when (item.role) {
+                                "Doctor" -> "${item.senderName}: Send Attachment"
+                                else -> "${item.role} - ${item.senderName}: Send Attachment"
+                            }
                         }
 
                         val draftMessage = preferences.findPreference(
@@ -188,7 +204,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                         )
 
                         tvlastMessage.text =
-                            if (draftMessage.isNotEmpty()) spannableDraftMessage else if (item.lastMessage.isNotEmpty()) lastMessage else "no messages"
+                            if (draftMessage.isNotEmpty()) spannableDraftMessage else if (item.lastMessage.isNotEmpty() || item.isAttachment) lastMessage else "no messages"
 
                         tvBadgeRoomType.text = item.countUnread
                         tvBadgeRoomType.isVisible = item.countUnread != "0"

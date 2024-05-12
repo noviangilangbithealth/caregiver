@@ -202,6 +202,7 @@ class ChatRoomCaregiverAdapter(
             }
 
             is VoiceNoteRightChatViewHolder -> holder.binding.run {
+                tvDate.text = item.time
                 mediaPlayer = MediaPlayer()
                 try {
                     mediaPlayer?.setDataSource(item.url)
@@ -260,6 +261,7 @@ class ChatRoomCaregiverAdapter(
 
             is VoiceNoteLeftChatViewHolder -> holder.binding.run {
                 tvName.text = item.name
+                tvDate.text = item.time
 //                tvName.setTextColor(Color.parseColor(item.color))
                 mediaPlayer = MediaPlayer()
                 try {
