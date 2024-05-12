@@ -93,7 +93,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
     private fun initRecorder() {
-       recorder = Recorder(this, requireContext())
+        recorder = Recorder(this, requireContext())
     }
 
     private fun setupCheckRecent() {
@@ -125,8 +125,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 }
 
                 override fun loadMoreItems() {
-                    viewModel.emitGetMessage(loadMore = true)
-                    onProcess = true
+                    if(!viewModel.isLastPage) {
+                        viewModel.emitGetMessage(loadMore = true)
+                        onProcess = true
+                    }
                 }
 
             })
@@ -332,7 +334,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             ivMic.setOnTouchListener { _, event ->
                 when (event.action) {
                     MotionEvent.ACTION_UP -> {
-                        if(superCheckPermission()) {
+                        if (superCheckPermission()) {
                             stopTimer()
                             recordMode(false)
                             recorder.stopRecording()
@@ -563,10 +565,12 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     override fun onResume() {
         super.onResume()
-        viewModel.emitGetMessage {
-            binding.run {
-                lottieLoadingChatRoom.visible()
-                rvChatCaregiver.gone()
+        if(viewModel.currentPage > 1) {
+            viewModel.emitGetMessage {
+                binding.run {
+                    lottieLoadingChatRoom.visible()
+                    rvChatCaregiver.gone()
+                }
             }
         }
         viewModel.listenNewMessageList()

@@ -362,7 +362,7 @@ class CaregiverFragment : Fragment() {
                         room = it.roomNo ?: "",
                         gender = it.gender ?: 5,
                         isUrgent = it.isUrgent ?: false,
-                        date = it.createAt ?: "",
+                        date = it.latestMessageAt ?: "",
                         hospitalCode = it.orgCode ?: "",
                         notification = it.notifications.map { e ->
                             NotificationIcon(
