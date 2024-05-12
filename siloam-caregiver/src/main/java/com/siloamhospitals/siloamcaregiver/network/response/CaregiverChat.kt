@@ -44,7 +44,13 @@ data class CaregiverChatData (
     @SerializedName("readed_at")
     val readedAt: Any? = null,
 
-    val user: CaregiverChatUser? = CaregiverChatUser()
+    val user: CaregiverChatUser? = CaregiverChatUser(),
+
+    @SerializedName("caregiver_id")
+    val caregiverId: String? = null,
+
+    @SerializedName("channel_id")
+    val channelId: String? = null,
 )
 
 @JsonClass(generateAdapter = true)

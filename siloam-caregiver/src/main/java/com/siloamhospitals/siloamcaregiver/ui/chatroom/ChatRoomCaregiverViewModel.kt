@@ -218,7 +218,9 @@ class ChatRoomCaregiverViewModel(
             color = user?.role?.color.orEmpty(),
             isRead = isReaded ?: false,
             isSelfSender = user?.hopeUserID == doctorHopeId,
-            isUrgent = (type ?: 1).toInt() == 2
+            isUrgent = (type ?: 1).toInt() == 2,
+            isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
+                .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
         )
     }
 

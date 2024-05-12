@@ -1,5 +1,6 @@
 package com.siloamhospitals.siloamcaregiver.network.response
 import com.google.gson.annotations.SerializedName
+import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -28,6 +29,7 @@ data class CaregiverRoomTypeLastMessage(
     val user: CaregiverRoomTypeLastMessageUser = CaregiverRoomTypeLastMessageUser(),
     @SerializedName("created_at")
     val createAt: String? = "",
+    val attachment: List<AttachmentCaregiver> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)

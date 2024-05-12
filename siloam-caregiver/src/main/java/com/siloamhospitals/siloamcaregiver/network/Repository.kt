@@ -22,8 +22,12 @@ import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.parse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.Response
@@ -36,8 +40,10 @@ class Repository(
         private const val GET_CAREGIVER_EMIT_EVENT = "get-caregiver"
         private const val CAREGIVER_LIST_ON_EVENT = "caregiver-listener"
         private const val NEW_CAREGIVER_LISTENER = "new-caregiver-listener"
+        private const val DELETE_CAREGIVER_LISTENER = "delete-caregiver-listener"
         private const val GET_ROOM_EMIT_EVENT = "get-room"
         private const val ROOM_LIST_ON_EVENT = "room-listener"
+        private const val NEW_ROOM_LISTENER = "new-room-listener"
         private const val GET_MESSAGE_EMIT_EVENT = "get-message"
         private const val MESSAGE_LIST_ON_EVENT = "message-listener"
         private const val NEW_MESSAGE_LIST_ON_EVENT = "new-message-listener"
@@ -121,6 +127,31 @@ class Repository(
 
     }
 
+    fun listenDeleteCaregiver(action: ((CaregiverPatientListData, String) -> Unit)) {
+        try {
+            mSocket.onEvent(DELETE_CAREGIVER_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val caregiverList =
+                        Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
+                    val decryptedData = caregiverList.data.decrypt(IV, KEY)
+                    val adapter = Gson().getAdapter(CaregiverPatientListData::class.java)
+                    val newData = adapter.fromJson(decryptedData)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(CaregiverPatientListData(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(CaregiverPatientListData(), error)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.d(e.toString())
+            action.invoke(CaregiverPatientListData(), e.toString())
+        }
+
+    }
+
     fun emitGetRoom(caregiverId: String, user: String) {
         val data = JSONObject()
         data.put("caregiverID", caregiverId)
@@ -151,6 +182,28 @@ class Repository(
             }
         } catch (e: Exception) {
             action.invoke(emptyList(), e.toString())
+        }
+    }
+
+    fun listenNewRoom( action: ((CaregiverRoomTypeData, String) -> Unit)) {
+        try {
+            mSocket.onEvent(NEW_ROOM_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val encryptedData = data as JSONObject
+                    val decryptedData = encryptedData.getString("data").decrypt(IV, KEY)
+                    val type = object : TypeToken<CaregiverRoomTypeData>() {}.type
+                    val newData = Gson().fromJson<CaregiverRoomTypeData>(decryptedData, type)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(CaregiverRoomTypeData(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(CaregiverRoomTypeData(), error)
+                }
+            }
+        } catch (e: Exception) {
+            action.invoke(CaregiverRoomTypeData(), e.toString())
         }
     }
 
@@ -275,8 +328,7 @@ class Repository(
         isVoiceNote: Boolean = false
     ): Response<AttachmentCaregiverResponse> {
         val attachment = files.map {
-            val fbody =
-                if (isVoiceNote) it.asRequestBody("audio/*".toMediaTypeOrNull()) else it.asRequestBody(
+            val fbody = if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType()) else it.asRequestBody(
                     "image/jpeg".toMediaTypeOrNull()
                 )
             MultipartBody.Part.createFormData("attachment", it.name, fbody)
