@@ -19,10 +19,8 @@ import com.afollestad.recyclical.datasource.dataSourceTypedOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.bumptech.glide.Glide
-import com.fondesa.recyclerviewdivider.addDivider
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentRoomTypeCaregiverBinding
-import com.siloamhospitals.siloamcaregiver.ui.CaregiverRoomTypeUi
 import com.siloamhospitals.siloamcaregiver.ext.datetime.TODAY
 import com.siloamhospitals.siloamcaregiver.ext.datetime.YESTERDAY
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTime
@@ -31,11 +29,8 @@ import com.siloamhospitals.siloamcaregiver.ext.text.ellipsizeText
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
-import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatRoomCaregiverViewModel
+import com.siloamhospitals.siloamcaregiver.ui.CaregiverRoomTypeUi
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatroomCaregiverActivity
-import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailActivity
-import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailViewModel
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class RoomTypeCaregiverFragment : Fragment() {
 
@@ -68,10 +63,11 @@ class RoomTypeCaregiverFragment : Fragment() {
 
     private fun observeConnection() {
         viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
-            if(isConnected) {
+            if (isConnected) {
                 viewModel.listenRoom()
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -146,7 +142,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                         countUnread = it.countUnreadMessage ?: "",
                         isUrgent = it.isUrgentMessage,
                         lastMessage = it.message.firstOrNull()?.message ?: "",
-                        latestMessageAt = it.latestMessageAt ?:"",
+                        latestMessageAt = it.latestMessageAt ?: "",
                         date = it.message.firstOrNull()?.createAt ?: "",
                         icon = it.icon.urlExt ?: "",
                         role = it.message.firstOrNull()?.user?.role?.name ?: "",
@@ -174,7 +170,10 @@ class RoomTypeCaregiverFragment : Fragment() {
                             else -> "${item.role} - ${item.senderName}:${item.lastMessage}"
                         }
 
-                        val draftMessage = preferences.findPreference("key_${item.caregiverId}_${item.channelId}", "")
+                        val draftMessage = preferences.findPreference(
+                            "key_${item.caregiverId}_${item.channelId}",
+                            ""
+                        )
                         val spannableDraftMessage = SpannableStringBuilder("Draft: $draftMessage")
                         spannableDraftMessage.setSpan(
                             ForegroundColorSpan(

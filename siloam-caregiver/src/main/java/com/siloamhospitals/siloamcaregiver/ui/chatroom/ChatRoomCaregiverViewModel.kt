@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.siloamhospitals.siloamcaregiver.ext.datetime.LocalDateTimeRange
 import com.siloamhospitals.siloamcaregiver.ext.datetime.NOW
-import com.siloamhospitals.siloamcaregiver.ext.datetime.TODAY
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTime
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTimeOrNow
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
@@ -23,7 +21,6 @@ import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
 import com.siloamhospitals.siloamcaregiver.ui.Event
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.logging.Logger
 
 class ChatRoomCaregiverViewModel(
     private val repository: Repository,
@@ -51,6 +48,7 @@ class ChatRoomCaregiverViewModel(
     var urlIcon = ""
 
     var currentPage = 1
+    var tempMessage = 0
     var isLastPage = false
 
     val isConnected: LiveData<Boolean> by lazy {
@@ -96,11 +94,21 @@ class ChatRoomCaregiverViewModel(
 
 
     fun emitGetMessage(loadMore: Boolean = false, action: (() -> Unit)? = null) {
-        if (loadMore) currentPage++
-        repository.emitGetMessage(
-            page = currentPage, limit = 20, caregiverId = caregiverId, channelId = channelId, user = preferences.userId.toString()
-        )
-        if (!loadMore) action?.invoke()
+        if (currentPage > tempMessage) {
+            if (loadMore) {
+                tempMessage = currentPage
+                currentPage++
+            }
+            repository.emitGetMessage(
+                page = currentPage,
+                limit = 20,
+                caregiverId = caregiverId,
+                channelId = channelId,
+                user = preferences.userId.toString()
+            )
+
+            if (!loadMore) action?.invoke()
+        }
     }
 
     fun setReadMessage() {
@@ -124,7 +132,11 @@ class ChatRoomCaregiverViewModel(
 //        }
 //    }
 
-    fun sendChat(message: String = "", type: Int = 1, attachments: List<AttachmentCaregiver> = emptyList()) =
+    fun sendChat(
+        message: String = "",
+        type: Int = 1,
+        attachments: List<AttachmentCaregiver> = emptyList()
+    ) =
         viewModelScope.launch {
             try {
                 _sendMessage.postValue(BaseHandleResponse.LOADING())
@@ -174,11 +186,12 @@ class ChatRoomCaregiverViewModel(
         }
     }
 
-
+var sizeChat = 0
     fun List<CaregiverChatData>.generateChatListUI(): List<CaregiverChatRoomUi> {
         com.orhanobut.logger.Logger.d(this)
         val dataUi = arrayListOf<CaregiverChatRoomUi>()
-        val dataGroup = this.groupBy { it.createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "" }
+        val dataGroup =
+            this.groupBy { it.createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "" }
         dataGroup.forEach { dataGrouped ->
             dataGrouped.value.map {
                 val roleId = it.user?.role?.id?.toInt() ?: 1
@@ -193,7 +206,9 @@ class ChatRoomCaregiverViewModel(
                         isRead = it.isReaded ?: false,
                         isSelfSender = it.user?.hopeUserID == doctorHopeId,
                         isUrgent = (it.type ?: 1).toInt() == 2,
-                        isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty()
+                        isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(
+                            0
+                        )?.uriExt.orEmpty()
                             .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
                     )
                 )
@@ -204,6 +219,7 @@ class ChatRoomCaregiverViewModel(
                 )
             )
         }
+        sizeChat = dataUi.size
         return dataUi
     }
 

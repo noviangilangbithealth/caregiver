@@ -130,12 +130,15 @@ class ChatRoomCaregiverFragment : Fragment() {
                 }
 
                 override fun loadMoreItems() {
-                    viewModel.emitGetMessage(loadMore = true)
-                    onProcess = true
+                    if (viewModel.sizeChat > 15) {
+                        viewModel.emitGetMessage(loadMore = true)
+                        onProcess = true
+                    }
                 }
 
             })
         }
+
     }
 
     private fun setupInit() {
@@ -156,7 +159,12 @@ class ChatRoomCaregiverFragment : Fragment() {
 
     private fun setupView() {
         binding.run {
-            etInputChat.setText(preferences.findPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", ""))
+            etInputChat.setText(
+                preferences.findPreference(
+                    "key_${viewModel.caregiverId}_${viewModel.channelId}",
+                    ""
+                )
+            )
             tvTitleChat.text = viewModel.roomName
             tvPatientName.text = viewModel.patientName
             Glide.with(requireContext()).load(viewModel.urlIcon).into(ivRoomChat)
@@ -186,7 +194,8 @@ class ChatRoomCaregiverFragment : Fragment() {
     private fun observeConnection() {
         viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
             if (!isConnected) {
-                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 viewModel.listenNewMessageList()
             }
@@ -245,6 +254,7 @@ class ChatRoomCaregiverFragment : Fragment() {
                         isLastPage = true
                     }
                 }
+
             }
 
             errorMessageList.observe(viewLifecycleOwner) { error ->
@@ -290,7 +300,10 @@ class ChatRoomCaregiverFragment : Fragment() {
             }
 
             etInputChat.addTextChangedListener(afterTextChanged = { text ->
-                preferences.putPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", text.toString())
+                preferences.putPreference(
+                    "key_${viewModel.caregiverId}_${viewModel.channelId}",
+                    text.toString()
+                )
             })
 
             ivBtnSend.setOnClickListener {
@@ -315,7 +328,7 @@ class ChatRoomCaregiverFragment : Fragment() {
 
             ivMic.setOnLongClickListener {
                 if (superCheckPermission()) {
-//                    Toast.makeText(requireContext(), "Recording Start", Toast.LENGTH_SHORT).show()
+                    //                    Toast.makeText(requireContext(), "Recording Start", Toast.LENGTH_SHORT).show()
                     recordMode(true)
                     startTimer()
                     startRecording()
@@ -327,7 +340,7 @@ class ChatRoomCaregiverFragment : Fragment() {
             ivMic.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_UP && superCheckPermission()) {
                     // Handle the finger lifted action (optional)
-//                    Toast.makeText(requireContext(), "Recording Stop", Toast.LENGTH_SHORT).show()
+                    //                    Toast.makeText(requireContext(), "Recording Stop", Toast.LENGTH_SHORT).show()
                     stopTimer()
                     recordMode(false)
                     stopRecording()
@@ -394,6 +407,7 @@ class ChatRoomCaregiverFragment : Fragment() {
             }
 
         }
+
     }
 
     private fun recordMode(isRecordMode: Boolean) {
@@ -572,7 +586,7 @@ class ChatRoomCaregiverFragment : Fragment() {
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val file = File("${mediaStorageDir.path}${File.separator}AUDIO_$timeStamp.aac")
-//        Toast.makeText(requireContext(), file.extension, Toast.LENGTH_SHORT).show()
+        //        Toast.makeText(requireContext(), file.extension, Toast.LENGTH_SHORT).show()
         return file
     }
 
@@ -611,7 +625,8 @@ class ChatRoomCaregiverFragment : Fragment() {
 
             isRecording = false
 
-            val renamedFile = File("${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath}/Caregiver/recording.mp3")
+            val renamedFile =
+                File("${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath}/Caregiver/recording.mp3")
             outputFileAudioRecord?.renameTo(renamedFile)
 
         } catch (e: Exception) {
@@ -625,8 +640,8 @@ class ChatRoomCaregiverFragment : Fragment() {
         if (file.exists()) {
             val delete = file.delete()
             if (delete) {
-//                Toast.makeText(requireContext(), "Delete record successfully", Toast.LENGTH_SHORT)
-//                    .show()
+                //                Toast.makeText(requireContext(), "Delete record successfully", Toast.LENGTH_SHORT)
+                //                    .show()
             }
         }
     }
@@ -637,7 +652,8 @@ class ChatRoomCaregiverFragment : Fragment() {
     private val sampleRateInHz = 44100
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val bufferSizeInBytes = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+    private val bufferSizeInBytes =
+        AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
     private var outputFileAudio: File? = null
     private lateinit var fileOutputStream: FileOutputStream
     private lateinit var audioEncoder: MediaCodec
@@ -653,7 +669,8 @@ class ChatRoomCaregiverFragment : Fragment() {
         ) {
             return
         }
-        audioRecord = AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
+        audioRecord =
+            AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
         fileOutputStream = FileOutputStream(outputFileAudio)
         audioRecord.startRecording()
         Thread({
@@ -676,10 +693,17 @@ class ChatRoomCaregiverFragment : Fragment() {
 
     private fun convertToM4A(pcmFile: File) {
         try {
-            val mediaMuxer = MediaMuxer(Environment.getExternalStorageDirectory().absolutePath + "/recording.m4a", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            val audioFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRateInHz, 1)
+            val mediaMuxer = MediaMuxer(
+                Environment.getExternalStorageDirectory().absolutePath + "/recording.m4a",
+                MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4
+            )
+            val audioFormat =
+                MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRateInHz, 1)
             audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 128000)
-            audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+            audioFormat.setInteger(
+                MediaFormat.KEY_AAC_PROFILE,
+                MediaCodecInfo.CodecProfileLevel.AACObjectLC
+            )
             val audioEncoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC)
             audioEncoder.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
             audioEncoder.start()
@@ -721,7 +745,6 @@ class ChatRoomCaregiverFragment : Fragment() {
             e.printStackTrace()
         }
     }
-
 
 
     private fun viewDetailImage(imageDetail: String) {
