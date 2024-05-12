@@ -106,7 +106,7 @@ class CaregiverPatientListViewModel(
 
     fun listenDeleteCaregiver() {
         viewModelScope.launch {
-            repository.listenNewCaregiver() { data, error ->
+            repository.listenDeleteCaregiver { data, error ->
                 if (error.isEmpty()) {
                     Logger.d(data)
                     _deleteCaregiver.postValue(data)
