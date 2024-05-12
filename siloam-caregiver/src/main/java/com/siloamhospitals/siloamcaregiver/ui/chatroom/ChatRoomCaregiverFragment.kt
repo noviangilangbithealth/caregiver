@@ -7,12 +7,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaCodec
-import android.media.MediaCodecInfo
-import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
@@ -46,19 +40,17 @@ import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
 import com.siloamhospitals.siloamcaregiver.ui.LinearLoadMoreListener
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.AudioRecordListener
 import com.siloamhospitals.siloamcaregiver.ui.decoration.SpaceItemDecoration
 import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailActivity
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 
-class ChatRoomCaregiverFragment : Fragment() {
+class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private var _binding: FragmentChatRoomCaregiverBinding? = null
     private val binding get() = _binding!!
@@ -633,99 +625,6 @@ class ChatRoomCaregiverFragment : Fragment() {
         }
     }
 
-
-    private lateinit var audioRecord: AudioRecord
-    private val audioSource = MediaRecorder.AudioSource.MIC
-    private val sampleRateInHz = 44100
-    private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val bufferSizeInBytes = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
-    private var outputFileAudio: File? = null
-    private lateinit var fileOutputStream: FileOutputStream
-    private lateinit var audioEncoder: MediaCodec
-    private lateinit var mediaMuxer: MediaMuxer
-
-    private fun startRecordingAudio() {
-        isRecording = true
-        outputFileAudio = getOutputMediaFile()
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-        audioRecord = AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
-        fileOutputStream = FileOutputStream(outputFileAudio)
-        audioRecord.startRecording()
-        Thread({
-            val buffer = ByteArray(bufferSizeInBytes)
-            while (isRecording) {
-                val read = audioRecord.read(buffer, 0, bufferSizeInBytes)
-                fileOutputStream.write(buffer, 0, read)
-            }
-            audioRecord.stop()
-            audioRecord.release()
-            fileOutputStream.close()
-            outputFileAudio?.let { convertToM4A(it) }
-        }).start()
-    }
-
-
-    private fun stopRecordingAudio() {
-        isRecording = false
-    }
-
-    private fun convertToM4A(pcmFile: File) {
-        try {
-            val mediaMuxer = MediaMuxer(Environment.getExternalStorageDirectory().absolutePath + "/recording.m4a", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            val audioFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRateInHz, 1)
-            audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 128000)
-            audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
-            val audioEncoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC)
-            audioEncoder.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-            audioEncoder.start()
-
-            val bufferInfo = MediaCodec.BufferInfo()
-            val buffer = ByteBuffer.allocate(bufferSizeInBytes)
-            val inputBufferIndex = audioEncoder.dequeueInputBuffer(-1)
-
-            if (inputBufferIndex >= 0) {
-                val inputBuffer = audioEncoder.getInputBuffer(inputBufferIndex)
-                inputBuffer?.clear()
-
-                val fis = FileInputStream(pcmFile)
-                var bytesRead: Int
-                while (fis.read(buffer.array()).also { bytesRead = it } != -1) {
-                    inputBuffer?.put(buffer.array(), 0, bytesRead) // Changed here
-                    audioEncoder.queueInputBuffer(inputBufferIndex, 0, bytesRead, 0, 0)
-                    buffer.clear() // Clear buffer after each read
-                }
-                fis.close()
-            }
-
-            var outputBufferIndex = audioEncoder.dequeueOutputBuffer(bufferInfo, 0)
-            while (outputBufferIndex >= 0) {
-                val outputBuffer = audioEncoder.getOutputBuffer(outputBufferIndex)
-                outputBuffer?.position(bufferInfo.offset)
-                outputBuffer?.limit(bufferInfo.offset + bufferInfo.size)
-                mediaMuxer.writeSampleData(0, outputBuffer!!, bufferInfo)
-                audioEncoder.releaseOutputBuffer(outputBufferIndex, false)
-                outputBufferIndex = audioEncoder.dequeueOutputBuffer(bufferInfo, 0)
-            }
-
-            audioEncoder.stop()
-            audioEncoder.release()
-            mediaMuxer.stop()
-            mediaMuxer.release()
-            pcmFile.delete()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-
-
     private fun viewDetailImage(imageDetail: String) {
         val bundle = Bundle()
         bundle.putString(
@@ -757,6 +656,18 @@ class ChatRoomCaregiverFragment : Fragment() {
         viewModel.resetCurrentPage()
         viewModel.isLastPage = false
         adapterChatRoom.clear()
+    }
+
+    override fun onAudioReady(audioUri: String?) {
+
+    }
+
+    override fun onRecordFailed(errorMessage: String?) {
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onReadyForRecord() {
+
     }
 
 
