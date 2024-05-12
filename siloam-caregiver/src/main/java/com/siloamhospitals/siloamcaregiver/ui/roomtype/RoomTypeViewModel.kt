@@ -38,6 +38,9 @@ class RoomTypeViewModel(
     private var _roomTypeList = MutableLiveData<List<CaregiverRoomTypeData>>()
     var roomTypeList: LiveData<List<CaregiverRoomTypeData>> = _roomTypeList
 
+    private var _newRoom = MutableLiveData<CaregiverRoomTypeData>()
+    var newRoom: LiveData<CaregiverRoomTypeData> = _newRoom
+
     private var _error = MutableLiveData<String>()
     var error: LiveData<String> = _error
     var errorHasBeenConsumed = false
@@ -47,6 +50,18 @@ class RoomTypeViewModel(
             repository.listenRoomList(doctorId.toString()) { data, error ->
                 if (error.isEmpty()) {
                     _roomTypeList.postValue(data)
+                } else {
+                    _error.postValue(error)
+                }
+            }
+        }
+    }
+
+    fun listenNewRoom() {
+        viewModelScope.launch {
+            repository.listenNewRoom() { data, error ->
+                if (error.isEmpty()) {
+                    _newRoom.postValue(data)
                 } else {
                     _error.postValue(error)
                 }

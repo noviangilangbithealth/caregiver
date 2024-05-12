@@ -14,6 +14,7 @@ class SiloamCaregiver(
     companion object {
         var appContext: Context? = null
 
+
         var instance: SiloamCaregiver? = null
 
         fun init(context: Context) {
@@ -51,6 +52,13 @@ class SiloamCaregiver(
             mPreference.userId = userId
             mPreference.organizationId = organizationId
             mPreference.wardId = wardId
+        }
+
+        fun setWardId(wardID: Long, context: Context) {
+            val mPreference by lazy {
+                AppPreferences(context)
+            }
+            mPreference.wardId = wardID
         }
 
     }
