@@ -7,7 +7,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -41,13 +40,10 @@ import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
 import com.siloamhospitals.siloamcaregiver.ui.LinearLoadMoreListener
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.AudioRecordListener
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.Recorder
 import com.siloamhospitals.siloamcaregiver.ui.decoration.SpaceItemDecoration
 import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailActivity
 import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
@@ -64,6 +60,8 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private var onProcess = false
 
     private lateinit var preferences: AppPreferences
+
+    lateinit var recorder: Recorder
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +81,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             GroupDetailActivity.start(requireContext(), viewModel.caregiverId, viewModel.channelId)
         }
 
+        initRecorder()
         setupPreference()
         setupAdapter()
         callSocket()
@@ -91,6 +90,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         setupObserver()
         setupView()
         setupCheckRecent()
+    }
+
+    private fun initRecorder() {
+       recorder = Recorder(this, requireContext())
     }
 
     private fun setupCheckRecent() {
@@ -148,7 +151,12 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun setupView() {
         binding.run {
-            etInputChat.setText(preferences.findPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", ""))
+            etInputChat.setText(
+                preferences.findPreference(
+                    "key_${viewModel.caregiverId}_${viewModel.channelId}",
+                    ""
+                )
+            )
             tvTitleChat.text = viewModel.roomName
             tvPatientName.text = viewModel.patientName
             Glide.with(requireContext()).load(viewModel.urlIcon).into(ivRoomChat)
@@ -178,7 +186,8 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private fun observeConnection() {
         viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
             if (!isConnected) {
-                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 viewModel.listenNewMessageList()
             }
@@ -284,7 +293,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             }
 
             etInputChat.addTextChangedListener(afterTextChanged = { text ->
-                preferences.putPreference("key_${viewModel.caregiverId}_${viewModel.channelId}", text.toString())
+                preferences.putPreference(
+                    "key_${viewModel.caregiverId}_${viewModel.channelId}",
+                    text.toString()
+                )
             })
 
             ivBtnSend.setOnClickListener {
@@ -312,44 +324,20 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 //                    Toast.makeText(requireContext(), "Recording Start", Toast.LENGTH_SHORT).show()
                     recordMode(true)
                     startTimer()
-                    startRecording()
+                    recorder.startRecord()
                 }
                 true
             }
 
-
             ivMic.setOnTouchListener { _, event ->
-                if (event.action == MotionEvent.ACTION_UP && superCheckPermission()) {
-                    // Handle the finger lifted action (optional)
-//                    Toast.makeText(requireContext(), "Recording Stop", Toast.LENGTH_SHORT).show()
-                    stopTimer()
-                    recordMode(false)
-                    stopRecording()
-                    createAlertDialog(
-                        title = "Send Voice Note",
-                        description = "Would you like to send this ${binding.tvTimerRecord.text} voice note?",
-                        action = {
-                            adapterChatRoom.add(
-                                0, CaregiverChatRoomUi(
-                                    isVoiceNote = true,
-                                    isSelfSender = true,
-                                    url = outputFile.orEmpty()
-                                )
-                            )
-
-                            outputFileAudioRecord?.let {
-                                viewModel.uploadFiles(listOf(it), true)
-                            }
-                            outputFile = null
-                            binding.rvChatCaregiver.smoothScrollToPosition(0)
-                            dataSource.invalidateAll()
-                        },
-                        actionCancel = {
-                            deleteFile(outputFile.orEmpty())
-                            outputFile = null
+                when (event.action) {
+                    MotionEvent.ACTION_UP -> {
+                        if(superCheckPermission()) {
+                            stopTimer()
+                            recordMode(false)
+                            recorder.stopRecording()
                         }
-                    )
-
+                    }
                 }
 
                 false // Return false to allow the touch event to continue
@@ -367,7 +355,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             val resGalleryPhotos =
                 bundle.getStringArrayList(CaregiverAttachmentDialogFragment.KEY_GALLERY)
             if (resCamera != null) {
-                val npwp = File(resCamera.toString()).also { file = it }
+                File(resCamera.toString()).also { file = it }
                 val bitmap = BitmapFactory.decodeFile(file?.path)
                 BitmapUtils.getFileFromBitmap(bitmap, requireContext()).also {
                     viewModel.uploadFiles(listOfNotNull(it))
@@ -546,73 +534,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
 
-    private lateinit var mediaRecorder: MediaRecorder
-
-    private var isRecording = false
-    private var outputFile: String? = null
-
-    private fun getOutputMediaFile(): File? {
-        val mediaStorageDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-            "Caregiver"
-        )
-
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Logger.d("Caregiver", "failed to create directory")
-                return null
-            }
-        }
-
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val file = File("${mediaStorageDir.path}${File.separator}AUDIO_$timeStamp.aac")
-//        Toast.makeText(requireContext(), file.extension, Toast.LENGTH_SHORT).show()
-        return file
-    }
-
-    private var outputFileAudioRecord: File? = null
-
-    private fun startRecording() {
-        try {
-            outputFileAudioRecord = getOutputMediaFile()
-            outputFile = outputFileAudioRecord?.absolutePath
-
-            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                MediaRecorder(requireContext())
-            } else {
-                MediaRecorder()
-            }
-
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            mediaRecorder.setOutputFile(outputFileAudioRecord)
-
-            mediaRecorder.prepare()
-            mediaRecorder.start()
-
-            isRecording = true
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun stopRecording() {
-        try {
-            mediaRecorder.stop()
-            mediaRecorder.release()
-
-            isRecording = false
-
-            val renamedFile = File("${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath}/Caregiver/recording.mp3")
-            outputFileAudioRecord?.renameTo(renamedFile)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     private fun deleteFile(path: String) {
         val file = File(path)
 
@@ -658,8 +579,21 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         adapterChatRoom.clear()
     }
 
-    override fun onAudioReady(audioUri: String?) {
-
+    override fun onAudioReady(audioUri: String?, file: File?) {
+        createAlertDialog(
+            title = "Send Voice Note",
+            description = "Would you like to send this ${binding.tvTimerRecord.text} voice note?",
+            action = {
+                file?.let {
+                    viewModel.uploadFiles(listOf(it), true)
+                }
+                binding.rvChatCaregiver.smoothScrollToPosition(0)
+                dataSource.invalidateAll()
+            },
+            actionCancel = {
+                deleteFile(audioUri.orEmpty())
+            }
+        )
     }
 
     override fun onRecordFailed(errorMessage: String?) {

@@ -181,6 +181,8 @@ dependencies {
     //lottie
     implementation("com.airbnb.android:lottie:5.2.0")
 
+    implementation("com.arthenica:mobile-ffmpeg-full:4.4")
+
 }
 
 publishing {

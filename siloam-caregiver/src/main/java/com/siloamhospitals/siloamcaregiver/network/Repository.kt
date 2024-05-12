@@ -22,8 +22,12 @@ import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.parse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.Response
@@ -323,8 +327,7 @@ class Repository(
         isVoiceNote: Boolean = false
     ): Response<AttachmentCaregiverResponse> {
         val attachment = files.map {
-            val fbody =
-                if (isVoiceNote) it.asRequestBody("audio/*".toMediaTypeOrNull()) else it.asRequestBody(
+            val fbody = if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType()) else it.asRequestBody(
                     "image/jpeg".toMediaTypeOrNull()
                 )
             MultipartBody.Part.createFormData("attachment", it.name, fbody)
