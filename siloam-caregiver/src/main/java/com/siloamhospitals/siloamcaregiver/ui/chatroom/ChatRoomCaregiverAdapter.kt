@@ -2,6 +2,7 @@ package com.siloamhospitals.siloamcaregiver.ui.chatroom
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -109,7 +110,7 @@ class ChatRoomCaregiverAdapter(
 
             is LeftChatViewHolder -> holder.binding.run {
                 tvName.text = item.name
-//                tvName.setTextColor(Color.parseColor(item.color))
+                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
                 if (item.url.isNotEmpty()) {
                     Glide.with(adapterContext).load(item.url).into(imageChat)
                     tvChat.gone()
@@ -262,7 +263,7 @@ class ChatRoomCaregiverAdapter(
             is VoiceNoteLeftChatViewHolder -> holder.binding.run {
                 tvName.text = item.name
                 tvDate.text = item.time
-//                tvName.setTextColor(Color.parseColor(item.color))
+                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
                 mediaPlayer = MediaPlayer()
                 try {
                     mediaPlayer?.setDataSource(item.url)
