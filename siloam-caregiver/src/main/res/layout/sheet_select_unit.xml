@@ -29,66 +29,76 @@
         app:layout_constraintStart_toEndOf="@id/btn_close_dialog_filter"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <LinearLayout
         android:layout_width="@dimen/match_constraint"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
+        android:layout_height="500dp"
+        android:layout_marginTop="@dimen/small_fit"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_apply_filter"
         app:layout_constraintTop_toBottomOf="@id/btn_close_dialog_filter">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_hospital_unit"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <com.google.android.material.button.MaterialButton
+            style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/medium_fit"
-            android:hint="@string/hospital_unit">
+            android:enabled="false"
+            android:gravity="start"
+            android:paddingVertical="@dimen/small_fit"
+            android:text="@string/please_select_unit_before_ward"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_small"
+            app:backgroundTint="@color/colorBlueLight" />
 
-            <AutoCompleteTextView
-                android:id="@+id/atv_hospital_unit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textColor="@color/colorBlackGrade"
-                tools:ignore="LabelFor" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_ward"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium"
-            android:hint="@string/ward">
+            android:text="@string/unit_semicol"
+            android:textColor="@color/colorBlack87"
+            android:textSize="@dimen/text_small" />
 
-            <AutoCompleteTextView
-                android:id="@+id/atv_ward"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textColor="@color/colorBlackGrade"
-                tools:ignore="LabelFor" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_apply_filter"
-            style="@style/Widget.CoreTheme.ButtonRadius"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chip_hospital"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/huge"
-            android:layout_marginEnd="@dimen/small"
-            android:paddingTop="@dimen/small_fit"
-            android:paddingBottom="@dimen/small_fit"
-            android:text="@string/apply_filter"
-            android:textAllCaps="true"
-            android:textColor="@color/colorWhite"
-            android:textSize="@dimen/text_small"
-            app:backgroundTint="@color/colorSecondaryBase" />
+            tools:listitem="@layout/chip_filter" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium"
+            android:text="@string/wards_semicol"
+            android:textColor="@color/colorBlack87"
+            android:textSize="@dimen/text_small" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chip_ward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/chip_filter" />
 
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_apply_filter"
+        style="@style/Widget.CoreTheme.ButtonRadius"
+        android:layout_width="@dimen/match_constraint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/huge"
+        android:layout_marginEnd="@dimen/small"
+        android:paddingTop="@dimen/small_fit"
+        android:paddingBottom="@dimen/small_fit"
+        android:text="@string/apply_filter"
+        android:textAllCaps="true"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_small"
+        app:backgroundTint="@color/colorSecondaryBase"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -183,6 +183,8 @@ dependencies {
 
     implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
 }
 
 publishing {

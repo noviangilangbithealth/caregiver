@@ -27,33 +27,38 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/chip_hospital"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layout_chip_caregiver_dashboard"
+        android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/medium"
-        android:layout_marginTop="@dimen/small"
-        android:checkable="false"
-        android:textColor="@color/colorPrimaryMid"
-        android:textSize="@dimen/text_small"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/medium"
+        android:paddingVertical="@dimen/medium"
         app:chipBackgroundColor="@color/colorPrimaryLight"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_layout_caregiver_dashboard"
-        tools:text="SHLV" />
+        app:layout_constraintTop_toBottomOf="@id/app_bar_layout_caregiver_dashboard">
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/chip_ward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/small"
-        android:layout_marginTop="@dimen/small"
-        android:checkable="false"
-        android:textColor="@color/colorPrimaryMid"
-        android:textSize="@dimen/text_small"
-        app:chipBackgroundColor="@color/colorPrimaryLight"
-        app:layout_constraintStart_toEndOf="@id/chip_hospital"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_layout_caregiver_dashboard"
-        tools:text="1-Ephilia" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chip_patient_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/chip_filter" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/ib_filter_patient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small"
+            android:background="@color/white"
+            android:src="@drawable/ic_filter_patient_list"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_search"
@@ -61,13 +66,12 @@
         android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/medium"
-        android:layout_marginTop="@dimen/small"
         android:hint="@string/search_patient_name"
         app:endIconDrawable="@drawable/ic_search_text_input"
         app:endIconMode="custom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_hospital">
+        app:layout_constraintTop_toBottomOf="@+id/layout_chip_caregiver_dashboard">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_search_patient_name_caregiver"
@@ -108,10 +112,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ill_empty_state"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/tv_empty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/til_search"
         app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="ContentDescription" />

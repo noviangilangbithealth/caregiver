@@ -1,5 +1,6 @@
 package com.siloamhospitals.siloamcaregiver.network.service
 
+import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
@@ -72,6 +73,12 @@ interface ApiService {
 //        @Path("userId") userId: String
 //    ) : Response<BaseDataResponse<MutableList<Message>>>
 
+    @POST(PostPinMessage)
+    suspend fun postPinMessage(
+        @Body pinMessageRequest: PinMessageRequest
+    ): Response<BaseDataResponse<*>>
+
+
     companion object {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
@@ -83,6 +90,7 @@ interface ApiService {
         const val GetUserShow = "/caregiver/api/v1/user/show/{$PathUserId}"
         const val GetWard = "/caregiver/api/v1/ward/{$PathHospitalId}"
         const val GetEmrIpdWebView = "/caregiver/api/v1/caregivers/summary/{$PathCaregiverId}"
+        const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
     }
 
 }

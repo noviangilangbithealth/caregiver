@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
 import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
-import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiverUI
 import com.siloamhospitals.siloamcaregiver.ui.button.CaregiverButtons
 
 class MainActivity : AppCompatActivity() {
@@ -22,9 +21,16 @@ class MainActivity : AppCompatActivity() {
         // todo add more parameter for fullfill the requirement
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
-        SiloamCaregiver.initUser(userId = 29000000134, organizationId = 2, wardId = 30, context = this)
+        SiloamCaregiver.initUser(
+            userId = 2000000834,
+            organizationId = 2,
+            wardId = 0,
+            context = this,
+            role = SiloamCaregiver.ROLE_DOCTOR
+        )
 //        2000000834 eka
 //        2000000761 andreas
+//        29000000134 amsal nurse
         binding.buttonOpenCaregiver.setOnClickListener {
             //navigate activity
 //            SiloamCaregiverUI().openChatRoom(
