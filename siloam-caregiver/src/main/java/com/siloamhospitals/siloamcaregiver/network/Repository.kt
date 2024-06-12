@@ -15,6 +15,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.CaregiverListData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverPatientListData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverRoomTypeData
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
+import com.siloamhospitals.siloamcaregiver.network.response.FloatingNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotification
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
@@ -50,6 +51,8 @@ class Repository(
         private const val SET_READ_MESSAGE = "set-read-message"
         private const val GET_PATIENT_LIST_NOTIFICATION = "get-notif-new-message"
         private const val PATIENT_LIST_NOTIFICATIONT_ON_EVENT = "notif-new-message-listener"
+        private const val GET_NOTIF_FLOATING = "get-notif-floating"
+        private const val NOTIF_FLOATING_LISTENER = "notif-floating-listener"
         private const val KEY = "YoDnqnDe-y42HklO0W2awXO4Rsnooic0"
         private const val IV = "24594253911bc137"
     }
@@ -273,6 +276,32 @@ class Repository(
             }
         } catch (e: Exception) {
             action.invoke(CaregiverChatData(), e.toString())
+        }
+    }
+
+    fun emitFloatingNotification() {
+        mSocket.emitEvent(GET_NOTIF_FLOATING, null)
+    }
+
+    fun listenFloatingNotification(action: (FloatingNotificationData, String) -> Unit) {
+        try {
+            mSocket.onEvent(NOTIF_FLOATING_LISTENER) { data, error ->
+                if (error.isEmpty()) {
+                    val encryptedData =
+                        Gson().getAdapter(PatientListNotification::class.java)
+                            .fromJson(data.toString())
+                    val decryptionData = encryptedData.data.decrypt(IV, KEY)
+                    val adapter = Gson().getAdapter(FloatingNotificationData::class.java)
+                    val newData = adapter.fromJson(decryptionData)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(FloatingNotificationData(), error)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            action.invoke(FloatingNotificationData(), e.toString())
         }
     }
 

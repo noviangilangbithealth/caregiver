@@ -23,6 +23,7 @@
     <color name="colorYellowBase">#FECA57</color>
     <color name="colorYellowLight">#FEF4DF</color>
     <color name="colorYellowText">#F5A30A</color>
+    <color name="colorYellowFloatNotif">#FFC34E</color>
 
     <color name="colorGreenBase">#10AC84</color>
     <color name="colorGreenLight">#DCFAF3</color>

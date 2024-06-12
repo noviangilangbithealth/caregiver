@@ -186,9 +186,10 @@ class ChatRoomCaregiverViewModel(
         }
     }
 
-var sizeChat = 0
-    fun List<CaregiverChatData>.generateChatListUI(): List<CaregiverChatRoomUi> {
+    var sizeChat = 0
+    fun List<CaregiverChatData>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
         com.orhanobut.logger.Logger.d(this)
+        var isSameDate = false
         val dataUi = arrayListOf<CaregiverChatRoomUi>()
         val dataGroup =
             this.groupBy { it.createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "" }
@@ -213,13 +214,20 @@ var sizeChat = 0
                     )
                 )
             }
+
             dataUi.add(
                 CaregiverChatRoomUi(
                     isDateLimit = true, time = dataGrouped.key
                 )
             )
+
+            if(lastData?.isDateLimit ?: false && lastData?.time.orEmpty() == dataGrouped.key){
+                isSameDate = true
+            }
         }
         sizeChat = dataUi.size
+
+        action?.invoke(isSameDate)
         return dataUi
     }
 

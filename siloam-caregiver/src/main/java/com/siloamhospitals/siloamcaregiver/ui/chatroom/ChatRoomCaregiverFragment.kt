@@ -244,7 +244,9 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 it.getContentIfNotHandled()?.let { data ->
                     onProcess = false
                     if (data.data.orEmpty().isNotEmpty()) {
-                        onMessageListLoadedBaseRv(data.data.orEmpty().generateChatListUI())
+                        onMessageListLoadedBaseRv(data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()){
+                            if(it) adapterChatRoom.remove(adapterChatRoom.getSize()-1)
+                        })
                     } else {
                         resetCurrentPage()
                         isLastPage = true

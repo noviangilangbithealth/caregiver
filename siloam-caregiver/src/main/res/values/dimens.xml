@@ -40,5 +40,8 @@
     <dimen name="match_constraint">@dimen/empty</dimen>
     <dimen name="calendar">300dp</dimen>
     <dimen name="space_between_items">8dp</dimen>
+    <dimen name="badge_text_size">12sp</dimen>
+    <dimen name="text_margin">4dp</dimen>
+    <dimen name="badge_margin">8dp</dimen>
 
 </resources>
