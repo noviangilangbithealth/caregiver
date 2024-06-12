@@ -6,12 +6,14 @@ import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
-import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatroomCaregiverActivity
 
 class SiloamCaregiver(
     appContexts: Context
 ) {
     companion object {
+        const val ROLE_DOCTOR = 1
+        const val ROLE_NURSE = 2
+
         var appContext: Context? = null
 
 
@@ -45,13 +47,20 @@ class SiloamCaregiver(
 
         //todo Add more parameter for fullfill the requirement
         //this function just an example
-        fun initUser(userId: Long, organizationId: Long, context: Context, wardId: Long = 0L) {
+        fun initUser(
+            userId: Long,
+            organizationId: Long,
+            context: Context,
+            wardId: Long = 0L,
+            role: Int
+        ) {
             val mPreference by lazy {
                 AppPreferences(context)
             }
             mPreference.userId = userId
             mPreference.organizationId = organizationId
             mPreference.wardId = wardId
+            mPreference.role = role
         }
 
         fun setWardId(wardID: Long, context: Context) {

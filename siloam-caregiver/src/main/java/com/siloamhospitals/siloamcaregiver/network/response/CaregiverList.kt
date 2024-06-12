@@ -1,7 +1,6 @@
 package com.siloamhospitals.siloamcaregiver.network.response
 
 import com.google.gson.annotations.SerializedName
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -47,6 +46,7 @@ data class CaregiverPatientListData(
     val admissionNo: String? = "",
     @SerializedName("ward_id")
     val wardId: String? = "",
+    val dpjp: String? = "",
     @SerializedName("ward_name")
     val wardName: String? = "",
     @SerializedName("patient_id")
@@ -66,6 +66,10 @@ data class CaregiverPatientListData(
     val isUrgent: Boolean? = false,
     @SerializedName("latest_message_at")
     val latestMessageAt: String? = "",
+    @SerializedName("is_new")
+    val isNew: Boolean = false,
+    @SerializedName("is_pinned")
+    val isPinned: Boolean = false,
     val notifications: List<CaregiverPatientNotification> = emptyList()
 )
 

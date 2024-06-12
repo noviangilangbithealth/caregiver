@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/layout_chip_filter_patient"
+    android:background="@drawable/background_chip_outline_secondary"
+   android:layout_marginTop="@dimen/small"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="@dimen/small_fit"
+    android:layout_marginEnd="@dimen/small"
+    android:paddingVertical="@dimen/very_small">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/chip_text"
+        style="@style/TextAppearance.MaterialComponents.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_small"
+        android:textColor="@color/colorSecondaryBase"
+        tools:text="Ephilia" />
+
+    <ImageView
+        android:id="@+id/iv_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small"
+        android:src="@drawable/ic_badge"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>

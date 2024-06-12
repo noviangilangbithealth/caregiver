@@ -1,9 +1,12 @@
 package com.siloamhospitals.siloamcaregiver.network
 
+import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.ext.encryption.decrypt
+import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
@@ -16,6 +19,8 @@ import com.siloamhospitals.siloamcaregiver.network.response.CaregiverPatientList
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverRoomTypeData
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
 import com.siloamhospitals.siloamcaregiver.network.response.FloatingNotificationData
+import com.siloamhospitals.siloamcaregiver.network.response.HospitalFilter
+import com.siloamhospitals.siloamcaregiver.network.response.ListHospitalWard
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotification
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
@@ -23,12 +28,9 @@ import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.parse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.Response
@@ -51,6 +53,8 @@ class Repository(
         private const val SET_READ_MESSAGE = "set-read-message"
         private const val GET_PATIENT_LIST_NOTIFICATION = "get-notif-new-message"
         private const val PATIENT_LIST_NOTIFICATIONT_ON_EVENT = "notif-new-message-listener"
+        private const val EMIT_HOSPITAL_WARD_FILTER = "get-list-ward-by-id"
+        private const val LISTEN_HOSPITAL_WARD_FILTER = "list-ward-by-id-listener"
         private const val GET_NOTIF_FLOATING = "get-notif-floating"
         private const val NOTIF_FLOATING_LISTENER = "notif-floating-listener"
         private const val KEY = "YoDnqnDe-y42HklO0W2awXO4Rsnooic0"
@@ -87,6 +91,7 @@ class Repository(
                     val caregiverList =
                         Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
                     val decryptedData = caregiverList.data.decrypt(IV, KEY)
+                    Log.e("decryptedData", "listenCaregiverList:$decryptedData", )
                     val adapter = Gson().getAdapter(CaregiverListData::class.java)
                     val newData = adapter.fromJson(decryptedData)
                     if (newData != null) {
@@ -188,7 +193,7 @@ class Repository(
         }
     }
 
-    fun listenNewRoom( action: ((CaregiverRoomTypeData, String) -> Unit)) {
+    fun listenNewRoom(action: ((CaregiverRoomTypeData, String) -> Unit)) {
         try {
             mSocket.onEvent(NEW_ROOM_LISTENER) { data, error ->
                 if (error.isEmpty()) {
@@ -226,7 +231,7 @@ class Repository(
         mSocket.emitEvent(GET_MESSAGE_EMIT_EVENT, data)
     }
 
-    fun setReadMessage(caregiverId: String, channelId: String,) {
+    fun setReadMessage(caregiverId: String, channelId: String) {
         val data = JSONObject()
         data.put("caregiverID", caregiverId)
         data.put("channelID", channelId)
@@ -357,7 +362,8 @@ class Repository(
         isVoiceNote: Boolean = false
     ): Response<AttachmentCaregiverResponse> {
         val attachment = files.map {
-            val fbody = if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType()) else it.asRequestBody(
+            val fbody =
+                if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType()) else it.asRequestBody(
                     "image/jpeg".toMediaTypeOrNull()
                 )
             MultipartBody.Part.createFormData("attachment", it.name, fbody)
@@ -389,4 +395,49 @@ class Repository(
         return RetrofitInstance.getInstance.getEmrIpdWebView(caregiverId)
     }
 
+    suspend fun pinMessage(
+        caregiverId: String,
+        userHopeId: String,
+        isPinned: Boolean
+    ): Response<BaseDataResponse<*>> {
+        val request = PinMessageRequest(caregiverId, userHopeId, isPinned)
+        return RetrofitInstance.getInstance.postPinMessage(request)
+    }
+
+    fun emitHospitalWardFilter(
+        doctorHopeId: Long
+    ) {
+        try {
+            val data = JSONObject()
+            data.put("doctor_hope_id", doctorHopeId)
+            mSocket.emitEvent(EMIT_HOSPITAL_WARD_FILTER, data)
+        } catch (e: Exception) {
+            Logger.d(e)
+        }
+    }
+
+    fun listenHospitalWardFilter(action: ((List<HospitalFilter>, String) -> Unit)) {
+        try {
+            mSocket.onEvent(LISTEN_HOSPITAL_WARD_FILTER) { data, error ->
+                if (error.isEmpty()) {
+                    val encryptedData =
+                        Gson().getAdapter(ListHospitalWard::class.java).fromJson(data.toString())
+                    val decryptedData = encryptedData.data.decrypt(IV, KEY)
+                    Logger.d(decryptedData)
+                    val builder =
+                        GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
+                    val adapter = ListAdapter(HospitalFilter::class.java, builder)
+                    val newData = adapter.fromJson(decryptedData)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    }
+                } else {
+                    action.invoke(emptyList(), error)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.d(e.toString())
+            action.invoke(emptyList(), e.toString())
+        }
+    }
 }

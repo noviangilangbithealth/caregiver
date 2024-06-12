@@ -7,13 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
+import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverListData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverPatientListData
+import com.siloamhospitals.siloamcaregiver.network.response.HospitalFilter
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowHospitalResponse
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
-import com.siloamhospitals.siloamcaregiver.network.response.WardListResponse
 import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.ListCaregiverPatient
@@ -24,13 +25,123 @@ class CaregiverPatientListViewModel(
     preferences: AppPreferences
 ) : ViewModel() {
 
+    val dialogFilterData = mutableListOf(
+        ChipHospitalData(
+            hospitalId = 2,
+            hospitalName = "Siloam Hospital Lippo Village",
+            hospitalAlias = "SHLV",
+            isUrgent = false,
+            showBadge = false,
+            isSelected = false,
+            wards = listOf(
+                ChipWardData(
+                    wardId = 201,
+                    wardName = "Orthopedics",
+                    isSelected = false,
+                    isUrgent = false,
+                    showBadge = true
+                ),
+                ChipWardData(
+                    wardId = 202,
+                    wardName = "Cardiology",
+                    isSelected = true,
+                    isUrgent = true,
+                    showBadge = true
+                )
+            )
+        ),
+        ChipHospitalData(
+            hospitalId = 3,
+            hospitalName = "Community Hospital",
+            hospitalAlias = "CommH",
+            isUrgent = false,
+            showBadge = true,
+            isSelected = false,
+            wards = listOf(
+                ChipWardData(
+                    wardId = 301,
+                    wardName = "Maternity",
+                    isSelected = true,
+                    isUrgent = false,
+                    showBadge = false
+                ),
+                ChipWardData(
+                    wardId = 302,
+                    wardName = "Oncology",
+                    isSelected = false,
+                    isUrgent = true,
+                    showBadge = true
+                )
+            )
+        ),
+        ChipHospitalData(
+            hospitalId = 1,
+            hospitalName = "City Hospital",
+            hospitalAlias = "CH",
+            isUrgent = true,
+            showBadge = true,
+            isSelected = false,
+            wards = listOf(
+                ChipWardData(
+                    wardId = 101,
+                    wardName = "Emergency",
+                    isSelected = true,
+                    isUrgent = true,
+                    showBadge = true
+                ),
+                ChipWardData(
+                    wardId = 102,
+                    wardName = "Pediatrics",
+                    isSelected = false,
+                    isUrgent = false,
+                    showBadge = false
+                ),
+                ChipWardData(
+                    wardId = 920,
+                    wardName = "Siloam 10F",
+                    isSelected = true,
+                    isUrgent = true,
+                    showBadge = true
+                ),
+                ChipWardData(
+                    wardId = 999,
+                    wardName = "Siloam 12947F",
+                    isSelected = false,
+                    isUrgent = false,
+                    showBadge = false
+                ),
+                ChipWardData(
+                    wardId = 1023,
+                    wardName = "Rose 03",
+                    isSelected = true,
+                    isUrgent = true,
+                    showBadge = true
+                ),
+                ChipWardData(
+                    wardId = 492,
+                    wardName = "Melati 19",
+                    isSelected = false,
+                    isUrgent = false,
+                    showBadge = false
+                ),
+
+                )
+        ),
+    )
+
+    val chipData = mutableListOf<ChipFilterPatientData>()
+    var selectedWard = preferences.wardId
+    var selectedHospital = preferences.organizationId
+    var bufferHospital = preferences.organizationId
+    var bufferWard = preferences.wardId
+    var isFiltered = false
+    var role = preferences.role
+
     val isConnected: LiveData<Boolean> by lazy {
         ConnectivityLiveData(preferences.context)
     }
 
     val doctorId = preferences.userId
-    var orgId = preferences.organizationId
-    var wardId = preferences.wardId
     var orgCode = ""
     var wardName = ""
     var isSpecialist = true
@@ -41,20 +152,15 @@ class CaregiverPatientListViewModel(
 
     val roomPatientList = mutableListOf<ListCaregiverPatient>()
 
-    init {
-        getUserShow()
-    }
-
     val hospitals = mutableListOf<UserShowHospitalResponse>()
-    val wards = mutableListOf<WardListResponse>()
 
     fun emitGetCaregiver(action: (() -> Unit)? = null) {
         repository.emitGetCaregiver(
             page = currentPage,
             keyword = keyword,
             user = doctorId.toString(),
-            organizationId = orgId,
-            wardId = wardId
+            organizationId = selectedHospital,
+            wardId = selectedWard
         )
         action?.invoke()
     }
@@ -166,7 +272,7 @@ class CaregiverPatientListViewModel(
     private val _ward = MutableLiveData<BaseHandleResponse<WardResponse>>()
     val ward: LiveData<BaseHandleResponse<WardResponse>> = _ward
 
-    fun getWard(hospitalId: Long = orgId) {
+    fun getWard(hospitalId: Long = selectedWard) {
         viewModelScope.launch {
             try {
                 val response = repository.getWard(hospitalId)
@@ -182,5 +288,57 @@ class CaregiverPatientListViewModel(
             }
         }
     }
+
+    val _pinnedMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
+    val pinnedMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _pinnedMessage
+
+    var isOnHold = false
+    var pinnedCaregiverId = ""
+    var isPinned = false
+    var pinPatientName = ""
+
+    fun pinMessage() {
+        viewModelScope.launch {
+            try {
+                _pinnedMessage.postValue(BaseHandleResponse.LOADING())
+                val response =
+                    repository.pinMessage(pinnedCaregiverId, doctorId.toString(), isPinned)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _pinnedMessage.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _pinnedMessage.postValue(BaseHandleResponse.ERROR(response.message()))
+                }
+            } catch (e: Exception) {
+                _pinnedMessage.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
+            }
+        }
+    }
+
+
+    private var _hospitalWard = MutableLiveData<List<HospitalFilter>>()
+    var hospitalWard: LiveData<List<HospitalFilter>> = _hospitalWard
+
+    fun emitHospitalWard() {
+        repository.emitHospitalWardFilter(doctorId)
+    }
+
+    fun listenHospitalWardFilter() {
+        viewModelScope.launch {
+            repository.listenHospitalWardFilter { data, error ->
+                if (error.isEmpty()) {
+                    Logger.d(data)
+                    _hospitalWard.postValue(data)
+                    errorHasBeenConsumed = false
+                } else {
+                    Logger.d(data)
+                    errorHasBeenConsumed = false
+                    _error.postValue(error)
+                }
+            }
+        }
+    }
+
 
 }

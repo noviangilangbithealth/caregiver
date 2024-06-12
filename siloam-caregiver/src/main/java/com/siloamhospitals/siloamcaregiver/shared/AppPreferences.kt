@@ -37,6 +37,7 @@ class AppPreferences(val context: Context) {
 
 
         private const val USER_ID = "userId"
+        private const val ROLE_CAREGIVER = "roleCaregiver"
         private const val ORG_ID = "orgId"
         private const val WARD_ID = "wardId"
 
@@ -212,6 +213,13 @@ class AppPreferences(val context: Context) {
         set(value) {
             putPreference(USER_ID, value)
         }
+
+    var role: Int
+        get() = findPreference(ROLE_CAREGIVER, 0)
+        set(value) {
+            putPreference(ROLE_CAREGIVER, value)
+        }
+
 
     var organizationId: Long
         get() = findPreference(ORG_ID, 0)

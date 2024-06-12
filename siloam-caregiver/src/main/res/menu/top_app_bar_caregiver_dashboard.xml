@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/filter"
+        android:id="@+id/menu_pin"
         app:showAsAction="ifRoom"
-        android:contentDescription="Dropdown Hospitals"
-        android:icon="@drawable/ic_filter_caregiver_chat"
-        android:title="Dropdown Hospitals"/>
+        android:contentDescription="Pin Patient"
+        android:icon="@drawable/ic_pin"
+        android:title="Pin Patient"/>
 </menu>
