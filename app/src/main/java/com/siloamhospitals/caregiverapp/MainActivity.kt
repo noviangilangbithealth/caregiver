@@ -1,10 +1,10 @@
 package com.siloamhospitals.caregiverapp
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
 import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
+import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiverUI
 import com.siloamhospitals.siloamcaregiver.ui.button.CaregiverButtons
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +32,19 @@ class MainActivity : AppCompatActivity() {
 //        2000000761 andreas
 //        29000000134 amsal nurse
         binding.buttonOpenCaregiver.setOnClickListener {
+            SiloamCaregiverUI().openChatHistory(
+                this,
+                hospitalHopeId = 2.toString(),
+                hospitalCode = "SHLV",
+                doctorHopeId = 2000000827,
+                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
+                patientName = "ROCK LEE",
+                localMrNumber = "1242421",
+                wardName = "Ephilia",
+                roomName = "1661",
+                gender = "M"
+            )
+
             //navigate activity
 //            SiloamCaregiverUI().openChatRoom(
 //                this,
@@ -42,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 //                doctorHopeId = 2000000827,
 //                icon = ""
 //            )
-            startActivity(Intent(this, SecondActivity::class.java))
+//            startActivity(Intent(this, SecondActivity::class.java))
         }
 
     }

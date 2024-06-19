@@ -3,10 +3,7 @@ package com.siloamhospitals.siloamcaregiver.ui.roomtype
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -15,8 +12,6 @@ import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.ActivityRoomTypeCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
-import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatroomCaregiverActivity
-import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailViewModel
 
 class RoomTypeCaregiverActivity : AppCompatActivity() {
 
@@ -91,10 +86,23 @@ class RoomTypeCaregiverActivity : AppCompatActivity() {
     private fun initDataExtra() {
         roomTypeViewModel.run {
             intent.run {
-                caregiverId = getStringExtra(CAREGIVER_ID).orEmpty()
-                patientName = getStringExtra(PATIENT_NAME).orEmpty()
-                description = getStringExtra(DESCRIPTION).orEmpty()
-                gender = getIntExtra(GENDER, 0)
+                if (mPreference.isChatHistory) {
+                    caregiverId = mPreference.historyCaregiverId
+                    patientName = mPreference.historyPatientName
+                    val descriptions =
+                        "${mPreference.historyHospitalUnit}." +
+                                "${mPreference.historyLocalMrNumber} • " +
+                                "${mPreference.historyWard} - " +
+                                mPreference.historyRoom
+                    description = descriptions
+                    gender = if (mPreference.historyGender == "M") 1 else 0
+                    mPreference.isChatHistory = false
+                } else {
+                    caregiverId = getStringExtra(CAREGIVER_ID).orEmpty()
+                    patientName = getStringExtra(PATIENT_NAME).orEmpty()
+                    description = getStringExtra(DESCRIPTION).orEmpty()
+                    gender = getIntExtra(GENDER, 0)
+                }
             }
         }
     }

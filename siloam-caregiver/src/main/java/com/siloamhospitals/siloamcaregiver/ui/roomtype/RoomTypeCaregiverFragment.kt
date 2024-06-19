@@ -26,8 +26,6 @@ import com.siloamhospitals.siloamcaregiver.ext.datetime.YESTERDAY
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTime
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
 import com.siloamhospitals.siloamcaregiver.ext.text.ellipsizeText
-import com.siloamhospitals.siloamcaregiver.ext.view.gone
-import com.siloamhospitals.siloamcaregiver.ext.view.visible
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverRoomTypeUi
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.ChatroomCaregiverActivity
@@ -91,6 +89,7 @@ class RoomTypeCaregiverFragment : Fragment() {
     }
 
     private fun initHeader() {
+        binding.tvRoomDescription.text = viewModel.description
         with(binding.topBarRoomType) {
             ibBack.setOnClickListener {
                 findNavController().navigateUp()
@@ -110,7 +109,6 @@ class RoomTypeCaregiverFragment : Fragment() {
                 }
             }
             tvAppBarPatientNameCaregiver.text = ellipsizeText(viewModel.patientName, 25)
-            tvAppBarPatientInfoCaregiver.text = viewModel.description
             ivAppBarGender.setImageDrawable(
                 if (viewModel.gender == 1) {
                     resources.getDrawable(R.drawable.ic_label_male)
@@ -123,7 +121,6 @@ class RoomTypeCaregiverFragment : Fragment() {
 
     private fun callSocket() {
         viewModel.emitRoom()
-        binding.lottieLoadingRoomtype.visible()
         viewModel.listenRoom()
         viewModel.listenNewRoom()
 
@@ -139,7 +136,6 @@ class RoomTypeCaregiverFragment : Fragment() {
 
     private fun observerRoomType() {
         viewModel.roomTypeList.observe(viewLifecycleOwner) { data ->
-            binding.lottieLoadingRoomtype.gone()
             viewModel.listRoomType.clear()
             data.map {
                 viewModel.listRoomType.add(
@@ -179,7 +175,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                             else -> "${item.role} - ${item.senderName}: ${item.lastMessage}"
                         }
 
-                        if(item.isAttachment) {
+                        if (item.isAttachment) {
                             lastMessage = when (item.role) {
                                 "Doctor" -> "${item.senderName}: Send Attachment"
                                 else -> "${item.role} - ${item.senderName}: Send Attachment"

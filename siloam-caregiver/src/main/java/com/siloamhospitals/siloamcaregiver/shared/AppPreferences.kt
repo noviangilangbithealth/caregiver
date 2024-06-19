@@ -42,6 +42,14 @@ class AppPreferences(val context: Context) {
         private const val WARD_ID = "wardId"
 
         private const val CAREGIVER_ID = "caregiverId"
+        private const val HISTORY_CAREGIVER_ID = "historyCaregiverId"
+        private const val HISTORY_HOSPITAL_ID = "historyHospitalId"
+        private const val HISTORY_HOSPITAL_UNIT = "historyHospitalUnit"
+        private const val HISTORY_ROOM = "historyRoom"
+        private const val HISTORY_WARD = "historyWard"
+        private const val HISTORY_LOCAL_MR_NUMBER = "historyLocalMrNumber"
+        private const val HISTORY_GENDER = "historyGender"
+        private const val HISTORY_PATIENT_NAME = "historyPatientName"
         private const val CHANNEL_ID = "channelId"
         private const val ROOM_NAME = "roomName"
         private const val URL_ICON = "urlIcon"
@@ -61,6 +69,7 @@ class AppPreferences(val context: Context) {
         private const val NOTIF_ROOM_NAME = "notifRoomName"
         private const val NOTIF_ICON = "notifIcon"
         private const val NOTIF = "isFromNotif"
+        private const val CHAT_HISTORY = "isChatHistory"
     }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -172,6 +181,61 @@ class AppPreferences(val context: Context) {
         }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    var isChatHistory: Boolean
+        get() = findPreference(NOTIF, false)
+        set(value) {
+            putPreference(NOTIF, value)
+        }
+
+    var historyCaregiverId: String
+        get() = findPreference(HISTORY_CAREGIVER_ID, "")
+        set(value) {
+            putPreference(HISTORY_CAREGIVER_ID, value)
+        }
+
+    var historyHospitalId: String
+        get() = findPreference(HISTORY_HOSPITAL_ID, "")
+        set(value) {
+            putPreference(HISTORY_HOSPITAL_ID, value)
+        }
+
+    var historyWard: String
+        get() = findPreference(HISTORY_WARD, "")
+        set(value) {
+            putPreference(HISTORY_WARD, value)
+        }
+
+    var historyHospitalUnit: String
+        get() = findPreference(HISTORY_HOSPITAL_UNIT, "")
+        set(value) {
+            putPreference(HISTORY_HOSPITAL_UNIT, value)
+        }
+
+    var historyRoom: String
+        get() = findPreference(HISTORY_ROOM, "")
+        set(value) {
+            putPreference(HISTORY_ROOM, value)
+        }
+
+    var historyLocalMrNumber: String
+        get() = findPreference(HISTORY_LOCAL_MR_NUMBER, "")
+        set(value) {
+            putPreference(HISTORY_LOCAL_MR_NUMBER, value)
+        }
+
+    var historyGender: String
+        get() = findPreference(HISTORY_GENDER, "")
+        set(value) {
+            putPreference(HISTORY_GENDER, value)
+        }
+
+    var historyPatientName: String
+        get() = findPreference(HISTORY_PATIENT_NAME, "")
+        set(value) {
+            putPreference(HISTORY_PATIENT_NAME, value)
+        }
+
+
     var isFromNotif: Boolean
         get() = findPreference(NOTIF, false)
         set(value) {
