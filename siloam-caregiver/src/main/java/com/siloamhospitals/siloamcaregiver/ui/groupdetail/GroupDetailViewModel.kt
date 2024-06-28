@@ -11,8 +11,11 @@ import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
+import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryDataResponse
+import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAttachmentResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
+import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResultResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import kotlinx.coroutines.launch
 
@@ -21,15 +24,46 @@ class GroupDetailViewModel(
     private val preferences: AppPreferences
 ) : ViewModel() {
 
+
+    var patientDetail = GroupInfoResultResponse()
     var caregiverId = ""
     val attachment = mutableListOf<GroupInfoAttachmentResponse>()
     var urlWebView = ""
+
 
     private val _groupInfo = MutableLiveData<BaseHandleResponse<GroupInfoResponse>>()
     val groupInfo: LiveData<BaseHandleResponse<GroupInfoResponse>> = _groupInfo
 
     private val _emrIpdWebView = MutableLiveData<BaseHandleResponse<EmrIpdWebViewResponse>>()
     val emrIpdWebView: LiveData<BaseHandleResponse<EmrIpdWebViewResponse>> = _emrIpdWebView
+
+    private val _admissionHistory =
+        MutableLiveData<BaseHandleResponse<GroupInfoAdmissionHistoryResponse>>()
+    val admissionHistory: LiveData<BaseHandleResponse<GroupInfoAdmissionHistoryResponse>> =
+        _admissionHistory
+
+    var savedAdmissionHistory = mutableListOf<GroupInfoAdmissionHistoryDataResponse>()
+    var admissionHistoryMrUrl = ""
+    var fromAdmissionHistory = false
+    fun getAdmissionHistory() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getAdmissionHistory(
+                    patientDetail.organizationId,
+                    patientDetail.patientId
+                )
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _admissionHistory.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _admissionHistory.postValue(BaseHandleResponse.ERROR(response.message()))
+                }
+            } catch (e: Exception) {
+                _admissionHistory.postValue(BaseHandleResponse.ERROR(e.toString()))
+            }
+        }
+    }
 
     fun getGroupInfo(caregiverId: String) {
         viewModelScope.launch {

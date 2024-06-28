@@ -25,6 +25,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificat
 import com.siloamhospitals.siloamcaregiver.network.response.PatientListNotificationData
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
 import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
+import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
@@ -173,6 +174,7 @@ class Repository(
     ) {
         try {
             mSocket.onEvent(ROOM_LIST_ON_EVENT) { data, error ->
+                Log.e("dataaaa", "listenRoomList: $data", )
                 if (error.isEmpty()) {
                     val encryptedData = data as JSONObject
                     val decryptedData = encryptedData.getString("data").decrypt(IV, KEY)
@@ -440,4 +442,13 @@ class Repository(
             action.invoke(emptyList(), e.toString())
         }
     }
+
+    suspend fun getAdmissionHistory(
+        hospitalId: String,
+        patientId: String
+    ): Response<GroupInfoAdmissionHistoryResponse> {
+        Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId", )
+        return RetrofitInstance.getInstance.getAdmissionHistory(hospitalId, patientId)
+    }
+
 }

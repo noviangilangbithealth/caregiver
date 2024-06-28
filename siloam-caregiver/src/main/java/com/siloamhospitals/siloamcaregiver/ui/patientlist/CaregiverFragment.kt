@@ -2,6 +2,7 @@ package com.siloamhospitals.siloamcaregiver.ui.patientlist
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentCaregiverBinding
@@ -529,6 +531,7 @@ class CaregiverFragment : Fragment() {
 
     private fun observeHospitalWard() {
         viewModel.hospitalWard.observe(viewLifecycleOwner) { data ->
+            Log.e("Ward", Gson().toJson(data), )
             val mapData = data.map {
                 ChipHospitalData(
                     hospitalId = it.hospitalHopeId ?: 0L,

@@ -7,6 +7,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
 import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
 import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
+import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -78,11 +79,17 @@ interface ApiService {
         @Body pinMessageRequest: PinMessageRequest
     ): Response<BaseDataResponse<*>>
 
+    @GET(GetAdmissionHistory)
+    suspend fun getAdmissionHistory(
+        @Path(value = PathHospitalId) hospitalId: String,
+        @Path(value = PathPatientId) patientId: String
+    ): Response<GroupInfoAdmissionHistoryResponse>
 
     companion object {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
         const val PathHospitalId = "hospital_id"
+        const val PathPatientId = "patient_id"
 
         const val PostUpload = "/caregiver/api/v1/messages/upload"
         const val PostSendMessage = "/caregiver/api/v1/messages"
@@ -91,6 +98,7 @@ interface ApiService {
         const val GetWard = "/caregiver/api/v1/ward/{$PathHospitalId}"
         const val GetEmrIpdWebView = "/caregiver/api/v1/caregivers/summary/{$PathCaregiverId}"
         const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
+        const val GetAdmissionHistory = "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
     }
 
 }

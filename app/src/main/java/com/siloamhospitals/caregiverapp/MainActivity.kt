@@ -1,5 +1,6 @@
 package com.siloamhospitals.caregiverapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
@@ -18,34 +19,36 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         CaregiverButtons.init(this.application)
         //setup initial user
-        // todo add more parameter for fullfill the requirement
+        // todo add more parameter for fulfill the requirement
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 2000000834,
+            userId = 2000000827,
             organizationId = 2,
             wardId = 0,
             context = this,
             role = SiloamCaregiver.ROLE_DOCTOR
         )
 //        2000000834 eka
+//        2000000827 tiur
 //        2000000761 andreas
 //        29000000134 amsal nurse
         binding.buttonOpenCaregiver.setOnClickListener {
-            SiloamCaregiverUI().openChatHistory(
-                this,
-                hospitalHopeId = 2.toString(),
-                hospitalCode = "SHLV",
-                doctorHopeId = 2000000827,
-                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
-                patientName = "ROCK LEE",
-                localMrNumber = "1242421",
-                wardName = "Ephilia",
-                roomName = "1661",
-                gender = "M"
-            )
+            //this function call is for open caregiver history chat
+//            SiloamCaregiverUI().openChatHistory(
+//                this,
+//                hospitalHopeId = 2.toString(),
+//                hospitalCode = "SHLV",
+//                doctorHopeId = 2000000827,
+//                caregiverId = "3467deb0-00de-4815-b2dc-3b89bd54cfe7",
+//                patientName = "ROCK LEE",
+//                localMrNumber = "1242421",
+//                wardName = "Ephilia",
+//                roomName = "1661",
+//                gender = "M"
+//            )
 
-            //navigate activity
+            //navigate to chat room
 //            SiloamCaregiverUI().openChatRoom(
 //                this,
 //                roomName = "General",
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 //                doctorHopeId = 2000000827,
 //                icon = ""
 //            )
-//            startActivity(Intent(this, SecondActivity::class.java))
+            startActivity(Intent(this, SecondActivity::class.java))
         }
 
     }

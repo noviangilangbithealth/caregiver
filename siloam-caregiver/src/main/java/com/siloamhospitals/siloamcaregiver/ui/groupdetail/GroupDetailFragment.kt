@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -87,6 +88,34 @@ class GroupDetailFragment : Fragment() {
         }
     }
 
+    private fun observeAdmissionHistory() {
+        viewModel.admissionHistory.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is BaseHandleResponse.ERROR -> {
+                    Log.e("error", "observeAdmissionHistory: ${response.message}")
+                }
+
+                is BaseHandleResponse.LOADING -> {}
+                is BaseHandleResponse.SUCCESS -> {
+                    val data = response.data?.data
+                    if (data != null) {
+                        if (data.isNotEmpty()) {
+                            viewModel.savedAdmissionHistory.addAll(data)
+                            findNavController().navigate(R.id.action_groupDetailFragment2_to_admissionHistoryFragment)
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.admission_history_empty),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     private fun onDataLoaded(data: GroupInfoDataResponse) {
         Logger.d(Gson().toJson(data))
         //map response to data class for ui
@@ -99,6 +128,9 @@ class GroupDetailFragment : Fragment() {
             )
         }.sortedBy { it.hopeId == viewModel.doctorHopeId }
         val patientResult = data.result
+
+        viewModel.patientDetail = patientResult
+
 
         with(binding) {
 
@@ -157,6 +189,13 @@ class GroupDetailFragment : Fragment() {
                     viewModel.attachment.clear()
                     viewModel.attachment.addAll(data.attachment)
                     findNavController().navigate(R.id.action_groupDetailFragment2_to_pictureDocumentFragment2)
+                }
+            }
+
+            with(groupDetailAdmissionHistory) {
+                layoutGroupDetailAdmissionHistory.setSingleOnClickListener {
+                    viewModel.getAdmissionHistory()
+                    observeAdmissionHistory()
                 }
             }
         }
