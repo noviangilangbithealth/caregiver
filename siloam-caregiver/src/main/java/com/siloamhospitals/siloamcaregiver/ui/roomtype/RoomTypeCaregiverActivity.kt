@@ -97,11 +97,13 @@ class RoomTypeCaregiverActivity : AppCompatActivity() {
                     description = descriptions
                     gender = if (mPreference.historyGender == "M") 1 else 0
                     mPreference.isChatHistory = false
+                    mPreference.isHistoryChatRoom = true
                 } else {
                     caregiverId = getStringExtra(CAREGIVER_ID).orEmpty()
                     patientName = getStringExtra(PATIENT_NAME).orEmpty()
                     description = getStringExtra(DESCRIPTION).orEmpty()
                     gender = getIntExtra(GENDER, 0)
+                    mPreference.isHistoryChatRoom = false
                 }
             }
         }

@@ -50,6 +50,7 @@ class AppPreferences(val context: Context) {
         private const val HISTORY_LOCAL_MR_NUMBER = "historyLocalMrNumber"
         private const val HISTORY_GENDER = "historyGender"
         private const val HISTORY_PATIENT_NAME = "historyPatientName"
+        private const val IS_HISTORY_CHAT_ROOM = "historyChatRoom"
         private const val CHANNEL_ID = "channelId"
         private const val ROOM_NAME = "roomName"
         private const val URL_ICON = "urlIcon"
@@ -181,6 +182,15 @@ class AppPreferences(val context: Context) {
         }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+    var isHistoryChatRoom: Boolean
+        get() = findPreference(IS_HISTORY_CHAT_ROOM, false)
+        set(value) {
+            putPreference(IS_HISTORY_CHAT_ROOM, value)
+        }
+
+
+
     var isChatHistory: Boolean
         get() = findPreference(NOTIF, false)
         set(value) {
