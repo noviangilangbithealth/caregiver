@@ -38,7 +38,7 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
     private lateinit var currentPhotoPath: String
     private var getFile: File? = null
 
-    private val launcherIntentCamera = registerForActivityResult(
+    private val launcherIntentPhotoCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
@@ -46,6 +46,15 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
             val bundleCam = Bundle()
             bundleCam.putSerializable(KEY_CAMERA, file)
             sendParent(bundleCam)
+        }
+    }
+
+    private val launcherIntentVideoCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            val videoUri: Uri? = result.data?.data
+            // Use videoUri here
         }
     }
 
@@ -110,26 +119,16 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
 //                    view = "button_camera",
 //                    message = "Button Camera Clicked"
 //                )
-                when {
-                    ContextCompat.checkSelfPermission(
-                        binding.root.context,
-                        Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED -> {
-                        startIntentCamera()
-                    }
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        requireActivity(),
-                        Manifest.permission.CAMERA
-                    ) -> {
-                        requestPermissionLauncher.launch(
-                            Manifest.permission.CAMERA
-                        )
-                    }
-                    else -> {
-                        requestPermissionLauncher.launch(
-                            Manifest.permission.CAMERA
-                        )
-                    }
+
+                checkPermissionCamera {
+                    startIntentPhotoCamera()
+                }
+
+            }
+
+            tbVideoFromCamera.setOnClickListener {
+                checkPermissionCamera {
+                    startIntentVideoCamera()
                 }
             }
 
@@ -157,7 +156,16 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
     }
 
     @SuppressLint("QueryPermissionsNeeded")
-    private fun startIntentCamera() {
+    private fun startIntentVideoCamera() {
+        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+        if (intent.resolveActivity(binding.root.context.packageManager) != null) {
+            launcherIntentVideoCamera.launch(intent)
+        }
+    }
+
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun startIntentPhotoCamera() {
+
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.resolveActivity(binding.root.context.packageManager)
 
@@ -169,7 +177,32 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
             )
             currentPhotoPath = it.absolutePath
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-            launcherIntentCamera.launch(intent)
+            launcherIntentPhotoCamera.launch(intent)
+        }
+
+    }
+
+    private fun checkPermissionCamera(action: () -> Unit) {
+        when {
+            ContextCompat.checkSelfPermission(
+                binding.root.context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                action.invoke()
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.CAMERA
+            ) -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.CAMERA
+                )
+            }
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.CAMERA
+                )
+            }
         }
     }
 
@@ -236,9 +269,9 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
     private fun startIntentGallery() {
         val intent = Intent()
         intent.action = Intent.ACTION_GET_CONTENT
-        intent.type = "image/*"
+        intent.type = "image/* video/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        val chooser = Intent.createChooser(intent, "Choose a Picture")
+        val chooser = Intent.createChooser(intent, "Choose a Picture or Video")
         launcherIntentGallery.launch(chooser)
     }
 

@@ -79,7 +79,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:paddingTop="@dimen/medium"
-        android:layout_marginHorizontal="@dimen/medium"
+        android:paddingHorizontal="@dimen/medium"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/medium"
         app:layout_constrainedHeight="true"

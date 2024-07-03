@@ -179,6 +179,10 @@ class ChatRoomCaregiverAdapter(
                 layoutLinkRight.setOnClickListener {
                     action?.invoke(urlWeb, true)
                 }
+                root.setOnLongClickListener {
+
+
+                }
 //                tvChat.isVisible = !item.message.contains("https://")
             }
 

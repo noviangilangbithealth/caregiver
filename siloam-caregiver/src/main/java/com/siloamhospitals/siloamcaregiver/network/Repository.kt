@@ -357,15 +357,20 @@ class Repository(
         return RetrofitInstance.getInstance.sendMessage(request)
     }
 
+    suspend fun deleteMessage(messageId: String): Response<BaseDataResponse<*>> {
+        return RetrofitInstance.getInstance.deleteMessage(messageId)
+    }
+
     suspend fun postUploadAttachment(
         files: List<File>,
-        isVoiceNote: Boolean = false
+        isVoiceNote: Boolean = false,
+        isVideo: Boolean = false,
     ): Response<AttachmentCaregiverResponse> {
         val attachment = files.map {
             val fbody =
-                if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType()) else it.asRequestBody(
-                    "image/jpeg".toMediaTypeOrNull()
-                )
+                if (isVoiceNote) it.asRequestBody("audio/m4a".toMediaType())
+                else if (isVideo) it.asRequestBody("video/*".toMediaType())
+                else it.asRequestBody("image/jpeg".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("attachment", it.name, fbody)
         }
         return RetrofitInstance.getInstance.postUpload(attachment)

@@ -56,6 +56,8 @@ data class CaregiverChatRoomUi(
     val isUrgent: Boolean = false,
     val uriPic: Uri? = null,
     val isDateLimit: Boolean = false,
-    val isVoiceNote: Boolean = false
+    val isVoiceNote: Boolean = false,
+    val isVideo: Boolean = false,
+    val isActive: Boolean = false,
 )
 

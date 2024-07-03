@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/small"
+    android:paddingBottom="@dimen/smaller">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -42,6 +44,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_chat_deleted"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Anda Menghapus Pesan Ini"
+                android:textColor="@color/colorBlack38"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_chat"
+                android:drawableStart="@drawable/ic_outline_block"
+                android:drawablePadding="6dp"
+                android:visibility="gone"/>
+
 
             <LinearLayout
                 android:id="@+id/layout_link_right"
@@ -49,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_chat">
+                app:layout_constraintTop_toBottomOf="@id/tv_chat_deleted">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -86,6 +104,25 @@
                     android:layout_height="wrap_content" />
 
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_video"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_link_right">
+
+                <ImageView
+                    android:id="@+id/video_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.card.MaterialCardView>
+
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_date"

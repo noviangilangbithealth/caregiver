@@ -11,6 +11,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoR
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -22,6 +23,11 @@ interface ApiService {
     @POST(PostSendMessage)
     suspend fun sendMessage(
         @Body sendChatRequestBody: SendChatCaregiverRequest
+    ): Response<BaseDataResponse<*>>
+
+    @DELETE(DeleteMessage)
+    suspend fun deleteMessage(
+        @Path(value = PathMessageId) messageId: String
     ): Response<BaseDataResponse<*>>
 
     @Multipart
@@ -83,6 +89,7 @@ interface ApiService {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
         const val PathHospitalId = "hospital_id"
+        const val PathMessageId = "message_id"
 
         const val PostUpload = "/caregiver/api/v1/messages/upload"
         const val PostSendMessage = "/caregiver/api/v1/messages"
@@ -91,6 +98,7 @@ interface ApiService {
         const val GetWard = "/caregiver/api/v1/ward/{$PathHospitalId}"
         const val GetEmrIpdWebView = "/caregiver/api/v1/caregivers/summary/{$PathCaregiverId}"
         const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
+        const val DeleteMessage = "/caregiver/api/v1/messages/{message_id}"
     }
 
 }

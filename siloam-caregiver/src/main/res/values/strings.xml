@@ -35,5 +35,7 @@
     <string name="please_select_unit_before_ward">Please select unit first before selecting ward</string>
     <string name="unit_semicol">Unit :</string>
     <string name="wards_semicol">Wards :</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 
 </resources>

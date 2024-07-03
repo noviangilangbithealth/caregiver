@@ -32,6 +32,9 @@ class ChatRoomCaregiverViewModel(
     val _sendMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
     val sendMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _sendMessage
 
+    val _deleteMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
+    val deleteMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _deleteMessage
+
     val _messageList = MutableLiveData<Event<CaregiverChatListData>>()
     val messageList: LiveData<Event<CaregiverChatListData>> = _messageList
     val _newMessage = MutableLiveData<Event<CaregiverChatData>>()
@@ -62,6 +65,23 @@ class ChatRoomCaregiverViewModel(
 
     val _uploadFiles = MutableLiveData<BaseHandleResponse<AttachmentCaregiverResponse>>()
     val uploadFiles: LiveData<BaseHandleResponse<AttachmentCaregiverResponse>> = _uploadFiles
+
+    fun deleteMessage(messageId: String) =
+        viewModelScope.launch {
+            try {
+                _deleteMessage.postValue(BaseHandleResponse.LOADING())
+                val response = repository.deleteMessage(messageId)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _deleteMessage.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _deleteMessage.postValue(BaseHandleResponse.ERROR(response.message()))
+                }
+            } catch (e: Exception) {
+                _deleteMessage.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
+            }
+        }
 
     fun uploadFiles(documentFiles: List<File>, isVoiceNote: Boolean = false) =
         viewModelScope.launch {
@@ -210,7 +230,8 @@ class ChatRoomCaregiverViewModel(
                         isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(
                             0
                         )?.uriExt.orEmpty()
-                            .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
+                            .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
+                        isActive = it.isActive ?: false
                     )
                 )
             }
@@ -244,7 +265,8 @@ class ChatRoomCaregiverViewModel(
             isSelfSender = user?.hopeUserID == doctorHopeId,
             isUrgent = (type ?: 1).toInt() == 2,
             isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
-                .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c'
+                .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
+            isActive = this.isActive ?: false
         )
     }
 

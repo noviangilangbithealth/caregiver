@@ -51,6 +51,9 @@ data class CaregiverChatData (
 
     @SerializedName("channel_id")
     val channelId: String? = null,
+
+    @SerializedName("is_active")
+    val isActive: Boolean? = false
 )
 
 @JsonClass(generateAdapter = true)

@@ -13,6 +13,18 @@
         android:layout_marginTop="@dimen/medium"/>
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tb_video_from_camera"
+        style="@style/TextAppearance.MaterialComponents.Body2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="14dp"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical"
+        android:drawablePadding="12dp"
+        android:text="Take Video from Camera"
+        android:drawableStart="@drawable/ic_video_camera"/>
+
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tb_from_camera"
         style="@style/TextAppearance.MaterialComponents.Body2"
         android:layout_width="match_parent"
@@ -21,7 +33,7 @@
         android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
         android:drawablePadding="12dp"
-        android:text="Lampirkan Gambar dari Kamera"
+        android:text="Take Photo from Camera"
         android:drawableStart="@drawable/ic_camera_chat_caregiver"/>
 
     <com.google.android.material.textview.MaterialTextView
@@ -33,7 +45,7 @@
         android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
         android:drawablePadding="12dp"
-        android:text="Lampirkan Gambar dari Galeri"
+        android:text="Get Photo/Video from Gallery"
         android:drawableStart="@drawable/ic_image_caregiver"/>
 
 <!--    <com.google.android.material.textview.MaterialTextView-->
