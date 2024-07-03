@@ -64,7 +64,7 @@ class EmrIpdWebViewFragment : Fragment() {
             }
         }
 
-        loadUrl(groupDetailViewModel.urlWebView)
+        loadUrl(if (groupDetailViewModel.fromAdmissionHistory) groupDetailViewModel.admissionHistoryMrUrl else groupDetailViewModel.urlWebView)
     }
 
     override fun onDestroyView() {

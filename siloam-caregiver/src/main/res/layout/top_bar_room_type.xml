@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="@dimen/medium"
+    android:paddingHorizontal="@dimen/small"
     android:paddingVertical="@dimen/small_fit">
 
     <ImageButton
@@ -25,6 +25,7 @@
         android:layout_marginStart="@dimen/large"
         android:layout_marginEnd="@dimen/medium"
         android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iv_close_room_type"
         app:layout_constraintStart_toEndOf="@id/ib_back"
         app:layout_constraintTop_toTopOf="parent">
@@ -33,52 +34,32 @@
             android:id="@+id/tv_app_bar_patient_name_caregiver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="200dp"
             android:singleLine="true"
             android:textColor="@color/colorBlackGrade"
-            android:textSize="@dimen/text_medium"
+            android:textSize="@dimen/text_large"
             android:textStyle="bold"
-            tools:text="Rina Gunawan " />
+            tools:text="Rina  " />
 
         <ImageView
             android:id="@+id/iv_app_bar_gender"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/small"
-            android:layout_marginEnd="@dimen/large"
             android:src="@drawable/ic_label_male"
             tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tv_app_bar_patient_info_caregiver"
-        android:layout_width="@dimen/match_constraint"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/large"
-        android:layout_marginTop="@dimen/very_small"
-        android:layout_marginEnd="@dimen/medium"
-        android:ellipsize="end"
-        android:letterSpacing="0.15"
-        android:lineHeight="14sp"
-        android:singleLine="true"
-        android:textAllCaps="true"
-        android:textColor="@color/colorBlack54"
-        android:textFontWeight="400"
-        android:textSize="@dimen/text_tiny"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iv_close_room_type"
-        app:layout_constraintStart_toEndOf="@id/ib_back"
-        app:layout_constraintTop_toBottomOf="@id/ll_app_bar_patient_name_caregiver"
-        tools:text="MR No: SHLV.901021  |  Admission No: IPA5000255000  | Ward: 1 Ephelia | Room No: 555-1" />
-
     <ImageView
         android:id="@+id/iv_close_room_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="@dimen/small"
+        android:src="@drawable/ic_close_caregiver"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_close_caregiver"
-        android:layout_marginEnd="@dimen/medium"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

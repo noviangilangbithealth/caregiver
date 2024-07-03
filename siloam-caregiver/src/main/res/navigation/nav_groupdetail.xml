@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_groupDetailFragment2_to_emrIpdWebViewFragment"
             app:destination="@id/emrIpdWebViewFragment" />
+        <action
+            android:id="@+id/action_groupDetailFragment2_to_admissionHistoryFragment"
+            app:destination="@id/admissionHistoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/pictureDocumentFragment2"
@@ -27,5 +30,14 @@
         android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.EmrIpdWebViewFragment"
         android:label="fragment_emr_ipd_web_view"
         tools:layout="@layout/fragment_emr_ipd_web_view" />
+    <fragment
+        android:id="@+id/admissionHistoryFragment"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.groupdetail.AdmissionHistoryFragment"
+        android:label="fragment_admission_history"
+        tools:layout="@layout/fragment_admission_history" >
+        <action
+            android:id="@+id/action_admissionHistoryFragment_to_emrIpdWebViewFragment"
+            app:destination="@id/emrIpdWebViewFragment" />
+    </fragment>
 
 </navigation>

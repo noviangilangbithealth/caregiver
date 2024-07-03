@@ -81,6 +81,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             GroupDetailActivity.start(requireContext(), viewModel.caregiverId, viewModel.channelId)
         }
 
+
         initRecorder()
         setupPreference()
         setupAdapter()
@@ -125,7 +126,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 }
 
                 override fun loadMoreItems() {
-                    if(!viewModel.isLastPage || viewModel.sizeChat > 15) {
+                    if (!viewModel.isLastPage || viewModel.sizeChat > 15) {
                         viewModel.emitGetMessage(loadMore = true)
                         onProcess = true
                     }
@@ -244,9 +245,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 it.getContentIfNotHandled()?.let { data ->
                     onProcess = false
                     if (data.data.orEmpty().isNotEmpty()) {
-                        onMessageListLoadedBaseRv(data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()){
-                            if(it) adapterChatRoom.remove(adapterChatRoom.getSize()-1)
-                        })
+                        onMessageListLoadedBaseRv(
+                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
+                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                            })
                     } else {
                         resetCurrentPage()
                         isLastPage = true
@@ -380,6 +382,15 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 }
             }
 
+        }
+
+
+        if (preferences.isHistoryChatRoom) {
+            binding.llChatRoomClosed.visible()
+            binding.clInputText.gone()
+        } else {
+            binding.llChatRoomClosed.gone()
+            binding.clInputText.visible()
         }
     }
 
@@ -568,7 +579,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     override fun onResume() {
         super.onResume()
-        if(viewModel.currentPage > 1) {
+        if (viewModel.currentPage > 1) {
             viewModel.emitGetMessage {
                 binding.run {
                     lottieLoadingChatRoom.visible()
@@ -583,6 +594,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         super.onDestroyView()
         viewModel.resetCurrentPage()
         viewModel.isLastPage = false
+        preferences.isHistoryChatRoom = false
         adapterChatRoom.clear()
     }
 
