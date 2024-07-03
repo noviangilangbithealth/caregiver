@@ -14,6 +14,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -62,6 +63,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private lateinit var preferences: AppPreferences
 
     lateinit var recorder: Recorder
+    private var positionDelete: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,14 +110,23 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
     private fun setupAdapter() {
-        adapterChatRoom = ChatRoomCaregiverAdapter { url, isWeb ->
-            if (isWeb) {
-                viewModel.urlEmrIpd = url
-                findNavController().navigate(R.id.action_chatRoomCaregiverFragment2_to_chatRoomWebViewFragment)
-            } else {
-                viewDetailImage(url)
+        adapterChatRoom = ChatRoomCaregiverAdapter(
+            action = { url, isWeb ->
+                if (isWeb) {
+                    viewModel.urlEmrIpd = url
+                    findNavController().navigate(R.id.action_chatRoomCaregiverFragment2_to_chatRoomWebViewFragment)
+                } else {
+                    viewDetailImage(url)
+                }
+            },
+            actionLongClick = { position ->
+                positionDelete = position
+//                Toast.makeText(requireContext(), "position: " + position.toString(), Toast.LENGTH_SHORT).show()
+                DeleteMessageBottomSheetDialog {
+                    viewModel.deleteMessage(adapterChatRoom.getList()[positionDelete!!].id)
+                }.show(childFragmentManager, "DeleteMessageBottomSheetDialog")
             }
-        }
+        )
 
         binding.rvChatCaregiver.run {
             adapter = adapterChatRoom
@@ -184,6 +195,23 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         observeNewMessage()
         observeUploadPhotos()
         observeConnection()
+        observeDeleteMessage()
+    }
+
+    private fun observeDeleteMessage() {
+        viewModel.deleteMessage.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is BaseHandleResponse.ERROR -> {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is BaseHandleResponse.LOADING -> {}
+                is BaseHandleResponse.SUCCESS -> {
+//                    Toast.makeText(requireContext(), "Message Deleted", Toast.LENGTH_SHORT).show()
+                    viewModel.listenNewMessageList()
+                }
+            }
+        }
     }
 
     private fun observeConnection() {
@@ -208,6 +236,8 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                             adapterChatRoom.add(0, data.generateNewChatUI())
                             binding.rvChatCaregiver.smoothScrollToPosition(0)
                             setReadMessage()
+                        } else if (data.isActive!!.not() && positionDelete != null) {
+                            adapterChatRoom.update(positionDelete!!, data.generateNewChatUI())
                         }
                     }
                 }

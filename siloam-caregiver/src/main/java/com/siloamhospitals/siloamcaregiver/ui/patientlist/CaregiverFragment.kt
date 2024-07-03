@@ -600,23 +600,27 @@ class CaregiverFragment : Fragment() {
             !viewModel.isSpecialist -> {
                 val wardSorted = ward.sortedBy { it.hospitalId }.sortedBy { it.wardId }
                 if (!viewModel.isFiltered) {
-                    val x = viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
-                        .copy(isSelected = true, isHospital = true)
-                    val y =
-                        if (viewModel.role == ROLE_DOCTOR) {
-                            wardSorted.first { it.hospitalId == x.hospitalId }
-                                .copy(isSelected = true, isHospital = false)
-                        } else {
-                            wardSorted.first { it.wardId == viewModel.selectedWard }
-                                .copy(isSelected = true, isHospital = false)
-                        }
-                    dataMap.add(x)
-                    dataMap.add(y)
-                    viewModel.selectedHospital = x.hospitalId
-                    viewModel.selectedWard = y.wardId
-                    viewModel.bufferHospital = x.hospitalId
-                    viewModel.bufferWard = y.wardId
-                    viewModel.emitGetCaregiver()
+                    try {
+                        val x = viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
+                            .copy(isSelected = true, isHospital = true)
+                        val y =
+                            if (viewModel.role == ROLE_DOCTOR) {
+                                wardSorted.first { it.hospitalId == x.hospitalId }
+                                    .copy(isSelected = true, isHospital = false)
+                            } else {
+                                wardSorted.first { it.wardId == viewModel.selectedWard }
+                                    .copy(isSelected = true, isHospital = false)
+                            }
+                        dataMap.add(x)
+                        dataMap.add(y)
+                        viewModel.selectedHospital = x.hospitalId
+                        viewModel.selectedWard = y.wardId
+                        viewModel.bufferHospital = x.hospitalId
+                        viewModel.bufferWard = y.wardId
+                        viewModel.emitGetCaregiver()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 } else {
                     val x = viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
                         .copy(isSelected = true, isHospital = true)

@@ -32,7 +32,8 @@ import kotlin.coroutines.CoroutineContext
 
 class ChatRoomCaregiverAdapter(
     private val chatRoomUis: MutableList<CaregiverChatRoomUi> = ArrayList(),
-    val action: ((url: String, isWeb: Boolean) -> Unit)? = null
+    private val action: ((url: String, isWeb: Boolean) -> Unit)? = null,
+    private val actionLongClick: ((position: Int) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), CoroutineScope {
 
     lateinit var adapterContext: Context
@@ -140,49 +141,61 @@ class ChatRoomCaregiverAdapter(
 
             is RightChatViewHolder -> holder.binding.run {
                 tvDate.text = item.time
-                if (item.url.isNotEmpty()) {
-                    Glide.with(adapterContext).load(item.url).into(imageChat)
+                if(!item.isActive) {
+                    tvChatDeleted.visible()
                     tvChat.gone()
-                    cardImage.visible()
-                } else {
-                    tvChat.visible()
+                    tvLink.gone()
                     cardImage.gone()
-                    tvChat.text = item.message
-                }
-                if (item.isRead) {
-                    ivRead.setColorFilter(
-                        ContextCompat.getColor(
-                            adapterContext,
-                            R.color.colorBlueBase
-                        )
-                    )
+                    cardVideo.gone()
                 } else {
-                    ivRead.setColorFilter(
-                        ContextCompat.getColor(
-                            adapterContext,
-                            R.color.colorBlack38
+                    tvChatDeleted.gone()
+                    cardVideo.gone()
+                    if (item.url.isNotEmpty()) {
+                        Glide.with(adapterContext).load(item.url).into(imageChat)
+                        tvChat.gone()
+                        cardImage.visible()
+                    } else {
+                        tvChat.visible()
+                        cardImage.gone()
+                        tvChat.text = item.message
+                    }
+                    if (item.isRead) {
+                        ivRead.setColorFilter(
+                            ContextCompat.getColor(
+                                adapterContext,
+                                R.color.colorBlueBase
+                            )
                         )
-                    )
-                }
-                imageChat.setOnClickListener {
-                    action?.invoke(item.url, false)
-                }
-                layoutLinkRight.isVisible = item.message.contains("https://")
-                var title = ""
-                var urlWeb = ""
-                if (item.message.contains("https://")) {
-                    var x = item.message.split(" ")
-                    title = x.first()
-                    urlWeb = x.last()
-                }
-                tvLink.text = "Go to link - $title"
-                layoutLinkRight.setOnClickListener {
-                    action?.invoke(urlWeb, true)
-                }
-                root.setOnLongClickListener {
+                    } else {
+                        ivRead.setColorFilter(
+                            ContextCompat.getColor(
+                                adapterContext,
+                                R.color.colorBlack38
+                            )
+                        )
+                    }
+                    imageChat.setOnClickListener {
+                        action?.invoke(item.url, false)
+                    }
+                    layoutLinkRight.isVisible = item.message.contains("https://")
+                    var title = ""
+                    var urlWeb = ""
+                    if (item.message.contains("https://")) {
+                        var x = item.message.split(" ")
+                        title = x.first()
+                        urlWeb = x.last()
+                    }
+                    tvLink.text = "Go to link - $title"
+                    layoutLinkRight.setOnClickListener {
+                        action?.invoke(urlWeb, true)
+                    }
 
-
+                    holder.itemView.setOnLongClickListener {
+                        actionLongClick?.invoke(holder.bindingAdapterPosition)
+                        return@setOnLongClickListener true
+                    }
                 }
+
 //                tvChat.isVisible = !item.message.contains("https://")
             }
 
