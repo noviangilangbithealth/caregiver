@@ -26,21 +26,19 @@ import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 class CaregiverButtons private constructor(app: Application) :
     Application.ActivityLifecycleCallbacks by ActivityEmptyLifecycleCallbacks() {
 
-    private var fab: FloatingActionButton? = null // Declare FAB here to access it later
+    private var fab: FloatingActionButton? = null
+    private var isFabVisible: Boolean = true
 
-    private val mPreference by lazy {  AppPreferences(app) }
-    private val repository by lazy {  Repository(mPreference) }
-    private  lateinit var caregiverButtonViewModel: CaregiverButtonViewModel
+    private val mPreference by lazy { AppPreferences(app) }
+    private val repository by lazy { Repository(mPreference) }
+    private lateinit var caregiverButtonViewModel: CaregiverButtonViewModel
 
     init {
-        app.registerActivityLifecycleCallbacks(this)
         app.registerActivityLifecycleCallbacks(this)
     }
 
     @SuppressLint("ClickableViewAccessibility", "UnsafeOptInUsageError")
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        // Check if the activity is not in the list of activities where the FAB should be hidden
-
         val caregiverButtonsViewModelFactory = viewModelFactory {
             initializer {
                 CaregiverButtonViewModel(repository)
@@ -55,48 +53,40 @@ class CaregiverButtons private constructor(app: Application) :
         if (!shouldHideFab(activity)) {
             val decorView = activity.window.decorView as ViewGroup
 
-            // Add FloatingActionButton
-            fab = FloatingActionButton(activity)
-            fab?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    activity,
-                    R.drawable.ic_caregiver_chat
+            if (fab == null) {
+                // Add FloatingActionButton
+                fab = FloatingActionButton(activity)
+                fab?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.ic_caregiver_chat
+                    )
                 )
-            )
-            fab?.imageTintList = null
-            fab?.backgroundTintList = ContextCompat.getColorStateList(activity, R.color.colorPrimaryLight)
+                fab?.imageTintList = null
+                fab?.backgroundTintList = ContextCompat.getColorStateList(activity, R.color.colorPrimaryLight)
 
-            // Set layout parameters for positioning at bottom right
-            val fabParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            )
-            fabParams.gravity = Gravity.BOTTOM or Gravity.END // Position at bottom right
-            // Calculate margin based on screen ratio
-            val screenWidth = activity.resources.displayMetrics.widthPixels.toFloat()
-            val screenHeight = activity.resources.displayMetrics.heightPixels.toFloat()
-            val marginRatio = 0.04f // 4% of the screen width as margin
-            val marginBottomRatio = 0.10f // 4% of the screen width as margin
-            val marginEnd = (screenWidth * marginRatio).toInt()
-            val marginBottom = (screenHeight * marginBottomRatio).toInt()
+                // Set layout parameters for positioning at bottom right
+                val fabParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                fabParams.gravity = Gravity.BOTTOM or Gravity.END // Position at bottom right
 
-            // Set margins based on screen ratio
-            fabParams.rightMargin = marginEnd
-            fabParams.bottomMargin = marginBottom
+                // Calculate margin based on screen ratio
+                val screenWidth = activity.resources.displayMetrics.widthPixels.toFloat()
+                val screenHeight = activity.resources.displayMetrics.heightPixels.toFloat()
+                val marginRatio = 0.04f // 4% of the screen width as margin
+                val marginBottomRatio = 0.10f // 4% of the screen width as margin
+                val marginEnd = (screenWidth * marginRatio).toInt()
+                val marginBottom = (screenHeight * marginBottomRatio).toInt()
 
-            // Add FAB to the layout
-            decorView.addView(fab, fabParams)
+                // Set margins based on screen ratio
+                fabParams.rightMargin = marginEnd
+                fabParams.bottomMargin = marginBottom
 
-//            fab?.doOnPreDraw {
-//                // Create a BadgeDrawable instance
-//                val badgeDrawable = BadgeDrawable.create(activity)
-//                badgeDrawable.number = 10 // Set the badge count
-//                badgeDrawable.backgroundColor = ContextCompat.getColor(activity, R.color.colorRedBase) // Set the badge background color
-//                badgeDrawable.badgeGravity = BadgeDrawable.TOP_END // Set the badge position
-//                badgeDrawable.horizontalOffset = 10.dpToPx(activity) // Set the horizontal offset
-//                badgeDrawable.verticalOffset = 10.dpToPx(activity) // Set the vertical offset
-//                BadgeUtils.attachBadgeDrawable(badgeDrawable, fab!!, null) // Attach the badge to the FAB
-//            }
+                // Add FAB to the layout
+                decorView.addView(fab, fabParams)
+            }
 
             val badgeDrawable = BadgeDrawable.create(activity)
             caregiverButtonViewModel.run {
@@ -105,7 +95,7 @@ class CaregiverButtons private constructor(app: Application) :
                 floatingNotification.observe(activity as LifecycleOwner) { event ->
                     event.getContentIfNotHandled()?.let { data ->
                         fab?.post {
-                            if(data.isUrgentMessage) {
+                            if (data.isUrgentMessage) {
                                 fab?.setImageDrawable(
                                     ContextCompat.getDrawable(
                                         activity,
@@ -124,7 +114,7 @@ class CaregiverButtons private constructor(app: Application) :
                                 fab?.imageTintList = null
                                 fab?.backgroundTintList = ContextCompat.getColorStateList(activity, R.color.colorPrimaryLight)
                             }
-                            if(data.count > 0) {
+                            if (data.count > 0) {
                                 badgeDrawable.setVisible(true)
                                 badgeDrawable.number = data.count // Set the badge count
                                 badgeDrawable.backgroundColor = ContextCompat.getColor(activity, R.color.colorRedVibrant) // Set the badge background color
@@ -142,12 +132,12 @@ class CaregiverButtons private constructor(app: Application) :
 
             // Set an onClick listener for the FAB
             fab?.setOnClickListener {
-                // Perform your onClick action here
                 SiloamCaregiverUI.getInstances().openCaregiver(activity)
             }
+
+            // Ensure the visibility is consistent with the flag
+            fab?.visibility = if (isFabVisible) View.VISIBLE else View.GONE
         } else {
-            // If the activity is in the list of activities where the FAB should be hidden,
-            // hide the existing FAB if it exists
             val fab = findFabForActivity(activity)
             fab?.visibility = View.GONE
         }
@@ -155,7 +145,6 @@ class CaregiverButtons private constructor(app: Application) :
 
     // Method to check if the FAB should be hidden for the given activity
     private fun shouldHideFab(activity: Activity): Boolean {
-        // List the activities where you want to hide the FAB by their class names
         val activitiesToHideFab = listOf(
             "AuthActivity",
             "CaregiverActivity",
@@ -163,8 +152,6 @@ class CaregiverButtons private constructor(app: Application) :
             "GroupDetailActivity",
             "RoomTypeCaregiverActivity",
         )
-
-        // Check if the current activity is in the list of activities where the FAB should be hidden
         return activitiesToHideFab.contains(activity::class.java.simpleName)
     }
 
@@ -179,11 +166,46 @@ class CaregiverButtons private constructor(app: Application) :
         return null
     }
 
+    // Add method to hide the FAB
+    private fun hideFab() {
+        fab?.visibility = View.GONE
+        isFabVisible = false
+    }
+
+    // Add method to show the FAB
+    private fun showFab() {
+        fab?.visibility = View.VISIBLE
+        isFabVisible = true
+    }
+
+    // Add method to toggle the FAB visibility
+    private fun toggleFab() {
+        if (isFabVisible) {
+            hideFab()
+        } else {
+            showFab()
+        }
+    }
+
     companion object {
         private var instance: CaregiverButtons? = null
 
         fun init(application: Application) {
-            instance = CaregiverButtons(application)
+            if (instance == null) {
+                instance = CaregiverButtons(application)
+            }
+        }
+
+        fun hide() {
+            instance?.hideFab()
+        }
+
+        fun show() {
+            instance?.showFab()
+        }
+
+        fun toggle() {
+            instance?.toggleFab()
         }
 
         // Extension function to convert dp to pixels
