@@ -52,7 +52,7 @@ class CaregiverButtons private constructor(app: Application) :
         if (!shouldHideFab(activity)) {
             val decorView = activity.window.decorView as ViewGroup
 
-            if (fab == null) {
+
                 // Add FloatingActionButton
                 fab = FloatingActionButton(activity)
                 fab?.setImageDrawable(
@@ -70,7 +70,6 @@ class CaregiverButtons private constructor(app: Application) :
                     FrameLayout.LayoutParams.WRAP_CONTENT
                 )
                 fabParams.gravity = Gravity.BOTTOM or Gravity.END // Position at bottom right
-
                 // Calculate margin based on screen ratio
                 val screenWidth = activity.resources.displayMetrics.widthPixels.toFloat()
                 val screenHeight = activity.resources.displayMetrics.heightPixels.toFloat()
@@ -85,7 +84,6 @@ class CaregiverButtons private constructor(app: Application) :
 
                 // Add FAB to the layout
                 decorView.addView(fab, fabParams)
-            }
 
             val badgeDrawable = BadgeDrawable.create(activity)
             caregiverButtonViewModel.run {
@@ -177,9 +175,9 @@ class CaregiverButtons private constructor(app: Application) :
         private var instance: CaregiverButtons? = null
 
         fun init(application: Application) {
-            if (instance == null) {
+
                 instance = CaregiverButtons(application)
-            }
+
         }
 
         fun hide() {
