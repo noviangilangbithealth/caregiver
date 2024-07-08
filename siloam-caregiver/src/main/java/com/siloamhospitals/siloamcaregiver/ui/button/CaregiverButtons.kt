@@ -27,7 +27,6 @@ class CaregiverButtons private constructor(app: Application) :
     Application.ActivityLifecycleCallbacks by ActivityEmptyLifecycleCallbacks() {
 
     private var fab: FloatingActionButton? = null
-    private var isFabVisible: Boolean = true
 
     private val mPreference by lazy { AppPreferences(app) }
     private val repository by lazy { Repository(mPreference) }
@@ -134,9 +133,6 @@ class CaregiverButtons private constructor(app: Application) :
             fab?.setOnClickListener {
                 SiloamCaregiverUI.getInstances().openCaregiver(activity)
             }
-
-            // Ensure the visibility is consistent with the flag
-            fab?.visibility = if (isFabVisible) View.VISIBLE else View.GONE
         } else {
             val fab = findFabForActivity(activity)
             fab?.visibility = View.GONE
@@ -169,23 +165,13 @@ class CaregiverButtons private constructor(app: Application) :
     // Add method to hide the FAB
     private fun hideFab() {
         fab?.visibility = View.GONE
-        isFabVisible = false
     }
 
     // Add method to show the FAB
     private fun showFab() {
         fab?.visibility = View.VISIBLE
-        isFabVisible = true
     }
 
-    // Add method to toggle the FAB visibility
-    private fun toggleFab() {
-        if (isFabVisible) {
-            hideFab()
-        } else {
-            showFab()
-        }
-    }
 
     companion object {
         private var instance: CaregiverButtons? = null
@@ -202,10 +188,6 @@ class CaregiverButtons private constructor(app: Application) :
 
         fun show() {
             instance?.showFab()
-        }
-
-        fun toggle() {
-            instance?.toggleFab()
         }
 
         // Extension function to convert dp to pixels
