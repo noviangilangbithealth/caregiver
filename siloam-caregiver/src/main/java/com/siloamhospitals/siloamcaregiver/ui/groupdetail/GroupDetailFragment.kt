@@ -103,11 +103,8 @@ class GroupDetailFragment : Fragment() {
                             viewModel.savedAdmissionHistory.addAll(data)
                             findNavController().navigate(R.id.action_groupDetailFragment2_to_admissionHistoryFragment)
                         } else {
-                            Toast.makeText(
-                                requireContext(),
-                                getString(R.string.admission_history_empty),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            viewModel.emptyState = true
+                            findNavController().navigate(R.id.action_groupDetailFragment2_to_admissionHistoryFragment)
                         }
                     }
                 }

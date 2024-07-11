@@ -16,6 +16,8 @@ import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentAdmissionHistoryBinding
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDateTime
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
+import com.siloamhospitals.siloamcaregiver.ext.view.gone
+import com.siloamhospitals.siloamcaregiver.ext.view.visible
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryDataResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
@@ -47,38 +49,53 @@ class AdmissionHistoryFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val dataSource = dataSourceTypedOf(viewModel.savedAdmissionHistory)
-        binding.rvAdmissionHistory.setup {
-            withDataSource(dataSource)
-            withItem<GroupInfoAdmissionHistoryDataResponse, AdmissionHistoryViewHolder>(R.layout.item_admission_history) {
-                onBind(::AdmissionHistoryViewHolder) { _, item ->
-                    val hospitalMrAdmission =
-                        "${item.orgCode}.${item.localMrNo} • ${item.admissionNo}"
-                    tvHospitalMrAdmission.text = hospitalMrAdmission
-                    tvDoctorName.text = item.doctorName
-                    tvDateTime.text =
-                        item.createAt.take(19).toLocalDateTime() withFormat "dd MMM yyyy, HH:mm"
-                    btnChatHistory.setOnClickListener {
-                        val intent = Intent(requireContext(), RoomTypeCaregiverActivity::class.java)
-                        preferences.historyCaregiverId = item.id
-                        preferences.isChatHistory = true
-                        preferences.historyHospitalId = item.orgId
-                        preferences.historyHospitalUnit = item.orgCode
-                        preferences.historyRoom = item.roomNo
-                        preferences.historyWard = item.wardName
-                        preferences.historyLocalMrNumber = item.localMrNo
-                        preferences.historyPatientName = viewModel.patientDetail.name
-                        preferences.historyGender =
-                            if (viewModel.patientDetail.gender == 1) "M" else "F"
-                        startActivity(intent)
-                    }
-                    btnMedicalRecord.setOnClickListener {
-                        viewModel.getEmrIpdWebView(item.id)
-                        observeUrlWebView()
+        if (viewModel.emptyState) {
+            with(binding) {
+                tvEmptyAdmissionHistory.visible()
+                ivEmptyAdmissionHistory.visible()
+                rvAdmissionHistory.gone()
+            }
+        } else {
+            with(binding) {
+                tvEmptyAdmissionHistory.gone()
+                ivEmptyAdmissionHistory.gone()
+                rvAdmissionHistory.visible()
+            }
+            val dataSource = dataSourceTypedOf(viewModel.savedAdmissionHistory)
+            binding.rvAdmissionHistory.setup {
+                withDataSource(dataSource)
+                withItem<GroupInfoAdmissionHistoryDataResponse, AdmissionHistoryViewHolder>(R.layout.item_admission_history) {
+                    onBind(::AdmissionHistoryViewHolder) { _, item ->
+                        val hospitalMrAdmission =
+                            "${item.orgCode}.${item.localMrNo} • ${item.admissionNo}"
+                        tvHospitalMrAdmission.text = hospitalMrAdmission
+                        tvDoctorName.text = item.doctorName
+                        tvDateTime.text =
+                            item.createAt.take(19).toLocalDateTime() withFormat "dd MMM yyyy, HH:mm"
+                        btnChatHistory.setOnClickListener {
+                            val intent =
+                                Intent(requireContext(), RoomTypeCaregiverActivity::class.java)
+                            preferences.historyCaregiverId = item.id
+                            preferences.isChatHistory = true
+                            preferences.historyHospitalId = item.orgId
+                            preferences.historyHospitalUnit = item.orgCode
+                            preferences.historyRoom = item.roomNo
+                            preferences.historyWard = item.wardName
+                            preferences.historyLocalMrNumber = item.localMrNo
+                            preferences.historyPatientName = viewModel.patientDetail.name
+                            preferences.historyGender =
+                                if (viewModel.patientDetail.gender == 1) "M" else "F"
+                            startActivity(intent)
+                        }
+                        btnMedicalRecord.setOnClickListener {
+                            viewModel.getEmrIpdWebView(item.id)
+                            observeUrlWebView()
+                        }
                     }
                 }
             }
         }
+
     }
 
     private fun observeUrlWebView() {

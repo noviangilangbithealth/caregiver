@@ -41,5 +41,7 @@
     <string name="history_chat">History Chat</string>
     <string name="admission_history_empty">The patient does not have a history of admission.</string>
     <string name="chat_room_closed">This room chat is closed. The patient has been discharged</string>
+    <string name="attachment">Attachment</string>
+    <string name="no_admission_history">No Admission History\n</string>
 
 </resources>

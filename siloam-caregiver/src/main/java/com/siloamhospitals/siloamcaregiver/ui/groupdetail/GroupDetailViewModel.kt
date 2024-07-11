@@ -43,6 +43,7 @@ class GroupDetailViewModel(
         _admissionHistory
 
     var savedAdmissionHistory = mutableListOf<GroupInfoAdmissionHistoryDataResponse>()
+    var emptyState = false
     var admissionHistoryMrUrl = ""
     var fromAdmissionHistory = false
     fun getAdmissionHistory() {
