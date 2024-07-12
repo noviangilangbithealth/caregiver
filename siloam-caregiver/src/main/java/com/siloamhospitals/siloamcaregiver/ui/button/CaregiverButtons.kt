@@ -158,6 +158,7 @@ class CaregiverButtons private constructor(app: Application) :
             "ChatroomCaregiverActivity",
             "GroupDetailActivity",
             "RoomTypeCaregiverActivity",
+            "VideoPlayerActivity"
         )
         return activitiesToHideFab.contains(activity::class.java.simpleName)
     }

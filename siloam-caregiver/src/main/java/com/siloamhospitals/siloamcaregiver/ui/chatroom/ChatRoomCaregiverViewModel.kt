@@ -83,11 +83,11 @@ class ChatRoomCaregiverViewModel(
             }
         }
 
-    fun uploadFiles(documentFiles: List<File>, isVoiceNote: Boolean = false) =
+    fun uploadFiles(documentFiles: List<File>, isVoiceNote: Boolean = false, isVideo: Boolean = false) =
         viewModelScope.launch {
             try {
                 _uploadFiles.postValue(BaseHandleResponse.LOADING())
-                val response = repository.postUploadAttachment(documentFiles, isVoiceNote)
+                val response = repository.postUploadAttachment(documentFiles, isVoiceNote, isVideo)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         com.orhanobut.logger.Logger.d(it)
@@ -222,7 +222,7 @@ class ChatRoomCaregiverViewModel(
                         name = if (roleId == 1) it.user?.name.orEmpty() else it.user?.role?.name.orEmpty() + " - " + it.user?.name.orEmpty(),
                         message = it.message.orEmpty(),
                         time = it.createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
-                        url = if (it.attachment.isNullOrEmpty()) "" else it.attachment?.get(0)?.uriExt.orEmpty(),
+                        url = if (it.attachment.isNullOrEmpty()) "" else it.attachment.get(0)?.uriExt.orEmpty(),
                         color = it.user?.role?.color.orEmpty(),
                         isRead = it.isReaded ?: false,
                         isSelfSender = it.user?.hopeUserID == doctorHopeId,
@@ -231,7 +231,8 @@ class ChatRoomCaregiverViewModel(
                             0
                         )?.uriExt.orEmpty()
                             .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
-                        isActive = it.isActive ?: false
+                        isActive = it.isActive ?: false,
+                        isVideo = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || it.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
                     )
                 )
             }
@@ -266,7 +267,8 @@ class ChatRoomCaregiverViewModel(
             isUrgent = (type ?: 1).toInt() == 2,
             isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
                 .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
-            isActive = this.isActive ?: false
+            isActive = this.isActive ?: false,
+            isVideo = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || this.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
         )
     }
 

@@ -19,13 +19,16 @@
 
     <application>
         <activity
+            android:name=".ui.player.VideoPlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.groupdetail.GroupDetailActivity"
             android:exported="false"
-            android:theme="@style/Theme.CaregiverApp"/>
+            android:theme="@style/Theme.CaregiverApp" />
         <activity
             android:name=".ui.roomtype.RoomTypeCaregiverActivity"
             android:exported="false"
-            android:theme="@style/Theme.CaregiverApp"/>
+            android:theme="@style/Theme.CaregiverApp" />
         <activity
             android:name=".ui.chatroom.ChatroomCaregiverActivity"
             android:exported="false"
