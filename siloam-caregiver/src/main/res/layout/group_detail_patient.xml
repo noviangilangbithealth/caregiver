@@ -52,7 +52,7 @@
             style="@style/TextAppearance.MaterialComponents.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/phone"
+            android:text="@string/phone_title"
             android:textAllCaps="true"
             android:textColor="@color/colorBlack54"
             android:textSize="@dimen/text_tiny"
@@ -61,7 +61,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_phone"
+            android:id="@+id/tv_phone_group_detail"
             style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium_fit"
-            android:text="@string/payer"
+            android:text="@string/payer_title"
             android:textAllCaps="true"
             android:textColor="@color/colorBlack54"
             android:textSize="@dimen/text_tiny"
@@ -113,7 +113,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_gd_patient_name" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_payer"
+            android:id="@+id/tv_payer_group_detail"
             style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
