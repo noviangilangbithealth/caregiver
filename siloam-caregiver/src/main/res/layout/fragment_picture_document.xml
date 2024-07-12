@@ -23,7 +23,7 @@
             android:background="@color/colorWhite"
             android:theme="@style/Widget.App.Toolbar.MenuButton"
             app:navigationIcon="@drawable/ic_arrow_back_primary"
-            app:title="@string/picture"
+            app:title="@string/attachment"
             app:titleMarginTop="@dimen/small_fit" />
 
     </com.google.android.material.appbar.AppBarLayout>
