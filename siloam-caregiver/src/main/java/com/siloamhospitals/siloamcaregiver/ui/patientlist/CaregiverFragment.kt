@@ -130,6 +130,7 @@ class CaregiverFragment : Fragment() {
         }
 
 
+        viewModel.getUserShow()
         viewModel.emitHospitalWard()
         viewModel.listenHospitalWardFilter()
         observeError()
@@ -137,12 +138,7 @@ class CaregiverFragment : Fragment() {
         observeBadgeNotif()
         setupListener()
         onDataLoaded()
-        if (preferences.role == ROLE_DOCTOR) {
-            viewModel.getUserShow()
-            observeUserShow()
-        } else {
-            observeHospitalWard()
-        }
+        observeUserShow()
         setupCheckRecent()
         observeConnection()
         observeNewCaregiver()
