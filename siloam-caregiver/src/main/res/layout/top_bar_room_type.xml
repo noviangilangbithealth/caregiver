@@ -11,7 +11,7 @@
         android:id="@+id/ib_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/smsp_transparent_color"
+        android:background="@color/smsp_transparent_colorCaregiver"
         android:src="@drawable/ic_arrow_back_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:maxWidth="200dp"
             android:singleLine="true"
-            android:textColor="@color/colorBlackGrade"
+            android:textColor="@color/colorBlackGradeCaregiver"
             android:textSize="@dimen/text_large"
             android:textStyle="bold"
             tools:text="Rina  " />

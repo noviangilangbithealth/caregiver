@@ -11,7 +11,7 @@
         android:id="@+id/btn_close_dialog_filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/smsp_transparent_color"
+        android:background="@color/smsp_transparent_colorCaregiver"
         android:src="@drawable/ic_close"
         app:layout_constraintBottom_toBottomOf="@id/tv_filter_schedule_history_rmo"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,16 +49,16 @@
             android:paddingVertical="@dimen/small_fit"
             android:text="@string/please_select_unit_before_ward"
             android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryCaregiver"
             android:textSize="@dimen/text_small"
-            app:backgroundTint="@color/colorBlueLight" />
+            app:backgroundTint="@color/colorBlueLightCaregiver" />
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium"
             android:text="@string/unit_semicol"
-            android:textColor="@color/colorBlack87"
+            android:textColor="@color/colorBlack87Caregiver"
             android:textSize="@dimen/text_small" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium"
             android:text="@string/wards_semicol"
-            android:textColor="@color/colorBlack87"
+            android:textColor="@color/colorBlack87Caregiver"
             android:textSize="@dimen/text_small" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -96,9 +96,9 @@
         android:paddingBottom="@dimen/small_fit"
         android:text="@string/apply_filter"
         android:textAllCaps="true"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/colorWhiteCaregiver"
         android:textSize="@dimen/text_small"
-        app:backgroundTint="@color/colorSecondaryBase"
+        app:backgroundTint="@color/colorSecondaryBaseCaregiver"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

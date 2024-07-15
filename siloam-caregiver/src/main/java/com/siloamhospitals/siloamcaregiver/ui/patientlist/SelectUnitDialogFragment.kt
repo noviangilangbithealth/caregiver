@@ -120,7 +120,7 @@ class SelectUnitDialogFragment() : BottomSheetDialogFragment() {
                             tvText.setTextColor(resources.getColor(R.color.white))
                         } else {
                             chip.setBackgroundResource(R.drawable.background_chip_outline_primary)
-                            tvText.setTextColor(resources.getColor(R.color.colorPrimary))
+                            tvText.setTextColor(resources.getColor(R.color.colorPrimaryCaregiver))
                         }
                     }
                     onClick {
@@ -175,7 +175,7 @@ class SelectUnitDialogFragment() : BottomSheetDialogFragment() {
                         tvText.setTextColor(resources.getColor(R.color.white))
                     } else {
                         chip.setBackgroundResource(R.drawable.background_chip_outline_secondary)
-                        tvText.setTextColor(resources.getColor(R.color.colorSecondaryBase))
+                        tvText.setTextColor(resources.getColor(R.color.colorSecondaryBaseCaregiver))
                     }
                 }
                 onClick {

@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/colorWhiteBackground"
+    android:backgroundTint="@color/colorWhiteBackgroundCaregiver"
     tools:context=".ui.groupdetail.PictureDocumentFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout_picture_document"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
+        android:background="@color/colorWhiteCaregiver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -20,7 +20,7 @@
             android:id="@+id/top_bar_picture_document"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorWhite"
+            android:background="@color/colorWhiteCaregiver"
             android:theme="@style/Widget.App.Toolbar.MenuButton"
             app:navigationIcon="@drawable/ic_arrow_back_primary"
             app:title="@string/attachment"

@@ -191,7 +191,7 @@ class RoomTypeCaregiverFragment : Fragment() {
                             ForegroundColorSpan(
                                 ContextCompat.getColor(
                                     requireContext(),
-                                    R.color.colorPrimary
+                                    R.color.colorPrimaryCaregiver
                                 )
                             ),
                             0,
@@ -207,9 +207,9 @@ class RoomTypeCaregiverFragment : Fragment() {
 
                         layoutItemRoom.setBackgroundColor(
                             if (item.isUrgent) {
-                                resources.getColor(R.color.colorYellowLight)
+                                resources.getColor(R.color.colorYellowLightCaregiver)
                             } else {
-                                resources.getColor(R.color.colorWhite)
+                                resources.getColor(R.color.colorWhiteCaregiver)
                             }
                         )
 
@@ -227,9 +227,9 @@ class RoomTypeCaregiverFragment : Fragment() {
 
                         layoutItemRoom.setBackgroundColor(
                             if (item.isUrgent) {
-                                resources.getColor(R.color.colorYellowLight)
+                                resources.getColor(R.color.colorYellowLightCaregiver)
                             } else {
-                                resources.getColor(R.color.colorWhite)
+                                resources.getColor(R.color.colorWhiteCaregiver)
                             }
                         )
                         ivUrgent.isVisible = item.isUrgent

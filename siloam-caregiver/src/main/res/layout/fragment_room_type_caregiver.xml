@@ -18,7 +18,7 @@
         android:layout_marginHorizontal="@dimen/medium"
         android:layout_marginVertical="@dimen/medium"
         android:textSize="@dimen/text_small"
-        android:textColor="@color/colorBlack54" />
+        android:textColor="@color/colorBlack54Caregiver" />
 
 
     <androidx.recyclerview.widget.RecyclerView

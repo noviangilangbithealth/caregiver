@@ -14,7 +14,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="1"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="@color/colorWhite">
+        app:cardBackgroundColor="@color/colorWhiteCaregiver">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -31,7 +31,7 @@
                 android:drawableStart="@drawable/ic_urgent_caregiver"
                 android:drawablePadding="7dp"
                 android:gravity="center_vertical"
-                android:textColor="@color/colorYellowText"
+                android:textColor="@color/colorYellowTextCaregiver"
                 android:text="Pesan Mendesak,  Radiology Staff - Logia" />
 
             <View
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_title_chat"
-                android:background="@color/colorBlack12"
+                android:background="@color/colorBlack12Caregiver"
                 android:layout_marginTop="12dp"/>
 
             <com.google.android.material.card.MaterialCardView
@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/colorBlackGrade"
+                android:textColor="@color/colorBlackGradeCaregiver"
                 android:text="Sekedar Info pasien Rini Gunawan sedang mengalami kanker otak"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card_image_urgent"
@@ -81,7 +81,7 @@
                 android:textSize="11sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorBlack38"
+                android:textColor="@color/colorBlack38Caregiver"
                 android:layout_gravity="end"
                 android:text="11:45"
                 android:layout_marginEnd="4dp"
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_read"
-                app:tint="@color/colorBlack38"
+                app:tint="@color/colorBlack38Caregiver"
                 app:layout_constraintTop_toTopOf="@id/tv_date"
                 app:layout_constraintBottom_toBottomOf="@id/tv_date"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -103,7 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 app:layout_constraintTop_toBottomOf="@id/iv_read"
-                android:background="@color/colorBlack12"
+                android:background="@color/colorBlack12Caregiver"
                 android:layout_marginTop="12dp"/>
 
            <androidx.appcompat.widget.LinearLayoutCompat
@@ -121,7 +121,7 @@
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:layout_gravity="center_horizontal"
-                   android:textColor="@color/colorPrimaryMid"
+                   android:textColor="@color/colorPrimaryMidCaregiver"
                    android:textStyle="bold"
                    android:gravity="center"
                    android:text="Saya telah memberikan instruksi"

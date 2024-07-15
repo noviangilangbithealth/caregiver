@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/small"
             android:ellipsize="end"
-            android:textColor="@color/colorBlackGrade"
+            android:textColor="@color/colorBlackGradeCaregiver"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold"
             tools:text="General" />
@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:gravity="right"
             android:text="00:15"
-            android:textColor="@color/colorBlackGrade"
+            android:textColor="@color/colorBlackGradeCaregiver"
             android:textSize="@dimen/text_very_small" />
 
     </LinearLayout>
@@ -63,7 +63,7 @@
         android:layout_marginEnd="@dimen/smaller"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/colorBlackGrade"
+        android:textColor="@color/colorBlackGradeCaregiver"
         android:textSize="@dimen/text_small"
         app:layout_constraintEnd_toStartOf="@id/ll_ic_room_type"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +96,7 @@
             android:background="@drawable/background_badge_red"
             android:paddingHorizontal="@dimen/small"
             android:paddingVertical="@dimen/very_small"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorWhiteCaregiver"
             android:textSize="@dimen/text_tiny"
             tools:text="2" />
 
@@ -107,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/very_tiny"
         android:layout_marginTop="@dimen/small"
-        android:background="@color/colorBlackGrade"
+        android:background="@color/colorBlackGradeCaregiver"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_last_message_room_type" />
 

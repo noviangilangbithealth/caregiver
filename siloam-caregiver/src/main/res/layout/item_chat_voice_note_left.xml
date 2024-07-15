@@ -48,7 +48,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_name"
                 app:layout_constraintStart_toStartOf="parent"
                 android:src="@drawable/ic_play_media"
-                android:tint="@color/colorPrimary"/>
+                android:tint="@color/colorPrimaryCaregiver"/>
 
             <SeekBar
                 android:id="@+id/seekbar_voice_note"
@@ -58,8 +58,8 @@
                 app:layout_constraintStart_toEndOf="@id/iv_play"
                 app:layout_constraintTop_toTopOf="@id/iv_play"
                 app:layout_constraintBottom_toBottomOf="@id/iv_play"
-                android:thumbTint="@color/colorPrimary"
-                android:progressTint="@color/colorPrimaryMid"/>
+                android:thumbTint="@color/colorPrimaryCaregiver"
+                android:progressTint="@color/colorPrimaryMidCaregiver"/>
 
 
             <com.google.android.material.textview.MaterialTextView
@@ -67,7 +67,7 @@
                 android:textSize="11sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorBlack38"
+                android:textColor="@color/colorBlack38Caregiver"
                 android:layout_gravity="end"
                 android:text="11:45"
                 android:layout_marginEnd="4dp"
@@ -79,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_read"
-                app:tint="@color/colorBlack38"
+                app:tint="@color/colorBlack38Caregiver"
                 app:layout_constraintTop_toTopOf="@id/tv_date"
                 app:layout_constraintBottom_toBottomOf="@id/tv_date"
                 app:layout_constraintEnd_toEndOf="parent"/>

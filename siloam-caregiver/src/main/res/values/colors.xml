@@ -8,63 +8,63 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#341F97</color>
-    <color name="colorPrimaryMid">#575FCF</color>
-    <color name="colorPrimaryLight">#C8CBFA</color>
-    <color name="colorPrimaryLighter">#EEEFFF</color>
+    <color name="colorPrimaryCaregiver">#341F97</color>
+    <color name="colorPrimaryMidCaregiver">#575FCF</color>
+    <color name="colorPrimaryLightCaregiver">#C8CBFA</color>
+    <color name="colorPrimaryLighterCaregiver">#EEEFFF</color>
 
-    <color name="colorSecondaryBase">#6AB04C</color>
-    <color name="colorSecondaryLight">#CFF0C0</color>
+    <color name="colorSecondaryBaseCaregiver">#6AB04C</color>
+    <color name="colorSecondaryLightCaregiver">#CFF0C0</color>
 
-    <color name="colorRedBase">#EE5253</color>
-    <color name="colorRedLight">#FAD1D2</color>
-    <color name="colorRedVibrant">#F53B57</color>
+    <color name="colorRedBaseCaregiver">#EE5253</color>
+    <color name="colorRedLightCaregiver">#FAD1D2</color>
+    <color name="colorRedVibrantCaregiver">#F53B57</color>
 
-    <color name="colorYellowBase">#FECA57</color>
-    <color name="colorYellowLight">#FEF4DF</color>
-    <color name="colorYellowText">#F5A30A</color>
-    <color name="colorYellowFloatNotif">#FFC34E</color>
+    <color name="colorYellowBaseCaregiver">#FECA57</color>
+    <color name="colorYellowLightCaregiver">#FEF4DF</color>
+    <color name="colorYellowTextCaregiver">#F5A30A</color>
+    <color name="colorYellowFloatNotifCaregiver">#FFC34E</color>
 
-    <color name="colorGreenBase">#10AC84</color>
-    <color name="colorGreenLight">#DCFAF3</color>
+    <color name="colorGreenBaseCaregiver">#10AC84</color>
+    <color name="colorGreenLightCaregiver">#DCFAF3</color>
 
-    <color name="colorBlueBase">#2E86DE</color>
-    <color name="colorBlueLight">#D1E5FA</color>
+    <color name="colorBlueBaseCaregiver">#2E86DE</color>
+    <color name="colorBlueLightCaregiver">#D1E5FA</color>
 
-    <color name="colorBlackGrade">#222F3E</color>
+    <color name="colorBlackGradeCaregiver">#222F3E</color>
 
-    <color name="colorWhite">#ffffff</color>
-    <color name="colorBlack">#000000</color>
-    <color name="colorBlack54">#888F97</color>
-    <color name="colorBlack38">#ABB0B6</color>
-    <color name="colorBlack87">#3F4A57</color>
-    <color name="colorBlack12">#E4E6E8</color>
+    <color name="colorWhiteCaregiver">#ffffff</color>
+    <color name="colorBlackCaregiver">#000000</color>
+    <color name="colorBlack54Caregiver">#888F97</color>
+    <color name="colorBlack38Caregiver">#ABB0B6</color>
+    <color name="colorBlack87Caregiver">#3F4A57</color>
+    <color name="colorBlack12Caregiver">#E4E6E8</color>
 
-    <color name="colorWhiteBackground">#FAFAFA</color>
+    <color name="colorWhiteBackgroundCaregiver">#FAFAFA</color>
 
-    <color name="colorButtonDisabled">#222F3E8A</color>
-    <color name="colorButtonIdle">#e5e7e8</color>
+    <color name="colorButtonDisabledCaregiver">#222F3E8A</color>
+    <color name="colorButtonIdleCaregiver">#e5e7e8</color>
 
-    <color name="colorTextIdle">#868d94</color>
-    <color name="colorTextSOAP">#1E272E</color>
-    <color name="colorTextIcon">#222F3E61</color>
+    <color name="colorTextIdleCaregiver">#868d94</color>
+    <color name="colorTextSOAPCaregiver">#1E272E</color>
+    <color name="colorTextIconCaregiver">#222F3E61</color>
 
-    <color name="colorMenuIconDefault">#222F3E60</color>
-    <color name="colorTextTypeAllergy">#B4B8BE</color>
-    <color name="colorTextAllergy">#222F3EDE</color>
-    <color name="colorBackgroundCard">#fafafa</color>
+    <color name="colorMenuIconDefaultCaregiver">#222F3E60</color>
+    <color name="colorTextTypeAllergyCaregiver">#B4B8BE</color>
+    <color name="colorTextAllergyCaregiver">#222F3EDE</color>
+    <color name="colorBackgroundCardCaregiver">#fafafa</color>
 
-    <color name="colorSelected">#EEEFFA</color>
+    <color name="colorSelectedCaregiver">#EEEFFA</color>
 
-    <color name="colorBackgroundProfile">#F9F9FF</color>
+    <color name="colorBackgroundProfileCaregiver">#F9F9FF</color>
 
-    <color name="colorFeldgrau">#45545B</color>
-    <color name="colorAzuerishWhite">#D9DFEB</color>
-    <color name="colorBackgroundBalloon">#232F34</color>
-    <color name="smsp_transparent_color">#00000000</color>
+    <color name="colorFeldgrauCaregiver">#45545B</color>
+    <color name="colorAzuerishWhiteCaregiver">#D9DFEB</color>
+    <color name="colorBackgroundBalloonCaregiver">#232F34</color>
+    <color name="smsp_transparent_colorCaregiver">#00000000</color>
 
-    <color name="colorLavender">#DEE0FF</color>
+    <color name="colorLavenderCaregiver">#DEE0FF</color>
 
 
-    <color name="colorFab">#341F97</color>
+    <color name="colorFabCaregiver">#341F97</color>
 </resources>

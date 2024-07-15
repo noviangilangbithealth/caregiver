@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
 import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
-import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiverUI
 import com.siloamhospitals.siloamcaregiver.ui.button.CaregiverButtons
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity() {
             context = this,
             role = SiloamCaregiver.ROLE_DOCTOR
         )
+//        30 Siloam 10F
 //        2000000834 eka
 //        2000000827 tiur
 //        2000000761 andreas

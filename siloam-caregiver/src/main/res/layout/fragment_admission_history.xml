@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackgroundProfile"
+    android:background="@color/colorBackgroundProfileCaregiver"
     android:orientation="vertical"
     tools:context=".ui.groupdetail.AdmissionHistoryFragment">
 
@@ -13,7 +13,7 @@
         android:id="@+id/app_bar_layout_admission_history"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
+        android:background="@color/colorWhiteCaregiver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,7 +22,7 @@
             android:id="@+id/top_bar_admission_history"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorWhite"
+            android:background="@color/colorWhiteCaregiver"
             android:theme="@style/Widget.App.Toolbar.MenuButton"
             app:navigationIcon="@drawable/ic_arrow_back_primary"
             app:title="@string/admission_history"
@@ -54,7 +54,7 @@
         android:layout_margin="@dimen/medium"
         android:gravity="center"
         android:text="@string/no_admission_history"
-        android:textColor="@color/colorBlack54"
+        android:textColor="@color/colorBlack54Caregiver"
         android:visibility="gone" />
 
 
