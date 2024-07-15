@@ -115,6 +115,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+val mediaVersion = "1.0.1"
 
 dependencies {
 
@@ -189,6 +190,11 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.1.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
+    //exo player
+    implementation("androidx.media3:media3-exoplayer:$mediaVersion")
+    implementation("androidx.media3:media3-ui:$mediaVersion")
+    implementation("androidx.media3:media3-exoplayer-dash:$mediaVersion")
+
 }
 
 publishing {
@@ -196,7 +202,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.noviangilangbithealth"
             artifactId = "caregiver"
-            version = "1.25"
+            version = "1.27"
 
             pom {
                 description.set("Caregiver Library")

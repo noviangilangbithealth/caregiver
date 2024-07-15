@@ -3,6 +3,7 @@ package com.siloamhospitals.siloamcaregiver.ui.chatroom
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,6 +13,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.target.Target
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatDateBinding
@@ -32,7 +36,7 @@ import kotlin.coroutines.CoroutineContext
 
 class ChatRoomCaregiverAdapter(
     private val chatRoomUis: MutableList<CaregiverChatRoomUi> = ArrayList(),
-    private val action: ((url: String, isWeb: Boolean) -> Unit)? = null,
+    private val action: ((url: String, isWeb: Boolean, isVideo: Boolean) -> Unit)? = null,
     private val actionLongClick: ((position: Int) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), CoroutineScope {
 
@@ -111,52 +115,111 @@ class ChatRoomCaregiverAdapter(
 
             is LeftChatViewHolder -> holder.binding.run {
                 tvName.text = item.name
-                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
-                if (item.url.isNotEmpty()) {
-                    Glide.with(adapterContext).load(item.url).into(imageChat)
-                    tvChat.gone()
-                    cardImage.visible()
-                } else {
-                    tvChat.visible()
-                    cardImage.gone()
-                    tvChat.text = item.message
-                }
                 tvTime.text = item.time
-                imageChat.setOnClickListener {
-                    action?.invoke(item.url, false)
-                }
-                layoutLinkLeft.isVisible = item.message.contains("https://")
-                var title = ""
-                var urlWeb = ""
-                if (item.message.contains("https://")) {
-                    var x = item.message.split(" ")
-                    title = x.first()
-                    urlWeb = x.last()
-                }
-                tvLink.text = "Go to link - $title"
-                layoutLinkLeft.setOnClickListener {
-                    action?.invoke(urlWeb, true)
-                }
-            }
+                ivPlayMedia.gone()
+                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
 
-            is RightChatViewHolder -> holder.binding.run {
-                tvDate.text = item.time
                 if(!item.isActive) {
                     tvChatDeleted.visible()
                     tvChat.gone()
                     tvLink.gone()
                     cardImage.gone()
-                    cardVideo.gone()
                 } else {
                     tvChatDeleted.gone()
-                    cardVideo.gone()
                     if (item.url.isNotEmpty()) {
-                        Glide.with(adapterContext).load(item.url).into(imageChat)
+                        Glide.with(adapterContext)
+                            .load(item.url)
+                            .addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    ivPlayMedia.isVisible = item.isVideo
+                                    return false
+                                }
+                            })
+                            .into(imageChat)
                         tvChat.gone()
                         cardImage.visible()
                     } else {
                         tvChat.visible()
                         cardImage.gone()
+                        ivPlayMedia.gone()
+                        tvChat.text = item.message
+                    }
+                    imageChat.setOnClickListener {
+                        action?.invoke(item.url, false, item.isVideo)
+                    }
+                    layoutLinkLeft.isVisible = item.message.contains("https://")
+                    var title = ""
+                    var urlWeb = ""
+                    if (item.message.contains("https://")) {
+                        var x = item.message.split(" ")
+                        title = x.first()
+                        urlWeb = x.last()
+                    }
+                    tvLink.text = "Go to link - $title"
+                    layoutLinkLeft.setOnClickListener {
+                        action?.invoke(urlWeb, true, false)
+                    }
+                }
+            }
+
+            is RightChatViewHolder -> holder.binding.run {
+                tvDate.text = item.time
+                ivPlayMedia.gone()
+                if(!item.isActive) {
+                    tvChatDeleted.visible()
+                    tvChat.gone()
+                    tvLink.gone()
+                    cardImage.gone()
+                } else {
+                    tvChatDeleted.gone()
+                    if (item.url.isNotEmpty()) {
+                        Glide.with(adapterContext)
+                            .load(item.url)
+                            .addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    ivPlayMedia.isVisible = item.isVideo
+                                    return false
+                                }
+                            })
+                            .into(imageChat)
+                        tvChat.gone()
+                        cardImage.visible()
+                    } else {
+                        tvChat.visible()
+                        cardImage.gone()
+                        ivPlayMedia.gone()
                         tvChat.text = item.message
                     }
                     if (item.isRead) {
@@ -175,7 +238,7 @@ class ChatRoomCaregiverAdapter(
                         )
                     }
                     imageChat.setOnClickListener {
-                        action?.invoke(item.url, false)
+                        action?.invoke(item.url, false, item.isVideo)
                     }
                     layoutLinkRight.isVisible = item.message.contains("https://")
                     var title = ""
@@ -187,7 +250,7 @@ class ChatRoomCaregiverAdapter(
                     }
                     tvLink.text = "Go to link - $title"
                     layoutLinkRight.setOnClickListener {
-                        action?.invoke(urlWeb, true)
+                        action?.invoke(urlWeb, true, false)
                     }
 
                     holder.itemView.setOnLongClickListener {

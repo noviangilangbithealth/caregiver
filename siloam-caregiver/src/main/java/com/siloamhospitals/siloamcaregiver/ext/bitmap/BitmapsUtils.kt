@@ -2,10 +2,12 @@ package com.siloamhospitals.siloamcaregiver.ext.bitmap
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
+import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import com.orhanobut.logger.Logger
 import java.io.*
@@ -132,6 +134,19 @@ object BitmapUtils {
         var length: Int
         while (source.read(buf).also { length = it } > 0) {
             target.write(buf, 0, length)
+        }
+    }
+
+    fun getRealPathFromURI(context: Context, contentUri: Uri): String? {
+        var cursor: Cursor? = null
+        try {
+            val proj = arrayOf(MediaStore.Images.Media.DATA)
+            cursor = context.contentResolver.query(contentUri, proj, null, null, null)
+            val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor?.moveToFirst()
+            return column_index?.let { cursor?.getString(it) }
+        } finally {
+            cursor?.close()
         }
     }
 }

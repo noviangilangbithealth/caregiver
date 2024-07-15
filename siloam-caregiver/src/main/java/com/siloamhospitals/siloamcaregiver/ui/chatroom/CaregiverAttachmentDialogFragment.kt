@@ -25,6 +25,7 @@ import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.SheetCaregiverChatBinding
 import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils
+import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils.getRealPathFromURI
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.io.File
 
@@ -54,7 +55,11 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
     ) { result ->
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             val videoUri: Uri? = result.data?.data
-            // Use videoUri here
+            videoUri?.let { uri ->
+                sendParent(Bundle().apply {
+                    putString(KEY_VIDEO, getRealPathFromURI(requireContext(), uri))
+                })
+            }
         }
     }
 
@@ -268,7 +273,7 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
 
     private fun startIntentGallery() {
         val intent = Intent()
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_PICK
         intent.type = "image/* video/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         val chooser = Intent.createChooser(intent, "Choose a Picture or Video")
@@ -291,6 +296,7 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
         const val KEY_CONFIRM_UPLOAD = "res_confirm_upload"
         const val KEY_CAMERA = "key_camera"
         const val KEY_GALLERY = "key_gallery"
+        const val KEY_VIDEO = "key_video"
     }
 
 

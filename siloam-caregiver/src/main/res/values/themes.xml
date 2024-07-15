@@ -17,6 +17,11 @@
         <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
+    <style name="roundedCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
     <style name="BaseTheme.BottomSheet.ShapeAppearanceOverlay" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamilyTopLeft">rounded</item>
         <item name="cornerFamilyTopRight">rounded</item>

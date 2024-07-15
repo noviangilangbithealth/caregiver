@@ -33,6 +33,7 @@ import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentChatRoomCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils
+import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils.getRealPathFromURI
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.invisible
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
@@ -44,6 +45,7 @@ import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.AudioRecordListe
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.Recorder
 import com.siloamhospitals.siloamcaregiver.ui.decoration.SpaceItemDecoration
 import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailActivity
+import com.siloamhospitals.siloamcaregiver.ui.player.VideoPlayerActivity
 import java.io.File
 
 
@@ -111,10 +113,12 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun setupAdapter() {
         adapterChatRoom = ChatRoomCaregiverAdapter(
-            action = { url, isWeb ->
+            action = { url, isWeb, isVideo ->
                 if (isWeb) {
                     viewModel.urlEmrIpd = url
                     findNavController().navigate(R.id.action_chatRoomCaregiverFragment2_to_chatRoomWebViewFragment)
+                } else if (isVideo) {
+                    VideoPlayerActivity.openPlayer(requireContext(), url)
                 } else {
                     viewDetailImage(url)
                 }
@@ -236,8 +240,13 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                             adapterChatRoom.add(0, data.generateNewChatUI())
                             binding.rvChatCaregiver.smoothScrollToPosition(0)
                             setReadMessage()
-                        } else if (data.isActive!!.not() && positionDelete != null) {
+                        } else if (data.isActive!!.not() && positionDelete != null && data.senderID == viewModel.doctorHopeId) {
                             adapterChatRoom.update(positionDelete!!, data.generateNewChatUI())
+                        } else if (data.isActive.not()) {
+                            adapterChatRoom.update(
+                                adapterChatRoom.getIndexOf(result),
+                                data.generateNewChatUI()
+                            )
                         }
                     }
                 }
@@ -391,7 +400,11 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             val resGallery = bundle.getString(CaregiverAttachmentDialogFragment.KEY_GALLERY)
             val resGalleryPhotos =
                 bundle.getStringArrayList(CaregiverAttachmentDialogFragment.KEY_GALLERY)
-            if (resCamera != null) {
+            val recordVideoPath = bundle.getString(CaregiverAttachmentDialogFragment.KEY_VIDEO)
+
+            if (recordVideoPath != null) {
+                viewModel.uploadFiles(listOf(File(recordVideoPath)), isVideo = true)
+            } else if (resCamera != null) {
                 File(resCamera.toString()).also { file = it }
                 val bitmap = BitmapFactory.decodeFile(file?.path)
                 BitmapUtils.getFileFromBitmap(bitmap, requireContext()).also {
@@ -404,10 +417,17 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     viewModel.uploadFiles(listOf(it))
                 }
             } else if (resGalleryPhotos.orEmpty().isNotEmpty()) {
+                Toast.makeText(requireContext(), "YIha", Toast.LENGTH_SHORT).show()
                 resGalleryPhotos.orEmpty().forEach {
                     val fileUri: Uri = Uri.parse(it)
-                    BitmapUtils.uriToFile(fileUri, requireContext()).also {
-                        viewModel.uploadFiles(listOf(it))
+                    if (isVideoUri(fileUri)) {
+                        getRealPathFromURI(requireContext(), fileUri)?.let { path ->
+                            viewModel.uploadFiles(listOf(File(path)), isVideo = true)
+                        }
+                    } else {
+                        BitmapUtils.uriToFile(fileUri, requireContext()).also {
+                            viewModel.uploadFiles(listOf(it))
+                        }
                     }
                 }
             }
@@ -422,6 +442,11 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             binding.llChatRoomClosed.gone()
             binding.clInputText.visible()
         }
+    }
+
+    fun isVideoUri(uri: Uri): Boolean {
+        val mimeType = requireContext().contentResolver.getType(uri)
+        return mimeType?.startsWith("video") == true
     }
 
     private fun recordMode(isRecordMode: Boolean) {
