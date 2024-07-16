@@ -146,8 +146,8 @@ class GroupDetailFragment : Fragment() {
 
                 val room = "${patientResult.wardName} - ${patientResult.roomNo}"
                 tvRoom.text = room
-                tvPayer.text = patientResult.payer
-                tvPhone.text = patientResult.phoneNumber
+                tvPayerGroupDetail.text = patientResult.payer
+                tvPhoneGroupDetail.text = patientResult.phoneNumber
                 btnDetailViewMedicalRecord.setSingleOnClickListener {
                     if (viewModel.urlWebView.isNotEmpty()) {
                         findNavController().navigate(R.id.action_groupDetailFragment2_to_emrIpdWebViewFragment)

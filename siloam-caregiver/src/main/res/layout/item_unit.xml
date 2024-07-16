@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingVertical="14dp"
         android:paddingHorizontal="@dimen/medium"
-        android:textColor="@color/colorBlack87"
+        android:textColor="@color/colorBlack87Caregiver"
         android:textStyle="bold"
         android:gravity="center_vertical"
         android:drawablePadding="@dimen/medium"

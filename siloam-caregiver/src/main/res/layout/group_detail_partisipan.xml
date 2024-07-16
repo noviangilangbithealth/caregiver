@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:backgroundTint="@color/colorWhite"
+    android:backgroundTint="@color/colorWhiteCaregiver"
     android:layout_marginTop="@dimen/medium"
     android:orientation="vertical"
     android:paddingBottom="@dimen/large"
@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/partisipan"
-        android:textColor="@color/colorBlack54"
+        android:textColor="@color/colorBlack54Caregiver"
         android:textSize="@dimen/text_medium"
         android:textStyle="bold" />
 

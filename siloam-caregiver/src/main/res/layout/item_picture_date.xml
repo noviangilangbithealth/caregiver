@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingHorizontal="@dimen/medium"
     android:paddingVertical="@dimen/small"
-    android:textColor="@color/colorBlack54"
+    android:textColor="@color/colorBlack54Caregiver"
     android:textSize="@dimen/text_small"
     android:textStyle="bold"
     tools:text="Terbaru" />

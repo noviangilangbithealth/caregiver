@@ -6,9 +6,9 @@
     <string name="search_patient_name">Search by patient name</string>
     <string name="permission_to_gallery">Please give permission to access gallery</string>
     <string name="info_group">Info Group</string>
-    <string name="phone">Phone</string>
+    <string name="phone_title">Phone</string>
     <string name="room">Room</string>
-    <string name="payer">Payer</string>
+    <string name="payer_title">Payer</string>
     <string name="view_medical_record">View Medical Record</string>
     <string name="gambar_document"><![CDATA[Gambar & Dokumen]]></string>
     <string name="partisipan">%1$s Partisipan</string>

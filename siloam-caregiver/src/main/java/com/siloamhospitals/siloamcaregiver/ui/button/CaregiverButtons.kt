@@ -57,7 +57,7 @@ class CaregiverButtons private constructor(app: Application) :
                 setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_caregiver_chat))
                 imageTintList = null
                 backgroundTintList =
-                    ContextCompat.getColorStateList(activity, R.color.colorPrimaryLight)
+                    ContextCompat.getColorStateList(activity, R.color.colorPrimaryLightCaregiver)
 
                 // Set layout parameters for positioning at bottom right
                 val fabParams = FrameLayout.LayoutParams(
@@ -99,7 +99,7 @@ class CaregiverButtons private constructor(app: Application) :
                                 fab?.imageTintList = null
                                 fab?.backgroundTintList = ContextCompat.getColorStateList(
                                     activity,
-                                    R.color.colorYellowFloatNotif
+                                    R.color.colorYellowFloatNotifCaregiver
                                 )
                             } else {
                                 fab?.setImageDrawable(
@@ -111,7 +111,7 @@ class CaregiverButtons private constructor(app: Application) :
                                 fab?.imageTintList = null
                                 fab?.backgroundTintList = ContextCompat.getColorStateList(
                                     activity,
-                                    R.color.colorPrimaryLight
+                                    R.color.colorPrimaryLightCaregiver
                                 )
                             }
                             if (data.count > 0) {
@@ -119,7 +119,7 @@ class CaregiverButtons private constructor(app: Application) :
                                 badgeDrawable.number = data.count // Set the badge count
                                 badgeDrawable.backgroundColor = ContextCompat.getColor(
                                     activity,
-                                    R.color.colorRedVibrant
+                                    R.color.colorRedVibrantCaregiver
                                 ) // Set the badge background color
                                 badgeDrawable.badgeGravity =
                                     BadgeDrawable.TOP_END // Set the badge position

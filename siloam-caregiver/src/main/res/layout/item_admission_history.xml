@@ -39,7 +39,7 @@
                 style="@style/TextAppearance.MaterialComponents.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorBlack54"
+                android:textColor="@color/colorBlack54Caregiver"
                 android:textSize="@dimen/text_tiny"
                 tools:text="SHLV.0001 - OPA129381053" />
 
@@ -48,7 +48,7 @@
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorBlack87"
+                android:textColor="@color/colorBlack87Caregiver"
                 android:textSize="@dimen/text_small"
                 tools:text="dr. Youngky Putra Sp.OG" />
 
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:textColor="@color/colorBlack54"
+                android:textColor="@color/colorBlack54Caregiver"
                 android:textSize="@dimen/text_very_small"
                 tools:text="8 Apr 2020, 8:12" />
         </LinearLayout>
@@ -70,14 +70,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium"
             android:text="@string/history_chat"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryCaregiver"
             android:textSize="@dimen/text_very_small"
-            app:backgroundTint="@color/colorWhite"
+            app:backgroundTint="@color/colorWhiteCaregiver"
             app:cornerRadius="@dimen/medium_fit"
             app:icon="@drawable/ic_caregiver_chat_15"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ll_admission_history"
-            app:strokeColor="@color/colorPrimary"
+            app:strokeColor="@color/colorPrimaryCaregiver"
             app:strokeWidth="@dimen/tiny" />
 
         <com.google.android.material.button.MaterialButton
@@ -88,16 +88,16 @@
             android:layout_marginStart="@dimen/small"
             android:layout_marginTop="@dimen/medium"
             android:text="@string/medical_record"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryCaregiver"
             android:textSize="@dimen/text_very_small"
-            app:backgroundTint="@color/colorWhite"
+            app:backgroundTint="@color/colorWhiteCaregiver"
             app:cornerRadius="@dimen/medium_fit"
             app:icon="@drawable/ic_medical_record"
             app:iconGravity="textStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_history_chat"
             app:layout_constraintTop_toBottomOf="@id/ll_admission_history"
-            app:strokeColor="@color/colorPrimary"
+            app:strokeColor="@color/colorPrimaryCaregiver"
             app:strokeWidth="@dimen/tiny" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

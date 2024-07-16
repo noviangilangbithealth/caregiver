@@ -226,14 +226,14 @@ class ChatRoomCaregiverAdapter(
                         ivRead.setColorFilter(
                             ContextCompat.getColor(
                                 adapterContext,
-                                R.color.colorBlueBase
+                                R.color.colorBlueBaseCaregiver
                             )
                         )
                     } else {
                         ivRead.setColorFilter(
                             ContextCompat.getColor(
                                 adapterContext,
-                                R.color.colorBlack38
+                                R.color.colorBlack38Caregiver
                             )
                         )
                     }
@@ -269,14 +269,14 @@ class ChatRoomCaregiverAdapter(
                     ivRead.setColorFilter(
                         ContextCompat.getColor(
                             adapterContext,
-                            R.color.colorBlueBase
+                            R.color.colorBlueBaseCaregiver
                         )
                     )
                 } else {
                     ivRead.setColorFilter(
                         ContextCompat.getColor(
                             adapterContext,
-                            R.color.colorBlack38
+                            R.color.colorBlack38Caregiver
                         )
                     )
                 }

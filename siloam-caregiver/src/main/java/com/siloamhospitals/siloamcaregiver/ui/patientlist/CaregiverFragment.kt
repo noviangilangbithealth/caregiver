@@ -129,6 +129,7 @@ class CaregiverFragment : Fragment() {
             }
         }
 
+
         viewModel.getUserShow()
         viewModel.emitHospitalWard()
         viewModel.listenHospitalWardFilter()
@@ -415,12 +416,12 @@ class CaregiverFragment : Fragment() {
 
                     layoutCard.setBackgroundColor(
                         if (item.isUrgent) {
-                            resources.getColor(R.color.colorYellowLight)
+                            resources.getColor(R.color.colorYellowLightCaregiver)
                         } else {
                             if (!item.isOnHold) {
-                                resources.getColor(R.color.colorWhite)
+                                resources.getColor(R.color.colorWhiteCaregiver)
                             } else {
-                                resources.getColor(R.color.colorBlueLight)
+                                resources.getColor(R.color.colorBlueLightCaregiver)
                             }
                         }
                     )
@@ -526,40 +527,47 @@ class CaregiverFragment : Fragment() {
     * - DPJP hanya filter hospital
     * - RMO ada filter hospital dan ward
     * - Nurse biasa hanya show ward dan hospital
-    * - Head nurse ada filter hospital dan ward
     *  */
 
     private fun observeHospitalWard() {
         viewModel.hospitalWard.observe(viewLifecycleOwner) { data ->
-            Log.e("Ward", Gson().toJson(data), )
-            val mapData = data.map {
-                ChipHospitalData(
-                    hospitalId = it.hospitalHopeId ?: 0L,
-                    hospitalAlias = it.hospitalCode ?: "",
-                    isSelected = it.hospitalHopeId == viewModel.selectedHospital,
-                    isUrgent = it.isUrgent ?: false,
-                    showBadge = it.isUnread ?: false,
-                    hospitalName = it.hospitalName ?: "",
-                    wards = it.wardList.map { w ->
-                        ChipWardData(
-                            wardId = w.wardId ?: 0L,
-                            wardName = w.wardName ?: "",
-                            isSelected = w.wardId == viewModel.selectedWard,
-                            isUrgent = w.isUrgent ?: false,
-                            showBadge = w.isUnread ?: false
-                        )
-                    }
-                )
+            if (data.isNotEmpty()) {
+                val mapData = data.map {
+                    ChipHospitalData(
+                        hospitalId = it.hospitalHopeId ?: 0L,
+                        hospitalAlias = it.hospitalCode ?: "",
+                        isSelected = it.hospitalHopeId == viewModel.selectedHospital,
+                        isUrgent = it.isUrgent ?: false,
+                        showBadge = it.isUnread,
+                        hospitalName = it.hospitalName ?: "",
+                        wards = it.wardList.map { w ->
+                            ChipWardData(
+                                wardId = w.wardId ?: 0L,
+                                wardName = w.wardName ?: "",
+                                isSelected = w.wardId == viewModel.selectedWard,
+                                isUrgent = w.isUrgent ?: false,
+                                showBadge = w.isUnread ?: false
+                            )
+                        }
+                    )
+                }
+                viewModel.dialogFilterData.clear()
+                viewModel.dialogFilterData.addAll(mapData)
+                setupChip()
+            } else {
+                Toast.makeText(requireContext(), "Data Hospital Ward Empty", Toast.LENGTH_SHORT)
+                    .show()
             }
-            viewModel.dialogFilterData.clear()
-            viewModel.dialogFilterData.addAll(mapData)
-            setupChip()
+
+
         }
     }
 
     fun setupChip() {
         val ward = mutableListOf<ChipFilterPatientData>()
+        viewModel.chipData.clear()
         viewModel.dialogFilterData.map { chipHospitalData ->
+            //mapping hospital
             viewModel.chipData.add(
                 ChipFilterPatientData(
                     name = chipHospitalData.hospitalAlias,
@@ -571,6 +579,7 @@ class CaregiverFragment : Fragment() {
                     wardId = -1
                 )
             )
+            //mapping ward
             chipHospitalData.wards.map { chipWardData ->
                 ward.add(
                     ChipFilterPatientData(
@@ -584,6 +593,7 @@ class CaregiverFragment : Fragment() {
                     )
                 )
             }
+
         }
         val dataMap = mutableListOf<ChipFilterPatientData>()
         when {
@@ -601,8 +611,9 @@ class CaregiverFragment : Fragment() {
                 val wardSorted = ward.sortedBy { it.hospitalId }.sortedBy { it.wardId }
                 if (!viewModel.isFiltered) {
                     try {
-                        val x = viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
-                            .copy(isSelected = true, isHospital = true)
+                        val x =
+                            viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
+                                .copy(isSelected = true, isHospital = true)
                         val y =
                             if (viewModel.role == ROLE_DOCTOR) {
                                 wardSorted.first { it.hospitalId == x.hospitalId }
@@ -611,6 +622,7 @@ class CaregiverFragment : Fragment() {
                                 wardSorted.first { it.wardId == viewModel.selectedWard }
                                     .copy(isSelected = true, isHospital = false)
                             }
+
                         dataMap.add(x)
                         dataMap.add(y)
                         viewModel.selectedHospital = x.hospitalId
@@ -665,24 +677,22 @@ class CaregiverFragment : Fragment() {
                     tvText.text = item.name
                     tvText.setTextColor(
                         if (item.isSelected) {
-                            resources.getColor(R.color.colorWhite)
+                            resources.getColor(R.color.colorWhiteCaregiver)
                         } else {
                             if (item.isHospital) {
-                                resources.getColor(R.color.colorPrimary)
+                                resources.getColor(R.color.colorPrimaryCaregiver)
                             } else {
-                                resources.getColor(R.color.colorSecondaryBase)
+                                resources.getColor(R.color.colorSecondaryBaseCaregiver)
                             }
                         }
                     )
-                    if (item.isUrgent) {
-                        ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_urgent_caregiver_16))
+
+                    if (item.showBadge) {
+                        ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
                     } else {
-                        if (item.showBadge) {
-                            ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
-                        } else {
-                            ivChip.gone()
-                        }
+                        ivChip.gone()
                     }
+
                     if (item.isHospital) {
                         if (item.isSelected) {
                             chip.setBackgroundResource(R.drawable.background_chip_primary)

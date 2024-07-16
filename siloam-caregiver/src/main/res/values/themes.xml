@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimaryCaregiver</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
@@ -55,14 +55,14 @@
     </style>
 
     <style name="ThemeOverlay.CoreTheme.Button.Secondary" parent="">
-        <item name="colorPrimary">@color/colorSecondaryBase</item>
+        <item name="colorPrimary">@color/colorSecondaryBaseCaregiver</item>
     </style>
 
     <style name="Theme.CaregiverApp" parent="CoreTheme" />
 
     <!--  Toolbar Menu Button  -->
     <style name="Widget.App.Toolbar.MenuButton" parent="Widget.MaterialComponents.Toolbar">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimaryCaregiver</item>
         <item name="android:textStyle">bold</item>
         <item name="actionMenuTextColor">@color/menu_color</item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.AppCompat.Subhead</item>
@@ -81,7 +81,7 @@
     </style>
 
     <style name="CalendarToolbarTheme" parent="ThemeOverlay.MaterialComponents.Light">
-        <item name="colorControlNormal">@color/colorTextIdle</item>
+        <item name="colorControlNormal">@color/colorTextIdleCaregiver</item>
     </style>
 
 

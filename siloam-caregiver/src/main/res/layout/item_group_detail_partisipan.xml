@@ -23,7 +23,7 @@
         android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/medium"
-        android:textColor="@color/colorBlack87"
+        android:textColor="@color/colorBlack87Caregiver"
         android:textSize="@dimen/text_medium"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

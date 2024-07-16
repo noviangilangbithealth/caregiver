@@ -4,7 +4,7 @@
     android:id="@+id/layout_group_detail_admission_history"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorWhite"
+    android:background="@color/colorWhiteCaregiver"
     android:padding="@dimen/medium">
 
     <ImageView
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/medium"
         android:text="@string/admission_history"
-        android:textColor="@color/colorBlack87"
+        android:textColor="@color/colorBlack87Caregiver"
         android:textSize="@dimen/text_medium"
         android:textStyle="bold" />
 

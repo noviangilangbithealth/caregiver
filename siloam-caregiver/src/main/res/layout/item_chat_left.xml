@@ -43,19 +43,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sekedar Info pasien Rini Gunawan sedang mengalami kanker otak"
-                android:textColor="@color/colorBlackGrade" />
+                android:textColor="@color/colorBlackGradeCaregiver" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_chat_deleted"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Anda Menghapus Pesan Ini"
-                android:textColor="@color/colorBlack38"
-                android:textStyle="italic"
                 android:drawableStart="@drawable/ic_outline_block"
                 android:drawablePadding="6dp"
-                android:visibility="gone"/>
+                android:text="Anda Menghapus Pesan Ini"
+                android:textColor="@color/colorBlack38Caregiver"
+                android:textStyle="italic"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/layout_link_left"
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/small"
                     android:text="@string/link"
-                    android:textColor="@color/colorBlueBase"
+                    android:textColor="@color/colorBlueBaseCaregiver"
                     android:textSize="@dimen/text_small" />
             </LinearLayout>
 
@@ -101,10 +101,10 @@
                         android:id="@+id/iv_play_media"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_play_video"
                         android:layout_centerInParent="true"
-                        android:visibility="gone"
+                        android:src="@drawable/ic_play_video"
                         android:translationZ="2dp"
+                        android:visibility="gone"
                         tools:ignore="UseAppTint" />
 
                 </RelativeLayout>
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:text="11:45"
-                android:textColor="@color/colorBlack38"
+                android:textColor="@color/colorBlack38Caregiver"
                 android:textSize="11sp" />
 
 
