@@ -16,7 +16,7 @@ data class HospitalFilter(
     @SerializedName("name") val hospitalName: String? = null,
     @SerializedName("wards") val wardList: List<WardFilter> = emptyList(),
     @SerializedName("is_urgent") val isUrgent: Boolean? = null,
-    @SerializedName("is_unread") val isUnread: Boolean? = null
+    @SerializedName("is_unread") val isUnread: Boolean = false
 )
 
 @JsonClass(generateAdapter = true)

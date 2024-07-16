@@ -22,14 +22,15 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 29000000134,
+            userId = 2000000732,
             organizationId = 2,
-            wardId = 30,
+            wardId = 0,
             context = this,
-            role = SiloamCaregiver.ROLE_NURSE
+            role = SiloamCaregiver.ROLE_DOCTOR
         )
 //        30 Siloam 10F
-//        2000000834 eka
+//        2000000834 ekajanti
+//        2000000732 prof eka
 //        2000000827 tiur
 //        2000000761 andreas
 //        29000000134 amsal nurse

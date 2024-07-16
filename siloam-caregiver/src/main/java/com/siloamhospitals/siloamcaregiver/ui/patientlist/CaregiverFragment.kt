@@ -531,7 +531,6 @@ class CaregiverFragment : Fragment() {
 
     private fun observeHospitalWard() {
         viewModel.hospitalWard.observe(viewLifecycleOwner) { data ->
-            Log.e("Ward", Gson().toJson(data))
             if (data.isNotEmpty()) {
                 val mapData = data.map {
                     ChipHospitalData(
@@ -539,7 +538,7 @@ class CaregiverFragment : Fragment() {
                         hospitalAlias = it.hospitalCode ?: "",
                         isSelected = it.hospitalHopeId == viewModel.selectedHospital,
                         isUrgent = it.isUrgent ?: false,
-                        showBadge = it.isUnread ?: false,
+                        showBadge = it.isUnread,
                         hospitalName = it.hospitalName ?: "",
                         wards = it.wardList.map { w ->
                             ChipWardData(
@@ -555,16 +554,20 @@ class CaregiverFragment : Fragment() {
                 viewModel.dialogFilterData.clear()
                 viewModel.dialogFilterData.addAll(mapData)
                 setupChip()
+            } else {
+                Toast.makeText(requireContext(), "Data Hospital Ward Empty", Toast.LENGTH_SHORT)
+                    .show()
             }
 
-            Toast.makeText(requireContext(), "Data Hospital Ward Empty", Toast.LENGTH_SHORT).show()
 
         }
     }
 
     fun setupChip() {
         val ward = mutableListOf<ChipFilterPatientData>()
+        viewModel.chipData.clear()
         viewModel.dialogFilterData.map { chipHospitalData ->
+            //mapping hospital
             viewModel.chipData.add(
                 ChipFilterPatientData(
                     name = chipHospitalData.hospitalAlias,
@@ -576,6 +579,7 @@ class CaregiverFragment : Fragment() {
                     wardId = -1
                 )
             )
+            //mapping ward
             chipHospitalData.wards.map { chipWardData ->
                 ward.add(
                     ChipFilterPatientData(
@@ -589,6 +593,7 @@ class CaregiverFragment : Fragment() {
                     )
                 )
             }
+
         }
         val dataMap = mutableListOf<ChipFilterPatientData>()
         when {
@@ -617,6 +622,7 @@ class CaregiverFragment : Fragment() {
                                 wardSorted.first { it.wardId == viewModel.selectedWard }
                                     .copy(isSelected = true, isHospital = false)
                             }
+
                         dataMap.add(x)
                         dataMap.add(y)
                         viewModel.selectedHospital = x.hospitalId
@@ -680,15 +686,13 @@ class CaregiverFragment : Fragment() {
                             }
                         }
                     )
-                    if (item.isUrgent) {
-                        ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_urgent_caregiver_16))
+
+                    if (item.showBadge) {
+                        ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
                     } else {
-                        if (item.showBadge) {
-                            ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
-                        } else {
-                            ivChip.gone()
-                        }
+                        ivChip.gone()
                     }
+
                     if (item.isHospital) {
                         if (item.isSelected) {
                             chip.setBackgroundResource(R.drawable.background_chip_primary)

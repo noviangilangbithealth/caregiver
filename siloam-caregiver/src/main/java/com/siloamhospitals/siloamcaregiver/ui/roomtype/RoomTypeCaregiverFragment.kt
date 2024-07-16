@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import com.afollestad.recyclical.datasource.dataSourceTypedOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentRoomTypeCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.ext.datetime.TODAY
@@ -37,8 +39,6 @@ class RoomTypeCaregiverFragment : Fragment() {
 
     private val viewModel: RoomTypeViewModel by activityViewModels()
 
-//    private val chatRoomViewModel: ChatRoomCaregiverViewModel by activityViewModels()
-//    private val detailViewModel: GroupDetailViewModel by activityViewModels()
 
     private lateinit var preferences: AppPreferences
 
@@ -147,7 +147,8 @@ class RoomTypeCaregiverFragment : Fragment() {
                         countUnread = it.countUnreadMessage ?: "",
                         isUrgent = it.isUrgentMessage,
                         lastMessage = it.message.firstOrNull()?.message ?: "",
-                        latestMessageAt = it.latestMessageAt ?: "",
+                        latestMessageAt = if (it.message.isNotEmpty()) it.latestMessageAt
+                            ?: "" else "",
                         date = it.message.firstOrNull()?.createAt ?: "",
                         icon = it.icon.urlExt ?: "",
                         role = it.message.firstOrNull()?.user?.role?.name ?: "",
@@ -155,7 +156,12 @@ class RoomTypeCaregiverFragment : Fragment() {
                     )
                 )
             }
-            viewModel.listRoomType.sortByDescending { it.latestMessageAt.toLocalDateTime() }
+            viewModel.listRoomType.sortByDescending { it.latestMessageAt }
+            val emptyRoom = viewModel.listRoomType.filter { it.latestMessageAt.isEmpty() }
+            val notEmptyRoom = viewModel.listRoomType.filter { it.latestMessageAt.isNotEmpty() }
+            viewModel.listRoomType.clear()
+            viewModel.listRoomType.addAll(notEmptyRoom)
+            viewModel.listRoomType.addAll(emptyRoom)
             onDataLoaded()
         }
     }
