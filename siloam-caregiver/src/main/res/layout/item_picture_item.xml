@@ -15,4 +15,17 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
 
+
+    <ImageView
+        android:id="@+id/iv_play_button"
+        android:layout_width="@dimen/large_fit"
+        android:layout_height="@dimen/large_fit"
+        android:src="@drawable/ic_play_video"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/iv_picture_item"
+        app:layout_constraintTop_toTopOf="@id/iv_picture_item"
+        app:layout_constraintEnd_toEndOf="@id/iv_picture_item"
+        app:layout_constraintBottom_toBottomOf="@id/iv_picture_item"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

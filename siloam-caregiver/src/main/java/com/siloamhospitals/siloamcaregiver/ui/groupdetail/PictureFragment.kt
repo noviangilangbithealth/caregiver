@@ -1,10 +1,12 @@
 package com.siloamhospitals.siloamcaregiver.ui.groupdetail
 
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,11 +15,16 @@ import com.afollestad.recyclical.datasource.dataSourceTypedOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.target.Target
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentPictureBinding
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDate
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
+import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.ImageDetailFragment
+import com.siloamhospitals.siloamcaregiver.ui.player.VideoPlayerActivity
 import java.time.LocalDate
 
 class PictureFragment : Fragment() {
@@ -45,7 +52,7 @@ class PictureFragment : Fragment() {
             dataList.add(PictureDate(date = sendDate))
             viewModel.attachment.forEach { data ->
                 if (data.sentAt.take(10) == sendDate) {
-                    dataList.add(PictureItem(url = data.attachment.first().uri))
+                    dataList.add(PictureItem(url = data.attachment.first().uriText, isVideo = data.attachment.first().uriText.endsWith(".mp4") || data.attachment.first().uriText.endsWith(".3gp") || data.attachment.first().uriText.endsWith(".mov")))
                 }
             }
         }
@@ -65,15 +72,41 @@ class PictureFragment : Fragment() {
 //                        val imageViewWidth = calculateImageViewWidth()
 //                        ivPictureItem.layoutParams =
 //                            ViewGroup.LayoutParams(imageViewWidth, imageViewWidth)
-
                         Glide.with(requireContext())
                             .load(item.url)
                             .centerCrop()
+                            .addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    ivPlayButton.gone()
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    ivPlayButton.isVisible = item.isVideo
+                                    return false
+                                }
+                            })
                             .into(ivPictureItem)
 
                     }
                     onClick {
-                        viewDetailImage(item.url)
+                        if(item.isVideo){
+                            VideoPlayerActivity.openPlayer(requireContext(), item.url)
+                        }else {
+                            viewDetailImage(item.url)
+                        }
                     }
                 }
                 val layoutManager = GridLayoutManager(requireContext(), 4)

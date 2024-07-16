@@ -14,4 +14,5 @@ data class PictureDate(
 
 data class PictureItem(
     val url: String = "",
+    val isVideo: Boolean = false
 )
