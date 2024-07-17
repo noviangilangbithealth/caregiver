@@ -29,13 +29,18 @@ data class CaregiverRoomTypeLastMessage(
     val user: CaregiverRoomTypeLastMessageUser = CaregiverRoomTypeLastMessageUser(),
     @SerializedName("created_at")
     val createAt: String? = "",
-    val attachment: List<AttachmentCaregiver> = emptyList()
+    val attachment: List<AttachmentCaregiver> = emptyList(),
+    @SerializedName("is_active")
+    val isActive: Boolean? = false,
+
 )
 
 @JsonClass(generateAdapter = true)
 data class CaregiverRoomTypeLastMessageUser(
     val name: String? = "",
-    val role: CaregiverRoomTypeLastMessageUserRole = CaregiverRoomTypeLastMessageUserRole()
+    val role: CaregiverRoomTypeLastMessageUserRole = CaregiverRoomTypeLastMessageUserRole(),
+    @SerializedName("hope_user_id")
+    val hopeId:String? = ""
 )
 
 @JsonClass(generateAdapter = true)

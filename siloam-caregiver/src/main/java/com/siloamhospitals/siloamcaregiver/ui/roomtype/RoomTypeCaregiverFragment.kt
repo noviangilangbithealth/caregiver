@@ -152,7 +152,9 @@ class RoomTypeCaregiverFragment : Fragment() {
                         date = it.message.firstOrNull()?.createAt ?: "",
                         icon = it.icon.urlExt ?: "",
                         role = it.message.firstOrNull()?.user?.role?.name ?: "",
-                        senderName = it.message.firstOrNull()?.user?.name ?: ""
+                        senderName = it.message.firstOrNull()?.user?.name ?: "",
+                        isActive = it.message.firstOrNull()?.isActive ?: false,
+                        hopeId = it.message.firstOrNull()?.user?.hopeId ?: ""
                     )
                 )
             }
@@ -162,6 +164,7 @@ class RoomTypeCaregiverFragment : Fragment() {
             viewModel.listRoomType.clear()
             viewModel.listRoomType.addAll(notEmptyRoom)
             viewModel.listRoomType.addAll(emptyRoom)
+            Log.e("ROOOOOOOOOOOOOOOM", Gson().toJson(viewModel.listRoomType))
             onDataLoaded()
         }
     }
@@ -180,18 +183,32 @@ class RoomTypeCaregiverFragment : Fragment() {
                             "Doctor" -> "${item.senderName}: ${item.lastMessage}"
                             else -> "${item.role} - ${item.senderName}: ${item.lastMessage}"
                         }
+                        tvlastMessage.text = lastMessage
+                        if (!item.isActive) {
+                            lastMessage = if (item.hopeId.toLong() == preferences.userId) {
+                                getString(R.string.own_message_deleted)
+                            } else {
+                                when (item.role) {
+                                    "Doctor" -> "${item.senderName}: ${getString(R.string.sender_delete)}"
+                                    else -> "${item.role} - ${item.senderName}: ${getString(R.string.sender_delete)}"
+                                }
+                            }
+                            tvlastMessage.text = lastMessage
+                        }
 
                         if (item.isAttachment) {
                             lastMessage = when (item.role) {
                                 "Doctor" -> "${item.senderName}: Send Attachment"
                                 else -> "${item.role} - ${item.senderName}: Send Attachment"
                             }
+                            tvlastMessage.text = lastMessage
                         }
 
                         val draftMessage = preferences.findPreference(
                             "key_${item.caregiverId}_${item.channelId}",
                             ""
                         )
+
                         val spannableDraftMessage = SpannableStringBuilder("Draft: $draftMessage")
                         spannableDraftMessage.setSpan(
                             ForegroundColorSpan(
@@ -205,8 +222,9 @@ class RoomTypeCaregiverFragment : Fragment() {
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                         )
 
-                        tvlastMessage.text =
-                            if (draftMessage.isNotEmpty()) spannableDraftMessage else if (item.lastMessage.isNotEmpty() || item.isAttachment) lastMessage else "no messages"
+                        if (draftMessage.isNotEmpty()) {
+                            tvlastMessage.text = spannableDraftMessage
+                        }
 
                         tvBadgeRoomType.text = item.countUnread
                         tvBadgeRoomType.isVisible = item.countUnread != "0"

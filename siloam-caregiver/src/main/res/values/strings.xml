@@ -43,5 +43,7 @@
     <string name="chat_room_closed">This room chat is closed. The patient has been discharged</string>
     <string name="attachment">Attachment</string>
     <string name="no_admission_history">No Admission History\n</string>
+    <string name="sender_delete">Message deleted</string>
+    <string name="own_message_deleted">You delete this message.</string>
 
 </resources>

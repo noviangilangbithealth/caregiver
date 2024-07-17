@@ -117,9 +117,10 @@ class ChatRoomCaregiverAdapter(
                 tvName.text = item.name
                 tvTime.text = item.time
                 ivPlayMedia.gone()
-                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
+                if (item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
 
-                if(!item.isActive) {
+                if (!item.isActive) {
+                    tvChatDeleted.text = "Pesan ini telah dihapus"
                     tvChatDeleted.visible()
                     tvChat.gone()
                     tvLink.gone()
@@ -129,7 +130,8 @@ class ChatRoomCaregiverAdapter(
                     if (item.url.isNotEmpty()) {
                         Glide.with(adapterContext)
                             .load(item.url)
-                            .addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                            .addListener(object :
+                                com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
 
                                 override fun onLoadFailed(
                                     e: GlideException?,
@@ -181,7 +183,7 @@ class ChatRoomCaregiverAdapter(
             is RightChatViewHolder -> holder.binding.run {
                 tvDate.text = item.time
                 ivPlayMedia.gone()
-                if(!item.isActive) {
+                if (!item.isActive) {
                     tvChatDeleted.visible()
                     tvChat.gone()
                     tvLink.gone()
@@ -191,7 +193,8 @@ class ChatRoomCaregiverAdapter(
                     if (item.url.isNotEmpty()) {
                         Glide.with(adapterContext)
                             .load(item.url)
-                            .addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                            .addListener(object :
+                                com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
 
                                 override fun onLoadFailed(
                                     e: GlideException?,
@@ -343,7 +346,7 @@ class ChatRoomCaregiverAdapter(
             is VoiceNoteLeftChatViewHolder -> holder.binding.run {
                 tvName.text = item.name
                 tvDate.text = item.time
-                if(item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
+                if (item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
                 mediaPlayer = MediaPlayer()
                 try {
                     mediaPlayer?.setDataSource(item.url)
