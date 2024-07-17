@@ -92,6 +92,10 @@ class CaregiverPatientListViewModel(
         }
     }
 
+    fun setFirebaseToken(token: String) {
+        repository.setFirebaseToken(token)
+    }
+
     fun listenNewCaregiver() {
         viewModelScope.launch {
             repository.listenNewCaregiver() { data, error ->

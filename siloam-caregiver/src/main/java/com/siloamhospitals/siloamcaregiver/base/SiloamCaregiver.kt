@@ -5,6 +5,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
+import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 
 class SiloamCaregiver(
@@ -68,6 +69,13 @@ class SiloamCaregiver(
                 AppPreferences(context)
             }
             mPreference.wardId = wardID
+        }
+
+        fun seFirebaseToken(context: Context, token: String) {
+            val mPreference by lazy {
+                AppPreferences(context)
+            }
+            mPreference.firebaseToken = token
         }
 
     }

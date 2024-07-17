@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
+import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.ext.datetime.TODAY
 import com.siloamhospitals.siloamcaregiver.ext.datetime.YESTERDAY
@@ -133,6 +134,7 @@ class CaregiverFragment : Fragment() {
         viewModel.getUserShow()
         viewModel.emitHospitalWard()
         viewModel.listenHospitalWardFilter()
+        setupFirebaseToken()
         observeError()
         observerCaregiverList()
         observeBadgeNotif()
@@ -145,6 +147,13 @@ class CaregiverFragment : Fragment() {
         observeDeleteCaregiver()
         observePinPatient()
         viewModel.listenBadgeNotif()
+    }
+
+    private fun setupFirebaseToken() {
+        if(preferences.role == SiloamCaregiver.ROLE_NURSE && preferences.firebaseToken.isNotEmpty()) {
+            viewModel.setFirebaseToken(preferences.firebaseToken)
+            preferences.firebaseToken = ""
+        }
     }
 
     private fun observeDeleteCaregiver() {

@@ -58,6 +58,7 @@ class Repository(
         private const val LISTEN_HOSPITAL_WARD_FILTER = "list-ward-by-id-listener"
         private const val GET_NOTIF_FLOATING = "get-notif-floating"
         private const val NOTIF_FLOATING_LISTENER = "notif-floating-listener"
+        private const val UPDATE_TOKEN_ID = "update-token-id"
         private const val KEY = "YoDnqnDe-y42HklO0W2awXO4Rsnooic0"
         private const val IV = "24594253911bc137"
     }
@@ -237,6 +238,12 @@ class Repository(
         data.put("caregiverID", caregiverId)
         data.put("channelID", channelId)
         mSocket.emitEvent(SET_READ_MESSAGE, data)
+    }
+
+    fun setFirebaseToken(tokenId: String) {
+        val data = JSONObject()
+        data.put("tokenId", tokenId)
+        mSocket.emitEvent(UPDATE_TOKEN_ID, data)
     }
 
     fun listenMessageList(doctorHopeid: String, action: ((CaregiverChatListData, String) -> Unit)) {

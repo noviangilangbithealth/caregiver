@@ -353,7 +353,7 @@ class AppPreferences(val context: Context) {
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-    private var firebaseToken: String
+    var firebaseToken: String
         get() = findPreference(TOKEN_FIREBASE, "")
         set(value) {
             putPreference(TOKEN_FIREBASE, value)
