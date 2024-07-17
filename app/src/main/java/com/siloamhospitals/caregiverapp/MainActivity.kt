@@ -3,6 +3,10 @@ package com.siloamhospitals.caregiverapp
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.BuildConfig
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.PrettyFormatStrategy
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
 import com.siloamhospitals.siloamcaregiver.base.SiloamCaregiver
 import com.siloamhospitals.siloamcaregiver.ui.button.CaregiverButtons
@@ -16,6 +20,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        Logger.addLogAdapter(object : AndroidLogAdapter(
+            PrettyFormatStrategy.newBuilder()
+                .showThreadInfo(false)
+                .tag("CAREGIVER_COMMUNICATION")
+                .build()
+        ) {
+            override fun isLoggable(priority: Int, tag: String?) = true
+        })
         CaregiverButtons.init(this.application)
         //setup initial user
         // todo add more parameter for fulfill the requirement

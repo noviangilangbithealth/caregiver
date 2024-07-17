@@ -163,9 +163,11 @@ class CaregiverPatientListViewModel(
                         _userShow.postValue(BaseHandleResponse.SUCCESS(it))
                     }
                 } else {
+                    Logger.d(response.message())
                     _userShow.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
             } catch (e: Exception) {
+                Logger.d(e)
                 _userShow.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }
@@ -183,9 +185,11 @@ class CaregiverPatientListViewModel(
                         _ward.postValue(BaseHandleResponse.SUCCESS(it))
                     }
                 } else {
+                    Logger.d(response.message() ?: "")
                     _ward.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
             } catch (e: Exception) {
+                Logger.d(e)
                 _ward.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }
@@ -210,9 +214,11 @@ class CaregiverPatientListViewModel(
                         _pinnedMessage.postValue(BaseHandleResponse.SUCCESS(it))
                     }
                 } else {
+                    Logger.d(response.message())
                     _pinnedMessage.postValue(BaseHandleResponse.ERROR(response.message()))
                 }
             } catch (e: Exception) {
+                Logger.d(e)
                 _pinnedMessage.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
             }
         }

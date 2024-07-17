@@ -8,6 +8,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.findNavController
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.BuildConfig
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.PrettyFormatStrategy
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.ActivityCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.network.Repository
@@ -38,6 +42,14 @@ class CaregiverActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Logger.addLogAdapter(object : AndroidLogAdapter(
+            PrettyFormatStrategy.newBuilder()
+                .showThreadInfo(false)
+                .tag("CAREGIVER_COMMUNICATION")
+                .build()
+        ) {
+            override fun isLoggable(priority: Int, tag: String?) = true
+        })
         mPreference = AppPreferences(this)
         setContentView(binding.root)
         initViewModel()

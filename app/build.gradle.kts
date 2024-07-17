@@ -51,4 +51,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
+    //logger
+    implementation("com.orhanobut:logger:2.2.0")
+
 }
