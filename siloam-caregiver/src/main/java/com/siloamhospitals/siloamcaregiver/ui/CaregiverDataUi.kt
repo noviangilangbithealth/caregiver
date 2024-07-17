@@ -43,6 +43,7 @@ data class CaregiverRoomTypeUi(
     val isAttachment: Boolean = false,
     val isActive:Boolean = true,
     val hopeId: String = "",
+    val isEmptyMessage: Boolean = false,
 )
 
 

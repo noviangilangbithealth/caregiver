@@ -154,7 +154,8 @@ class RoomTypeCaregiverFragment : Fragment() {
                         role = it.message.firstOrNull()?.user?.role?.name ?: "",
                         senderName = it.message.firstOrNull()?.user?.name ?: "",
                         isActive = it.message.firstOrNull()?.isActive ?: false,
-                        hopeId = it.message.firstOrNull()?.user?.hopeId ?: ""
+                        hopeId = it.message.firstOrNull()?.user?.hopeId ?: "",
+                        isEmptyMessage = it.message.isEmpty()
                     )
                 )
             }
@@ -179,52 +180,69 @@ class RoomTypeCaregiverFragment : Fragment() {
                         Glide.with(requireContext()).load(item.icon).into(ivRoomType)
                         tvRoomName.text = item.roomName
 
-                        var lastMessage = when (item.role) {
-                            "Doctor" -> "${item.senderName}: ${item.lastMessage}"
-                            else -> "${item.role} - ${item.senderName}: ${item.lastMessage}"
-                        }
-                        tvlastMessage.text = lastMessage
-                        if (!item.isActive) {
-                            lastMessage = if (item.hopeId.toLong() == preferences.userId) {
-                                getString(R.string.own_message_deleted)
-                            } else {
-                                when (item.role) {
-                                    "Doctor" -> "${item.senderName}: ${getString(R.string.sender_delete)}"
-                                    else -> "${item.role} - ${item.senderName}: ${getString(R.string.sender_delete)}"
-                                }
-                            }
-                            tvlastMessage.text = lastMessage
-                        }
 
-                        if (item.isAttachment) {
-                            lastMessage = when (item.role) {
-                                "Doctor" -> "${item.senderName}: Send Attachment"
-                                else -> "${item.role} - ${item.senderName}: Send Attachment"
-                            }
-                            tvlastMessage.text = lastMessage
-                        }
-
+                        // Get the draft message
                         val draftMessage = preferences.findPreference(
                             "key_${item.caregiverId}_${item.channelId}",
                             ""
                         )
 
-                        val spannableDraftMessage = SpannableStringBuilder("Draft: $draftMessage")
-                        spannableDraftMessage.setSpan(
-                            ForegroundColorSpan(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.colorPrimaryCaregiver
-                                )
-                            ),
-                            0,
-                            6,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
-
+                        // Check and set the draft message
                         if (draftMessage.isNotEmpty()) {
+                            val spannableDraftMessage =
+                                SpannableStringBuilder("Draft: $draftMessage")
+                            spannableDraftMessage.setSpan(
+                                ForegroundColorSpan(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.colorPrimaryCaregiver
+                                    )
+                                ),
+                                0,
+                                6,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                             tvlastMessage.text = spannableDraftMessage
+                        } else {
+                            // Check if the message is deleted and empty
+                            if (!item.isActive && !item.isEmptyMessage) {
+                                val deletedMessage =
+                                    if (item.hopeId == preferences.userId.toString()) {
+                                        getString(R.string.own_message_deleted)
+                                    } else {
+                                        when (item.role) {
+                                            "Doctor" -> "${item.senderName}: ${getString(R.string.sender_delete)}"
+                                            else -> "${item.role} - ${item.senderName}: ${
+                                                getString(
+                                                    R.string.sender_delete
+                                                )
+                                            }"
+                                        }
+                                    }
+                                tvlastMessage.text = deletedMessage
+                            } else if (item.isEmptyMessage) {
+                                // Check if the message is empty
+                                tvlastMessage.text = getString(R.string.no_messages)
+                            } else if (item.isAttachment) {
+                                // Check if there is an attachment
+                                val attachmentMessage = when (item.role) {
+                                    "Doctor" -> "${item.senderName}: Send Attachment"
+                                    else -> "${item.role} - ${item.senderName}: Send Attachment"
+                                }
+                                tvlastMessage.text = attachmentMessage
+                            } else {
+                                // Set the last message
+                                val lastMessage = when (item.role) {
+                                    "Doctor" -> "${item.senderName}: ${item.lastMessage}"
+                                    else -> "${item.role} - ${item.senderName}: ${item.lastMessage}"
+                                }
+                                tvlastMessage.text = lastMessage
+                            }
                         }
+
+
+
+
 
                         tvBadgeRoomType.text = item.countUnread
                         tvBadgeRoomType.isVisible = item.countUnread != "0"
