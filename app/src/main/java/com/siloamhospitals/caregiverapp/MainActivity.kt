@@ -22,12 +22,13 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 2000000834,
+            userId = 29000000134,
             organizationId = 2,
             wardId = 0,
             context = this,
-            role = SiloamCaregiver.ROLE_DOCTOR
+            role = SiloamCaregiver.ROLE_NURSE
         )
+        SiloamCaregiver.seFirebaseToken(this, "1234567")
 //        30 Siloam 10F
 //        2000000834 ekajanti
 //        2000000732 prof eka
