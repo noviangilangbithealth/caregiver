@@ -32,6 +32,9 @@ data class CaregiverChatData (
     @SerializedName("created_at")
     val createdAt: String? = "",
 
+    @SerializedName("sent_at")
+    val sentAt: String? = "",
+
     @SerializedName("is_received")
     val isReceived: Boolean? = false,
 

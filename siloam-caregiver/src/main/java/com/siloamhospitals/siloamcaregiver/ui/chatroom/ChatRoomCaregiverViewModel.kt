@@ -11,6 +11,7 @@ import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
 import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
+import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
@@ -65,6 +66,19 @@ class ChatRoomCaregiverViewModel(
 
     val _uploadFiles = MutableLiveData<BaseHandleResponse<AttachmentCaregiverResponse>>()
     val uploadFiles: LiveData<BaseHandleResponse<AttachmentCaregiverResponse>> = _uploadFiles
+
+    private val _chatMessages = MutableLiveData<Event<List<CaregiverChatEntity>>>()
+    val chatMessages: LiveData<Event<List<CaregiverChatEntity>>> = _chatMessages
+
+    fun getCaregiverChat() {
+        viewModelScope.launch {
+            repository.getChatMessagesFlow(channelId, caregiverId)
+                .collect { messages ->
+                    _chatMessages.postValue(Event(messages))
+                }
+        }
+    }
+
 
     fun deleteMessage(messageId: String) =
         viewModelScope.launch {
@@ -207,32 +221,95 @@ class ChatRoomCaregiverViewModel(
     }
 
     var sizeChat = 0
-    fun List<CaregiverChatData>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
+//    fun List<CaregiverChatData>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
+//        com.orhanobut.logger.Logger.d(this)
+//        var isSameDate = false
+//        val dataUi = arrayListOf<CaregiverChatRoomUi>()
+//        val dataGroup =
+//            this.groupBy { it.createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "" }
+//        dataGroup.forEach { dataGrouped ->
+//            dataGrouped.value.map {
+//                val roleId = it.user?.role?.id?.toInt() ?: 1
+//                dataUi.add(
+//                    CaregiverChatRoomUi(
+//                        id = it.id.orEmpty(),
+//                        name = if (roleId == 1) it.user?.name.orEmpty() else it.user?.role?.name.orEmpty() + " - " + it.user?.name.orEmpty(),
+//                        message = it.message.orEmpty(),
+//                        time = it.createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
+//                        url = if (it.attachment.isNullOrEmpty()) "" else it.attachment.get(0)?.uriExt.orEmpty(),
+//                        color = it.user?.role?.color.orEmpty(),
+//                        isRead = it.isReaded ?: false,
+//                        isSelfSender = it.user?.hopeUserID == doctorHopeId,
+//                        isUrgent = (it.type ?: 1).toInt() == 2,
+//                        isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(
+//                            0
+//                        )?.uriExt.orEmpty()
+//                            .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
+//                        isActive = it.isActive ?: false,
+//                        isVideo = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || it.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
+//                    )
+//                )
+//            }
+//
+//            dataUi.add(
+//                CaregiverChatRoomUi(
+//                    isDateLimit = true, time = dataGrouped.key
+//                )
+//            )
+//
+//            if(lastData?.isDateLimit ?: false && lastData?.time.orEmpty() == dataGrouped.key){
+//                isSameDate = true
+//            }
+//        }
+//        sizeChat = dataUi.size
+//
+//        action?.invoke(isSameDate)
+//        return dataUi
+//    }
+
+    fun CaregiverChatData.generateNewChatUI(): CaregiverChatRoomUi {
+        val roleId = user?.role?.id?.toInt() ?: 1
+        return CaregiverChatRoomUi(
+            id = this.id.orEmpty(),
+            name = if (roleId == 1) user?.name.orEmpty() else user?.role?.name.orEmpty() + " - " + user?.name.orEmpty(),
+            message = message.orEmpty(),
+            time = createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
+            url = if (attachment.isNullOrEmpty()) "" else attachment.get(0)?.uriExt.orEmpty(),
+            color = user?.role?.color.orEmpty(),
+            isRead = isReaded ?: false,
+            isSelfSender = user?.hopeUserID == doctorHopeId,
+            isUrgent = (type ?: 1).toInt() == 2,
+            isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
+                .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
+            isActive = this.isActive ?: false,
+            isVideo = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || this.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
+        )
+    }
+
+    fun List<CaregiverChatEntity>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
         com.orhanobut.logger.Logger.d(this)
         var isSameDate = false
         val dataUi = arrayListOf<CaregiverChatRoomUi>()
         val dataGroup =
-            this.groupBy { it.createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "" }
+            this.groupBy { it.createdAt.toLocalDateTime().withFormat("EEEE, dd MMM") ?: "" }
         dataGroup.forEach { dataGrouped ->
             dataGrouped.value.map {
-                val roleId = it.user?.role?.id?.toInt() ?: 1
+                val roleId = it.user.role.id?.toInt() ?: 1
                 dataUi.add(
                     CaregiverChatRoomUi(
                         id = it.id.orEmpty(),
-                        name = if (roleId == 1) it.user?.name.orEmpty() else it.user?.role?.name.orEmpty() + " - " + it.user?.name.orEmpty(),
+                        name = if (roleId == 1) it.user.name else it.user.role.name+ " - " + it.user.name,
                         message = it.message.orEmpty(),
-                        time = it.createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
-                        url = if (it.attachment.isNullOrEmpty()) "" else it.attachment.get(0)?.uriExt.orEmpty(),
-                        color = it.user?.role?.color.orEmpty(),
-                        isRead = it.isReaded ?: false,
-                        isSelfSender = it.user?.hopeUserID == doctorHopeId,
-                        isUrgent = (it.type ?: 1).toInt() == 2,
-                        isVoiceNote = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(
-                            0
-                        )?.uriExt.orEmpty()
-                            .last() == 'a' || it.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
-                        isActive = it.isActive ?: false,
-                        isVideo = if (it.attachment.isNullOrEmpty()) false else it.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || it.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
+                        time = it.createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),
+                        url = it.attachment?.uriExt.orEmpty(),
+                        color = it.user.role.color,
+                        isRead = it.isReaded,
+                        isSelfSender = it.user.hopeUserId == doctorHopeId,
+                        isUrgent = it.type == 2,
+                        isVoiceNote =if(it.attachment?.uriExt.isNullOrEmpty()) false else it.attachment?.uriExt.orEmpty()
+                            .last() == 'a' || it.attachment?.uriExt.orEmpty().last() == 'c',
+                        isActive = it.isActive ,
+                        isVideo = it.attachment?.uriExt.orEmpty().endsWith("mp4") || it.attachment?.uriExt.orEmpty().endsWith("mov")
                     )
                 )
             }
@@ -253,24 +330,25 @@ class ChatRoomCaregiverViewModel(
         return dataUi
     }
 
-    fun CaregiverChatData.generateNewChatUI(): CaregiverChatRoomUi {
-        val roleId = user?.role?.id?.toInt() ?: 1
-        return CaregiverChatRoomUi(
-            id = this.id.orEmpty(),
-            name = if (roleId == 1) user?.name.orEmpty() else user?.role?.name.orEmpty() + " - " + user?.name.orEmpty(),
-            message = message.orEmpty(),
-            time = createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
-            url = if (attachment.isNullOrEmpty()) "" else attachment.get(0)?.uriExt.orEmpty(),
-            color = user?.role?.color.orEmpty(),
-            isRead = isReaded ?: false,
-            isSelfSender = user?.hopeUserID == doctorHopeId,
-            isUrgent = (type ?: 1).toInt() == 2,
-            isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
-                .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
-            isActive = this.isActive ?: false,
-            isVideo = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || this.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
-        )
-    }
+//    fun CaregiverChatEntity.generateNewChatUI(): CaregiverChatRoomUi {
+//        val roleId = user.role.id
+//        return CaregiverChatRoomUi(
+//            id = this.id,
+//            name = if (roleId == 1) user.name else user.role.name + " - " + user.name,
+//            message = message,
+//            time = createdAt.toLocalDateTimeOrNow().withFormat("HH:mm") ?: "",
+//            url = attachment?.uriExt.orEmpty(),
+//            color = user.role.color,
+//            isRead = isReaded,
+//            isSelfSender = user.hopeUserId == doctorHopeId,
+//            isUrgent = type == 2,
+//            isVoiceNote = attachment?.uriExt.orEmpty()
+//                .last() == 'a' || this.attachment?.uriExt.orEmpty().last() == 'c',
+//            isActive = this.isActive,
+//            isVideo = attachment?.uriExt.orEmpty().endsWith("mp4") || attachment?.uriExt.orEmpty().endsWith("mov")
+//        )
+//    }
+
 
 
 }

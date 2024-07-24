@@ -135,19 +135,19 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         binding.rvChatCaregiver.run {
             adapter = adapterChatRoom
             addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.medium)))
-            addOnScrollListener(object : LinearLoadMoreListener(layoutManager) {
-                override fun isLoading(): Boolean {
-                    return onProcess
-                }
-
-                override fun loadMoreItems() {
-                    if (!viewModel.isLastPage || viewModel.sizeChat > 15) {
-                        viewModel.emitGetMessage(loadMore = true)
-                        onProcess = true
-                    }
-                }
-
-            })
+//            addOnScrollListener(object : LinearLoadMoreListener(layoutManager) {
+//                override fun isLoading(): Boolean {
+//                    return onProcess
+//                }
+//
+//                override fun loadMoreItems() {
+//                    if (!viewModel.isLastPage || viewModel.sizeChat > 15) {
+//                        viewModel.emitGetMessage(loadMore = true)
+//                        onProcess = true
+//                    }
+//                }
+//
+//            })
         }
     }
 
@@ -182,12 +182,13 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
     private fun callSocket() {
-        viewModel.emitGetMessage {
-            binding.run {
-                lottieLoadingChatRoom.visible()
-                rvChatCaregiver.gone()
-            }
-        }
+//        viewModel.emitGetMessage {
+//            binding.run {
+//                lottieLoadingChatRoom.visible()
+//                rvChatCaregiver.gone()
+//            }
+//        }
+        viewModel.getCaregiverChat()
         viewModel.listenMessageList()
         viewModel.listenNewMessageList()
         viewModel.setReadMessage()
@@ -200,6 +201,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         observeUploadPhotos()
         observeConnection()
         observeDeleteMessage()
+        observeChatMessages()
     }
 
     private fun observeDeleteMessage() {
@@ -223,6 +225,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             if (!isConnected) {
                 Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT)
                     .show()
+                viewModel.getCaregiverChat()
             } else {
                 viewModel.listenNewMessageList()
             }
@@ -284,10 +287,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 it.getContentIfNotHandled()?.let { data ->
                     onProcess = false
                     if (data.data.orEmpty().isNotEmpty()) {
-                        onMessageListLoadedBaseRv(
-                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
-                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-                            })
+//                        onMessageListLoadedBaseRv(
+//                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
+//                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+//                            })
                     } else {
                         resetCurrentPage()
                         isLastPage = true
@@ -298,6 +301,18 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             errorMessageList.observe(viewLifecycleOwner) { error ->
                 error.getContentIfNotHandled()?.let {
                     Logger.d(it)
+                }
+            }
+        }
+    }
+
+    private fun observeChatMessages() {
+        viewModel.run {
+            chatMessages.observe(viewLifecycleOwner) {
+                it.getContentIfNotHandled()?.let { data ->
+                    adapterChatRoom.initialize(data.generateChatListUI(adapterChatRoom.lastItem()) {
+                        if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                    })
                 }
             }
         }
@@ -634,14 +649,14 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.currentPage > 1) {
-            viewModel.emitGetMessage {
-                binding.run {
-                    lottieLoadingChatRoom.visible()
-                    rvChatCaregiver.gone()
-                }
-            }
-        }
+//        if (viewModel.currentPage > 1) {
+//            viewModel.emitGetMessage {
+//                binding.run {
+//                    lottieLoadingChatRoom.visible()
+//                    rvChatCaregiver.gone()
+//                }
+//            }
+//        }
         viewModel.listenNewMessageList()
     }
 

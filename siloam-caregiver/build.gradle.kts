@@ -5,7 +5,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id ("maven-publish")
+    id("maven-publish")
 }
 
 val keystorePropertiesFile = rootProject.file("../keys_caregiver/keystore.properties")
@@ -14,23 +14,24 @@ val keystoreProperties = Properties().apply {
 }
 
 buildscript {
-    val kotlin_version  = "1.7.20"
+    val kotlinVersion = "1.7.20"
 
     repositories {
         google()
         mavenCentral()
-        mavenLocal() // Add this line
+        mavenLocal()
     }
 
     dependencies {
         classpath("com.android.tools.build:gradle:7.1.3")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 
 android {
     namespace = "com.siloamhospitals.siloamcaregiver"
     compileSdk = 34
+
     val URL_CAREGIVER = "\"https://mysiloam-api-staging.siloamhospitals.com/caregiver/\""
     val ALGORITHM_HASH = "\"HmacSHA256\""
     val ALGORITHM_ENCRYPT = "\"AES\""
@@ -70,25 +71,25 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("String", "URL_CAREGIVER", URL_CAREGIVER)
             signingConfig = signingConfigs.getByName("releaseConfig")
-
         }
 
         debug {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-//            applicationIdSuffix = ".dev"
-//            versionNameSuffix = "-dev"
             buildConfigField("String", "URL_CAREGIVER", URL_CAREGIVER)
             signingConfig = signingConfigs.getByName("debugConfig")
-
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
+        allWarningsAsErrors = false
+        freeCompilerArgs = listOf("-Xmodule-name=${project.name}")
     }
 
     buildFeatures {
@@ -96,29 +97,14 @@ android {
         buildConfig = true
     }
 
-    kapt {
-        correctErrorTypes = true
-    }
-
-
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)        // << --- ADD This
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        warningsAsErrors = false
     }
 }
-
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17            // << --- ADD This
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-val mediaVersion = "1.0.1"
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.4.0-alpha02")
@@ -133,68 +119,86 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
     implementation("com.google.firebase:firebase-analytics")
 
-    //Moshi
+    // Moshi
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
-    //Retrofit
+    // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation(  "com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
-    //Koin
+    // Koin
     implementation("io.insert-koin:koin-android:3.3.2")
 
-    //chucker
+    // Chucker
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 
-    //Gson
+    // Gson
     implementation("com.google.code.gson:gson:2.10.1")
 
-    //okhttp3.logging.HttpLoggingInterceptor
+    // OkHttp Logging Interceptor
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
-    //retrofit2.converter.gson.GsonConverterFactory
+    // Retrofit Gson Converter
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    //com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+    // Coroutine Call Adapter
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 
-    //multidex
+    // Multidex
     implementation("androidx.multidex:multidex:2.0.1")
 
-    //socket.io
+    // Socket.IO
     implementation("io.socket:socket.io-client:2.1.0")
 
-    //logger
+    // Logger
     implementation("com.orhanobut:logger:2.2.0")
 
-    //recyclical
+    // Recyclical
     implementation("com.afollestad:recyclical:1.1.1")
 
-    //Glide
+    // Glide
     implementation("com.github.bumptech.glide:glide:4.14.2")
 
-    //RecyclerViewDivider
+    // RecyclerView Divider
     implementation("com.github.fondesa:recycler-view-divider:3.6.0")
 
-    //lottie
+    // Lottie
     implementation("com.airbnb.android:lottie:5.2.0")
 
+    // FFmpeg
     implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
+    // Flexbox
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 
     testImplementation("io.mockk:mockk:1.13.3")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
-    //exo player
+    // ExoPlayer
+    val mediaVersion = "1.0.1"
     implementation("androidx.media3:media3-exoplayer:$mediaVersion")
     implementation("androidx.media3:media3-ui:$mediaVersion")
     implementation("androidx.media3:media3-exoplayer-dash:$mediaVersion")
 
+    // Room
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    implementation("androidx.room:room-migration:$roomVersion")
+
+    // SQLCipher
+    val sqlcipherVersion = "4.5.3"
+    implementation("net.zetetic:android-database-sqlcipher:$sqlcipherVersion")
+
+    // SQLite
+    val sqliteVersion = "2.3.0"
+    implementation("androidx.sqlite:sqlite:$sqliteVersion")
 }
 
 publishing {

@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.findNavController
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.ActivityChatroomCaregiverBinding
+import com.siloamhospitals.siloamcaregiver.network.CaregiverDatabase
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailViewModel
@@ -112,7 +113,7 @@ class ChatroomCaregiverActivity : AppCompatActivity() {
     }
 
     private fun initViewModel() {
-        val repository = Repository(mPreference)
+        val repository = Repository(mPreference, CaregiverDatabase.getInstance(this))
 
         val chatRoomCaregiverViewModelFactory = viewModelFactory {
             initializer {

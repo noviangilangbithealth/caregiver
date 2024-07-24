@@ -91,12 +91,20 @@ interface ApiService {
         @Path(value = PathPatientId) patientId: String
     ): Response<GroupInfoAdmissionHistoryResponse>
 
+    @GET(GetListMessage)
+    suspend fun getListMessage(
+        @Path(value = PathUserId) userId: String,
+        @Path(value = PathCaregiverId) caregiverId: String,
+        @Path(value = PathChannelId) channelId: String
+    ): Response<BaseDataResponse<String>>
+
     companion object {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
         const val PathHospitalId = "hospital_id"
         const val PathPatientId = "patient_id"
         const val PathMessageId = "message_id"
+        const val PathChannelId = "channel_id"
 
         const val PostUpload = "/caregiver/api/v1/messages/upload"
         const val PostSendMessage = "/caregiver/api/v1/messages"
@@ -107,6 +115,7 @@ interface ApiService {
         const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
         const val GetAdmissionHistory = "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
         const val DeleteMessage = "/caregiver/api/v1/messages/{message_id}"
+        const val GetListMessage = "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}?unread="
     }
 
 }

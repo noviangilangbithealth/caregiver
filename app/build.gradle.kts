@@ -1,4 +1,6 @@
 plugins {
+    //ksp
+    id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
@@ -29,12 +31,19 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        allWarningsAsErrors = false
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
     }
     buildFeatures {
         viewBinding = true
 
     }
 }
+
+ksp {
+    arg("moduleName", project.name)
+}
+
 
 dependencies {
 

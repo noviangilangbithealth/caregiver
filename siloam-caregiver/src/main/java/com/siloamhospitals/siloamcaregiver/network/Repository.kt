@@ -6,6 +6,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.ext.encryption.decrypt
+import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
+import com.siloamhospitals.siloamcaregiver.network.entity.toEntity
 import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
@@ -29,6 +31,9 @@ import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoA
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -38,7 +43,8 @@ import retrofit2.Response
 import java.io.File
 
 class Repository(
-    private val preferences: AppPreferences
+    private val preferences: AppPreferences,
+    private val caregiverDatabase: CaregiverDatabase? = null
 ) {
     companion object {
         private const val GET_CAREGIVER_EMIT_EVENT = "get-caregiver"
@@ -64,6 +70,8 @@ class Repository(
     }
 
     private var mSocket = SocketIoManager(preferences)
+
+    private val caregiverChatDao by lazy { caregiverDatabase?.caregiverChatDao() }
 
     fun emitGetCaregiver(
         page: Int,
@@ -460,6 +468,47 @@ class Repository(
     ): Response<GroupInfoAdmissionHistoryResponse> {
         Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId", )
         return RetrofitInstance.getInstance.getAdmissionHistory(hospitalId, patientId)
+    }
+
+
+    fun getChatMessagesFlow(channelId: String, caregiverId: String): Flow<List<CaregiverChatEntity>> {
+        return flow {
+            val localMessages = caregiverChatDao?.getChatMessages(channelId, caregiverId)
+            emit(localMessages?.first().orEmpty())
+
+            try {
+                val body = RetrofitInstance.getInstance.getListMessage(preferences.userId.toString(), caregiverId, channelId).body()
+                Logger.d(body)
+                if(body?.data.orEmpty().isNotEmpty()) {
+                    val decryptedData = body?.data?.decrypt(IV, KEY)
+                    Logger.d(decryptedData)
+                    val builder =
+                        GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
+                    val adapter = ListAdapter(CaregiverChatData::class.java, builder)
+                    val newData = adapter.fromJson(decryptedData)
+                    var messages = emptyList<CaregiverChatEntity>()
+                    if (newData != null) {
+                        messages = newData.map { it.toEntity() }
+                        insertChatMessages(messages)
+                    }
+                    emit(messages)
+                }
+
+            } catch (e: Exception) {
+                Logger.d(e)
+//                emit(emptyList())
+            }
+        }
+    }
+
+    private suspend fun insertChatMessages(messages: List<CaregiverChatEntity>) {
+        for (message in messages) {
+            caregiverChatDao?.let { caregiverChatDao ->
+                if (!caregiverChatDao.exists(message.id)) {
+                    caregiverChatDao.insertChatMessage(message)
+                }
+            }
+        }
     }
 
 }
