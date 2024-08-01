@@ -12,6 +12,7 @@ import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
+import com.siloamhospitals.siloamcaregiver.network.entity.toEntity
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
@@ -196,27 +197,30 @@ class ChatRoomCaregiverViewModel(
         }
 
 
-    fun listenMessageList() {
-        viewModelScope.launch {
-            repository.listenMessageList(preferences.userId.toString()) { data, error ->
-                if (error.isEmpty()) {
-                    _messageList.postValue(Event(data))
-                } else {
-                    _errorMessageList.postValue(Event(error))
-                }
-            }
-        }
-    }
+//    fun listenMessageList() {
+//        viewModelScope.launch {
+//            repository.listenMessageList(preferences.userId.toString()) { data, error ->
+//                if (error.isEmpty()) {
+//                    _messageList.postValue(Event(data))
+//                } else {
+//                    _errorMessageList.postValue(Event(error))
+//                }
+//            }
+//        }
+//    }
 
     fun listenNewMessageList() {
         viewModelScope.launch {
+            var newData: CaregiverChatData? = null
             repository.listenNewMessageList { data, error ->
                 if (error.isEmpty()) {
+                    newData = data
                     _newMessage.postValue(Event(data))
                 } else {
                     _errorNewMessage.postValue(Event(error))
                 }
             }
+            newData?.let {  repository.insertChatMessage(it.toEntity()) }
         }
     }
 

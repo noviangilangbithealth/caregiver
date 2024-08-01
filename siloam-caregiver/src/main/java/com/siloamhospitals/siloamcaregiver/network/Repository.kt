@@ -511,4 +511,12 @@ class Repository(
         }
     }
 
+    suspend fun insertChatMessage(message: CaregiverChatEntity) {
+        caregiverChatDao?.let { caregiverChatDao ->
+            if (!caregiverChatDao.exists(message.id)) {
+                caregiverChatDao.insertChatMessage(message)
+            }
+        }
+    }
+
 }

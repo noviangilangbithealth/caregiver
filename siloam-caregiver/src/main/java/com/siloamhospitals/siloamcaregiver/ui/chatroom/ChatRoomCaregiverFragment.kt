@@ -189,14 +189,14 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 //            }
 //        }
         viewModel.getCaregiverChat()
-        viewModel.listenMessageList()
+//        viewModel.listenMessageList()
         viewModel.listenNewMessageList()
         viewModel.setReadMessage()
     }
 
     private fun setupObserver() {
         observeSendChat()
-        observeMessageList()
+//        observeMessageList()
         observeNewMessage()
         observeUploadPhotos()
         observeConnection()
@@ -275,36 +275,36 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
 
-    private fun observeMessageList() {
-        viewModel.run {
-            messageList.observe(viewLifecycleOwner) {
-
-                binding.run {
-                    lottieLoadingChatRoom.gone()
-                    rvChatCaregiver.visible()
-                }
-
-                it.getContentIfNotHandled()?.let { data ->
-                    onProcess = false
-                    if (data.data.orEmpty().isNotEmpty()) {
-//                        onMessageListLoadedBaseRv(
-//                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
-//                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-//                            })
-                    } else {
-                        resetCurrentPage()
-                        isLastPage = true
-                    }
-                }
-            }
-
-            errorMessageList.observe(viewLifecycleOwner) { error ->
-                error.getContentIfNotHandled()?.let {
-                    Logger.d(it)
-                }
-            }
-        }
-    }
+//    private fun observeMessageList() {
+//        viewModel.run {
+//            messageList.observe(viewLifecycleOwner) {
+//
+//                binding.run {
+//                    lottieLoadingChatRoom.gone()
+//                    rvChatCaregiver.visible()
+//                }
+//
+//                it.getContentIfNotHandled()?.let { data ->
+//                    onProcess = false
+//                    if (data.data.orEmpty().isNotEmpty()) {
+////                        onMessageListLoadedBaseRv(
+////                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
+////                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+////                            })
+//                    } else {
+//                        resetCurrentPage()
+//                        isLastPage = true
+//                    }
+//                }
+//            }
+//
+//            errorMessageList.observe(viewLifecycleOwner) { error ->
+//                error.getContentIfNotHandled()?.let {
+//                    Logger.d(it)
+//                }
+//            }
+//        }
+//    }
 
     private fun observeChatMessages() {
         viewModel.run {
