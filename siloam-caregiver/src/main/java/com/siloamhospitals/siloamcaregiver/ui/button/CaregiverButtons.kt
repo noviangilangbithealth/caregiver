@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -35,6 +36,7 @@ class CaregiverButtons private constructor(app: Application) :
     init {
         app.registerActivityLifecycleCallbacks(this)
     }
+
 
     @SuppressLint("ClickableViewAccessibility", "UnsafeOptInUsageError")
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -80,6 +82,46 @@ class CaregiverButtons private constructor(app: Application) :
                 setOnClickListener {
                     SiloamCaregiverUI.getInstances().openCaregiver(activity)
                 }
+
+                // Add touch listener for drag functionality
+                setOnTouchListener(object : View.OnTouchListener {
+                    private var initialX = 0f
+                    private var initialY = 0f
+                    private var dX = 0f
+                    private var dY = 0f
+                    private var isDragging = false
+
+                    override fun onTouch(view: View, event: MotionEvent): Boolean {
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                initialX = view.x
+                                initialY = view.y
+                                dX = initialX - event.rawX
+                                dY = initialY - event.rawY
+                                view.postDelayed({
+                                    isDragging = true
+                                }, 300) // Long press duration
+                                return false // Allow click event to be processed
+                            }
+
+                            MotionEvent.ACTION_MOVE -> {
+                                if (isDragging) {
+                                    view.animate()
+                                        .x(event.rawX + dX)
+                                        .y(event.rawY + dY)
+                                        .setDuration(0)
+                                        .start()
+                                    return true // Handle drag event
+                                }
+                            }
+
+                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                                isDragging = false
+                            }
+                        }
+                        return false
+                    }
+                })
             }
 
             // Handle visibility based on isFabVisible state
