@@ -21,17 +21,17 @@ abstract class CaregiverDatabase : RoomDatabase() {
         fun getInstance(context: Context): CaregiverDatabase {
             val PHRASE = "siloam_c4r3g1v3r"
 
-            val passphrase = SQLiteDatabase.getBytes(PHRASE.getMd5()?.toCharArray())
+//            val passphrase = SQLiteDatabase.getBytes(PHRASE.getMd5()?.toCharArray())
+//
+//            if (SQLCipherUtils.getDatabaseState(
+//                    context,
+//                    DB_NAME
+//                ) == SQLCipherUtils.State.UNENCRYPTED
+//            ) {
+//                SQLCipherUtils.encrypt(context, DB_NAME, passphrase)
+//            }
 
-            if (SQLCipherUtils.getDatabaseState(
-                    context,
-                    DB_NAME
-                ) == SQLCipherUtils.State.UNENCRYPTED
-            ) {
-                SQLCipherUtils.encrypt(context, DB_NAME, passphrase)
-            }
-
-            val factory = SupportFactory(passphrase)
+//            val factory = SupportFactory(passphrase)
 
             /*
                         if (DEBUG || BUILD_TYPE == STAGING) {
@@ -55,7 +55,7 @@ abstract class CaregiverDatabase : RoomDatabase() {
 
             return Room.databaseBuilder(context, CaregiverDatabase::class.java, DB_NAME)
                 .fallbackToDestructiveMigration()
-                .openHelperFactory(factory)
+//                .openHelperFactory(factory)
                 .build()
         }
     }
