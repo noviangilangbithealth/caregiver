@@ -140,7 +140,7 @@ class GroupDetailFragment : Fragment() {
 
                 tvAdm.text = getString(
                     R.string.sub_header_group_detail,
-                    patientResult.organizationCode,
+                    patientResult.localMrNo,
                     patientResult.admissionNo
                 )
 
