@@ -100,6 +100,7 @@ class GroupDetailFragment : Fragment() {
                     val data = response.data?.data
                     if (data != null) {
                         if (data.isNotEmpty()) {
+                            viewModel.savedAdmissionHistory.clear()
                             viewModel.savedAdmissionHistory.addAll(data)
                             findNavController().navigate(R.id.action_groupDetailFragment2_to_admissionHistoryFragment)
                         } else {

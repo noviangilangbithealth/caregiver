@@ -312,6 +312,7 @@ class RoomTypeCaregiverFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        preferences.isHistoryChatRoom = false
     }
 
     val chatRoomLauncher =

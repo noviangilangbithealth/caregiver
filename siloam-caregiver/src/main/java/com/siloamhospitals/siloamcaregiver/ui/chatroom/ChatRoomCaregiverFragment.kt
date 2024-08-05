@@ -682,7 +682,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         super.onDestroyView()
         viewModel.resetCurrentPage()
         viewModel.isLastPage = false
-        preferences.isHistoryChatRoom = false
         adapterChatRoom.clear()
     }
 
