@@ -68,8 +68,8 @@ class ChatRoomCaregiverViewModel(
     val _uploadFiles = MutableLiveData<BaseHandleResponse<AttachmentCaregiverResponse>>()
     val uploadFiles: LiveData<BaseHandleResponse<AttachmentCaregiverResponse>> = _uploadFiles
 
-    private val _chatMessages = MutableLiveData<Event<List<CaregiverChatEntity>>>()
-    val chatMessages: LiveData<Event<List<CaregiverChatEntity>>> = _chatMessages
+    private val _chatMessages = MutableLiveData<Event<PairChats>>()
+    val chatMessages: LiveData<Event<PairChats>> = _chatMessages
 
     fun getCaregiverChat() {
         viewModelScope.launch {
@@ -224,6 +224,12 @@ class ChatRoomCaregiverViewModel(
         }
     }
 
+    fun insertChatMessage(message: CaregiverChatData) {
+        viewModelScope.launch {
+            repository.insertChatMessage(message.toEntity())
+        }
+    }
+
     var sizeChat = 0
 //    fun List<CaregiverChatData>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
 //        com.orhanobut.logger.Logger.d(this)
@@ -278,6 +284,7 @@ class ChatRoomCaregiverViewModel(
             name = if (roleId == 1) user?.name.orEmpty() else user?.role?.name.orEmpty() + " - " + user?.name.orEmpty(),
             message = message.orEmpty(),
             time = createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
+            date = createdAt?.toLocalDateTime()?.withFormat("EEEE, dd MMM") ?: "",
             url = if (attachment.isNullOrEmpty()) "" else attachment.get(0)?.uriExt.orEmpty(),
             color = user?.role?.color.orEmpty(),
             isRead = isReaded ?: false,
@@ -297,14 +304,16 @@ class ChatRoomCaregiverViewModel(
         val dataGroup =
             this.groupBy { it.createdAt.toLocalDateTime().withFormat("EEEE, dd MMM") ?: "" }
         dataGroup.forEach { dataGrouped ->
+
             dataGrouped.value.map {
-                val roleId = it.user.role.id?.toInt() ?: 1
+                val roleId = it.user.role.id
                 dataUi.add(
                     CaregiverChatRoomUi(
                         id = it.id.orEmpty(),
                         name = if (roleId == 1) it.user.name else it.user.role.name+ " - " + it.user.name,
                         message = it.message.orEmpty(),
                         time = it.createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),
+                        date = it.createdAt.toLocalDateTime().withFormat("EEEE, dd MMM"),
                         url = it.attachment?.uriExt.orEmpty(),
                         color = it.user.role.color,
                         isRead = it.isReaded,
@@ -318,11 +327,14 @@ class ChatRoomCaregiverViewModel(
                 )
             }
 
-            dataUi.add(
-                CaregiverChatRoomUi(
-                    isDateLimit = true, time = dataGrouped.key
+            if(lastData?.date != dataGrouped.key){
+                dataUi.add(
+                    CaregiverChatRoomUi(
+                        isDateLimit = true, time = dataGrouped.key
+                    )
                 )
-            )
+            }
+
 
             if(lastData?.isDateLimit ?: false && lastData?.time.orEmpty() == dataGrouped.key){
                 isSameDate = true
@@ -334,25 +346,27 @@ class ChatRoomCaregiverViewModel(
         return dataUi
     }
 
-//    fun CaregiverChatEntity.generateNewChatUI(): CaregiverChatRoomUi {
-//        val roleId = user.role.id
-//        return CaregiverChatRoomUi(
-//            id = this.id,
-//            name = if (roleId == 1) user.name else user.role.name + " - " + user.name,
-//            message = message,
-//            time = createdAt.toLocalDateTimeOrNow().withFormat("HH:mm") ?: "",
-//            url = attachment?.uriExt.orEmpty(),
-//            color = user.role.color,
-//            isRead = isReaded,
-//            isSelfSender = user.hopeUserId == doctorHopeId,
-//            isUrgent = type == 2,
-//            isVoiceNote = attachment?.uriExt.orEmpty()
-//                .last() == 'a' || this.attachment?.uriExt.orEmpty().last() == 'c',
-//            isActive = this.isActive,
-//            isVideo = attachment?.uriExt.orEmpty().endsWith("mp4") || attachment?.uriExt.orEmpty().endsWith("mov")
-//        )
-//    }
+    fun CaregiverChatEntity.generateNewChatUIfromEntity(): CaregiverChatRoomUi {
+        val roleId = user.role.id
+        return CaregiverChatRoomUi(
+            id = this.id,
+            name = if (roleId == 1) user.name else user.role.name + " - " + user.name,
+            message = message,
+            time = createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),
+            url = if (attachment == null) "" else attachment.uriExt,
+            color = user.role.color,
+            isRead = isReaded,
+            isSelfSender = user.hopeUserId == doctorHopeId,
+            isUrgent = type == 2,
+            isVoiceNote = if (this.attachment?.uriExt.orEmpty().isEmpty()) false else this.attachment?.uriExt
+                ?.last() == 'a' || this.attachment?.uriExt?.last() == 'c',
+            isActive = this.isActive,
+            isVideo = if (this.attachment?.uriExt.orEmpty().isEmpty()) false else this.attachment?.uriExt?.endsWith("mp4") ?: false || this.attachment?.uriExt?.endsWith("mov") ?: false
+        )
+    }
 
 
 
 }
+
+typealias PairChats = Pair<List<CaregiverChatEntity>, List<CaregiverChatEntity>>

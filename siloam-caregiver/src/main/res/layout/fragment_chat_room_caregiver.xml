@@ -79,15 +79,14 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:paddingTop="@dimen/medium"
-        android:paddingHorizontal="@dimen/medium"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/medium"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/ll_input_chat"
         app:layout_constraintTop_toBottomOf="@id/app_bar_chat_room"
         app:layout_constraintVertical_bias="1"
-        tools:itemCount="3"
         app:reverseLayout="true"
+        tools:itemCount="3"
         tools:listitem="@layout/item_chat_left"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 

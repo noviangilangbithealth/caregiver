@@ -470,14 +470,18 @@ class Repository(
         return RetrofitInstance.getInstance.getAdmissionHistory(hospitalId, patientId)
     }
 
-
-    fun getChatMessagesFlow(channelId: String, caregiverId: String): Flow<List<CaregiverChatEntity>> {
+    // Pair first data is local data, second data is unread data
+    fun getChatMessagesFlow(channelId: String, caregiverId: String): Flow<Pair<List<CaregiverChatEntity>, List<CaregiverChatEntity>>> {
         return flow {
-            val localMessages = caregiverChatDao?.getChatMessages(channelId, caregiverId)
-            emit(localMessages?.first().orEmpty())
+            val messages = caregiverChatDao?.getChatMessages(channelId, caregiverId)?.first().orEmpty()
+            val isLocalDataEmpty = messages.isEmpty()
+               try {
+                val body = RetrofitInstance.getInstance.getListMessage(
+                    preferences.userId.toString(),
+                    caregiverId,
+                    channelId
+                ).body()
 
-            try {
-                val body = RetrofitInstance.getInstance.getListMessage(preferences.userId.toString(), caregiverId, channelId).body()
                 Logger.d(body)
                 if(body?.data.orEmpty().isNotEmpty()) {
                     val decryptedData = body?.data?.decrypt(IV, KEY)
@@ -486,17 +490,21 @@ class Repository(
                         GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
                     val adapter = ListAdapter(CaregiverChatData::class.java, builder)
                     val newData = adapter.fromJson(decryptedData)
-                    var messages = emptyList<CaregiverChatEntity>()
                     if (newData != null) {
-                        messages = newData.map { it.toEntity() }
-                        insertChatMessages(messages)
+                        if(isLocalDataEmpty) {
+                            insertChatMessages(newData.map { it.toEntity() })
+                            emit(Pair(newData.map { it.toEntity() }, emptyList()))
+                        } else {
+                            val unreadData = getUnreadMessages(newData.map { it.toEntity() })
+                            insertChatMessages(unreadData)
+                            emit(Pair(messages, unreadData))
+                        }
                     }
-                    emit(messages)
                 }
 
             } catch (e: Exception) {
                 Logger.d(e)
-//                emit(emptyList())
+                emit(Pair(messages, emptyList()))
             }
         }
     }
@@ -517,6 +525,13 @@ class Repository(
                 caregiverChatDao.insertChatMessage(message)
             }
         }
+    }
+
+    suspend fun getUnreadMessages(messages: List<CaregiverChatEntity>): List<CaregiverChatEntity> {
+        caregiverChatDao?.let {
+            return messages.filter { message -> !it.exists(message.id) }
+        }
+        return emptyList()
     }
 
 }

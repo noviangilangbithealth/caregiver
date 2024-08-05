@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatDateBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatLeftBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatRightBinding
+import com.siloamhospitals.siloamcaregiver.databinding.ItemChatUnreadBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatUrgentRightBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatVoiceNoteLeftBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatVoiceNoteRightBinding
@@ -19,3 +20,5 @@ class UrgentRightChatViewHolder(val binding: ItemChatUrgentRightBinding): Recycl
 class VoiceNoteRightChatViewHolder(val binding: ItemChatVoiceNoteRightBinding): RecyclerView.ViewHolder(binding.root)
 
 class VoiceNoteLeftChatViewHolder(val binding: ItemChatVoiceNoteLeftBinding): RecyclerView.ViewHolder(binding.root)
+
+class UnreadChatViewHolder(val binding: ItemChatUnreadBinding): RecyclerView.ViewHolder(binding.root)

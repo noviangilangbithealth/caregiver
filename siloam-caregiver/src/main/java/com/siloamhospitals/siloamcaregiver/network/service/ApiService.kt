@@ -95,7 +95,7 @@ interface ApiService {
     suspend fun getListMessage(
         @Path(value = PathUserId) userId: String,
         @Path(value = PathCaregiverId) caregiverId: String,
-        @Path(value = PathChannelId) channelId: String
+        @Path(value = PathChannelId) channelId: String,
     ): Response<BaseDataResponse<String>>
 
     companion object {
@@ -105,6 +105,7 @@ interface ApiService {
         const val PathPatientId = "patient_id"
         const val PathMessageId = "message_id"
         const val PathChannelId = "channel_id"
+        const val PathUnread = "unread"
 
         const val PostUpload = "/caregiver/api/v1/messages/upload"
         const val PostSendMessage = "/caregiver/api/v1/messages"

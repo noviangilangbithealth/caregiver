@@ -240,7 +240,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     if (data.channelId == viewModel.channelId && data.caregiverId == viewModel.caregiverId) {
                         val result = adapterChatRoom.getList().find { it.id == data.id }
                         if (result == null) {
-                            adapterChatRoom.add(0, data.generateNewChatUI())
+                            adapterChatRoom.add(0,data.generateNewChatUI())
                             binding.rvChatCaregiver.smoothScrollToPosition(0)
                             setReadMessage()
                         } else if (data.isActive!!.not() && positionDelete != null && data.senderID == viewModel.doctorHopeId) {
@@ -251,6 +251,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                                 data.generateNewChatUI()
                             )
                         }
+                        viewModel.insertChatMessage(data)
                     }
                 }
             }
@@ -310,9 +311,26 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         viewModel.run {
             chatMessages.observe(viewLifecycleOwner) {
                 it.getContentIfNotHandled()?.let { data ->
-                    adapterChatRoom.initialize(data.generateChatListUI(adapterChatRoom.lastItem()) {
+
+                    adapterChatRoom.initialize(data.first.generateChatListUI(adapterChatRoom.firstItem()) {
                         if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
                     })
+
+
+                    if (data.second.isNotEmpty()) {
+                        adapterChatRoom.add(
+                            0,
+                            CaregiverChatRoomUi(
+                                isUnread = true,
+                                unreadCount = data.second.size
+                            )
+                        )
+                        data.second.generateChatListUI(adapterChatRoom.secondItem()) {
+                            if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                        }.reversed().map {
+                            adapterChatRoom.add(0, it)
+                        }
+                    }
                 }
             }
         }

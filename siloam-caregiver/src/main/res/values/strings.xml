@@ -46,5 +46,7 @@
     <string name="sender_delete">Message deleted</string>
     <string name="own_message_deleted">You delete this message.</string>
     <string name="no_messages">No Messages</string>
+    <string name="x_unread_message">%1$s Unread Message</string>
+    <string name="deleted_message_desc">Pesan ini telah dihapus</string>
 
 </resources>

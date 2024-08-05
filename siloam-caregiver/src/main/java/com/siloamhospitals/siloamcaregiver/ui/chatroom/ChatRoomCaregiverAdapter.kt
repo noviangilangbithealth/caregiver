@@ -21,6 +21,7 @@ import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatDateBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatLeftBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatRightBinding
+import com.siloamhospitals.siloamcaregiver.databinding.ItemChatUnreadBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatUrgentRightBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatVoiceNoteLeftBinding
 import com.siloamhospitals.siloamcaregiver.databinding.ItemChatVoiceNoteRightBinding
@@ -98,6 +99,14 @@ class ChatRoomCaregiverAdapter(
                 )
             )
 
+            UNREAD_CHAT -> UnreadChatViewHolder(
+                ItemChatUnreadBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -109,6 +118,9 @@ class ChatRoomCaregiverAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = chatRoomUis[position]
         when (holder) {
+            is UnreadChatViewHolder -> {
+                holder.binding.tvUnreadMessage.text = adapterContext.getString(R.string.x_unread_message, item.unreadCount.toString())
+            }
             is DateChatViewHolder -> {
                 holder.binding.tvDateTime.text = item.time
             }
@@ -120,7 +132,7 @@ class ChatRoomCaregiverAdapter(
                 if (item.color.isNotEmpty()) tvName.setTextColor(Color.parseColor(item.color))
 
                 if (!item.isActive) {
-                    tvChatDeleted.text = "Pesan ini telah dihapus"
+                    tvChatDeleted.text = adapterContext.getString(R.string.deleted_message_desc)
                     tvChatDeleted.visible()
                     tvChat.gone()
                     tvLink.gone()
@@ -173,7 +185,7 @@ class ChatRoomCaregiverAdapter(
                         title = x.first()
                         urlWeb = x.last()
                     }
-                    tvLink.text = "Go to link - $title"
+                    tvLink.text = "Go to link"
                     layoutLinkLeft.setOnClickListener {
                         action?.invoke(urlWeb, true, false)
                     }
@@ -251,7 +263,7 @@ class ChatRoomCaregiverAdapter(
                         title = x.first()
                         urlWeb = x.last()
                     }
-                    tvLink.text = "Go to link - $title"
+                    tvLink.text = "Go to link"
                     layoutLinkRight.setOnClickListener {
                         action?.invoke(urlWeb, true, false)
                     }
@@ -466,6 +478,7 @@ class ChatRoomCaregiverAdapter(
             data.isDateLimit -> DATE_CHAT
             data.isSelfSender -> RIGHT_CHAT
             data.isUrgent -> URGENT_RIGHT_CHAT
+            data.isUnread -> UNREAD_CHAT
             else -> LEFT_CHAT
         }
     }
@@ -477,6 +490,7 @@ class ChatRoomCaregiverAdapter(
         private const val URGENT_RIGHT_CHAT = 3
         private const val VN_RIGHT_CHAT = 4
         private const val VN_LEFT_CHAT = 5
+        private const val UNREAD_CHAT = 6
     }
 
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -551,6 +565,8 @@ class ChatRoomCaregiverAdapter(
 
     fun firstItem() = chatRoomUis.firstOrNull()
     fun lastItem() = chatRoomUis.lastOrNull()
+    fun secondItem() = chatRoomUis.getOrNull(1)
+    fun secondLastItem() = chatRoomUis.getOrNull(chatRoomUis.lastIndex - 1)
 
     fun lastIndex() = chatRoomUis.lastIndex
     fun isEmpty() = chatRoomUis.isEmpty()
