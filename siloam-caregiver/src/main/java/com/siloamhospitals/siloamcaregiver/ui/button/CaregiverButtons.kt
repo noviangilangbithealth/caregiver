@@ -79,8 +79,12 @@ class CaregiverButtons private constructor(app: Application) :
                 // Add FAB to the layout
                 decorView.addView(this, fabParams)
 
+                var isDragging = false
+
                 setOnClickListener {
-                    SiloamCaregiverUI.getInstances().openCaregiver(activity)
+                    if (!isDragging) {
+                        SiloamCaregiverUI.getInstances().openCaregiver(activity)
+                    }
                 }
 
                 // Add touch listener for drag functionality
@@ -89,7 +93,6 @@ class CaregiverButtons private constructor(app: Application) :
                     private var initialY = 0f
                     private var dX = 0f
                     private var dY = 0f
-                    private var isDragging = false
 
                     override fun onTouch(view: View, event: MotionEvent): Boolean {
                         when (event.action) {
@@ -116,7 +119,22 @@ class CaregiverButtons private constructor(app: Application) :
                             }
 
                             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                                isDragging = false
+                                if (isDragging) {
+                                    isDragging = false
+                                    // Snap to the nearest side
+                                    val screenWidth = activity.resources.displayMetrics.widthPixels
+                                    val fabWidth = view.width
+                                    val targetX = if (view.x + fabWidth / 2 < screenWidth / 2) {
+                                        0f // Snap to left
+                                    } else {
+                                        (screenWidth - fabWidth).toFloat() // Snap to right
+                                    }
+                                    view.animate()
+                                        .x(targetX)
+                                        .setDuration(300)
+                                        .start()
+                                    return true // Prevent click event after dragging
+                                }
                             }
                         }
                         return false
@@ -186,6 +204,7 @@ class CaregiverButtons private constructor(app: Application) :
             fab?.visibility = View.GONE
         }
     }
+
 
 
     override fun onActivityResumed(p0: Activity) {
