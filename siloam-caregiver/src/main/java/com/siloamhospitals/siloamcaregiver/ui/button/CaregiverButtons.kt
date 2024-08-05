@@ -205,8 +205,6 @@ class CaregiverButtons private constructor(app: Application) :
         }
     }
 
-
-
     override fun onActivityResumed(p0: Activity) {
         updateFabVisibility()
     }
