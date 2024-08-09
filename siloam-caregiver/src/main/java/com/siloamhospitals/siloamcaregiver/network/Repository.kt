@@ -479,7 +479,8 @@ class Repository(
                 val body = RetrofitInstance.getInstance.getListMessage(
                     preferences.userId.toString(),
                     caregiverId,
-                    channelId
+                    channelId,
+                    if(isLocalDataEmpty) "" else "true"
                 ).body()
 
                 Logger.d(body)
@@ -495,7 +496,7 @@ class Repository(
                             insertChatMessages(newData.map { it.toEntity() })
                             emit(Pair(newData.map { it.toEntity() }, emptyList()))
                         } else {
-                            val unreadData = getUnreadMessages(newData.map { it.toEntity() })
+                            val unreadData = newData.map { it.toEntity() }
                             insertChatMessages(unreadData)
                             emit(Pair(messages, unreadData))
                         }

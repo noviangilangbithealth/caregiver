@@ -18,6 +18,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -96,6 +97,7 @@ interface ApiService {
         @Path(value = PathUserId) userId: String,
         @Path(value = PathCaregiverId) caregiverId: String,
         @Path(value = PathChannelId) channelId: String,
+        @Query("unread") unread: String
     ): Response<BaseDataResponse<String>>
 
     companion object {
@@ -116,7 +118,7 @@ interface ApiService {
         const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
         const val GetAdmissionHistory = "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
         const val DeleteMessage = "/caregiver/api/v1/messages/{message_id}"
-        const val GetListMessage = "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}?unread="
+        const val GetListMessage = "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}"
     }
 
 }

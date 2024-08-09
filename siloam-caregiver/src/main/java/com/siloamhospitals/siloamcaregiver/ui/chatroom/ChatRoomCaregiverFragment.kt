@@ -191,7 +191,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         viewModel.getCaregiverChat()
 //        viewModel.listenMessageList()
         viewModel.listenNewMessageList()
-        viewModel.setReadMessage()
+//        viewModel.setReadMessage()
     }
 
     private fun setupObserver() {
@@ -231,6 +231,37 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             }
         }
 
+    }
+
+    private fun observeChatMessages() {
+        viewModel.run {
+            chatMessages.observe(viewLifecycleOwner) {
+                it.getContentIfNotHandled()?.let { data ->
+
+                    adapterChatRoom.initialize(data.first.generateChatListUI(adapterChatRoom.firstItem()) {
+                        if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                    })
+
+
+                    if (data.second.isNotEmpty()) {
+                        adapterChatRoom.add(
+                            0,
+                            CaregiverChatRoomUi(
+                                isUnread = true,
+                                unreadCount = data.second.size
+                            )
+                        )
+                        data.second.generateChatListUI(adapterChatRoom.secondItem()) {
+                            if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                        }.reversed().map {
+                            adapterChatRoom.add(0, it)
+                        }
+                    }
+
+                    setReadMessage()
+                }
+            }
+        }
     }
 
     private fun observeNewMessage() {
@@ -306,35 +337,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 //            }
 //        }
 //    }
-
-    private fun observeChatMessages() {
-        viewModel.run {
-            chatMessages.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { data ->
-
-                    adapterChatRoom.initialize(data.first.generateChatListUI(adapterChatRoom.firstItem()) {
-                        if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-                    })
-
-
-                    if (data.second.isNotEmpty()) {
-                        adapterChatRoom.add(
-                            0,
-                            CaregiverChatRoomUi(
-                                isUnread = true,
-                                unreadCount = data.second.size
-                            )
-                        )
-                        data.second.generateChatListUI(adapterChatRoom.secondItem()) {
-                            if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-                        }.reversed().map {
-                            adapterChatRoom.add(0, it)
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     private fun observeSendChat() {
         viewModel.sendMessage.observe(viewLifecycleOwner) { response ->
