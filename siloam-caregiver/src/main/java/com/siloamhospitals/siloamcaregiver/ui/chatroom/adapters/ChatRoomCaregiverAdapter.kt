@@ -1,4 +1,4 @@
-package com.siloamhospitals.siloamcaregiver.ui.chatroom
+package com.siloamhospitals.siloamcaregiver.ui.chatroom.adapters
 
 import android.app.Activity
 import android.content.Context
@@ -28,17 +28,24 @@ import com.siloamhospitals.siloamcaregiver.databinding.ItemChatVoiceNoteRightBin
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.DateChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.LeftChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.RightChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.UnreadChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.UrgentRightChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.VoiceNoteLeftChatViewHolder
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.VoiceNoteRightChatViewHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 
 class ChatRoomCaregiverAdapter(
     private val chatRoomUis: MutableList<CaregiverChatRoomUi> = ArrayList(),
-    private val action: ((url: String, isWeb: Boolean, isVideo: Boolean) -> Unit)? = null,
-    private val actionLongClick: ((position: Int) -> Unit)? = null
+    private val action: ((clickType: ClickType, item: CaregiverChatRoomUi, position: Int) -> Unit)? = null,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), CoroutineScope {
 
     lateinit var adapterContext: Context
@@ -47,6 +54,10 @@ class ChatRoomCaregiverAdapter(
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
+
+    enum class ClickType {
+        MEDiA, LINK, PIN, RETRY, DElETE_OR_PIN
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         adapterContext = parent.context
@@ -119,8 +130,10 @@ class ChatRoomCaregiverAdapter(
         val item = chatRoomUis[position]
         when (holder) {
             is UnreadChatViewHolder -> {
-                holder.binding.tvUnreadMessage.text = adapterContext.getString(R.string.x_unread_message, item.unreadCount.toString())
+                holder.binding.tvUnreadMessage.text =
+                    adapterContext.getString(R.string.x_unread_message, item.unreadCount.toString())
             }
+
             is DateChatViewHolder -> {
                 holder.binding.tvDateTime.text = item.time
             }
@@ -175,7 +188,7 @@ class ChatRoomCaregiverAdapter(
                         tvChat.text = item.message
                     }
                     imageChat.setOnClickListener {
-                        action?.invoke(item.url, false, item.isVideo)
+                        action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkLeft.isVisible = item.message.contains("https://")
                     var title = ""
@@ -187,7 +200,11 @@ class ChatRoomCaregiverAdapter(
                     }
                     tvLink.text = "Go to link"
                     layoutLinkLeft.setOnClickListener {
-                        action?.invoke(urlWeb, true, false)
+                        action?.invoke(ClickType.LINK, item, holder.bindingAdapterPosition)
+                    }
+                    holder.itemView.setOnLongClickListener {
+                        action?.invoke(ClickType.PIN, item, holder.bindingAdapterPosition)
+                        return@setOnLongClickListener true
                     }
                 }
             }
@@ -200,35 +217,43 @@ class ChatRoomCaregiverAdapter(
                     tvChat.gone()
                     tvLink.gone()
                     cardImage.gone()
+                    tvRetrySend.gone()
                 } else {
                     tvChatDeleted.gone()
                     if (item.url.isNotEmpty()) {
-                        Glide.with(adapterContext)
-                            .load(item.url)
-                            .addListener(object :
-                                com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                        if(item.isFailed) {
+                            Glide.with(adapterContext)
+                                .load(File(item.url))
+                                .into(imageChat)
+                            ivPlayMedia.isVisible = item.isVideo
+                        } else {
+                            Glide.with(adapterContext)
+                                .load(item.url)
+                                .addListener(object :
+                                    com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
 
-                                override fun onLoadFailed(
-                                    e: GlideException?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    return false
-                                }
+                                    override fun onLoadFailed(
+                                        e: GlideException?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        return false
+                                    }
 
-                                override fun onResourceReady(
-                                    resource: Drawable?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    dataSource: DataSource?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    ivPlayMedia.isVisible = item.isVideo
-                                    return false
-                                }
-                            })
-                            .into(imageChat)
+                                    override fun onResourceReady(
+                                        resource: Drawable?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        dataSource: DataSource?,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        ivPlayMedia.isVisible = item.isVideo
+                                        return false
+                                    }
+                                })
+                                .into(imageChat)
+                        }
                         tvChat.gone()
                         cardImage.visible()
                     } else {
@@ -253,7 +278,7 @@ class ChatRoomCaregiverAdapter(
                         )
                     }
                     imageChat.setOnClickListener {
-                        action?.invoke(item.url, false, item.isVideo)
+                        action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkRight.isVisible = item.message.contains("https://")
                     var title = ""
@@ -265,12 +290,27 @@ class ChatRoomCaregiverAdapter(
                     }
                     tvLink.text = "Go to link"
                     layoutLinkRight.setOnClickListener {
-                        action?.invoke(urlWeb, true, false)
+                        action?.invoke(ClickType.LINK, item, holder.bindingAdapterPosition)
                     }
 
                     holder.itemView.setOnLongClickListener {
-                        actionLongClick?.invoke(holder.bindingAdapterPosition)
+//                        action?.invoke(ClickType.DElETE, item, holder.bindingAdapterPosition)
+                        if(!item.isFailed) action?.invoke(ClickType.DElETE_OR_PIN, item, holder.bindingAdapterPosition)
                         return@setOnLongClickListener true
+                    }
+
+                    if (item.isFailed) {
+                        tvRetrySend.visible()
+                        ivRead.gone()
+                        tvDate.gone()
+                    } else {
+                        tvRetrySend.gone()
+                        ivRead.visible()
+                        tvDate.visible()
+                    }
+
+                    holder.binding.tvRetrySend.setOnClickListener {
+                        action?.invoke(ClickType.RETRY, item, holder.bindingAdapterPosition)
                     }
                 }
 

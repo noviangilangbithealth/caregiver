@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 
 data class SendChatCaregiverRequest(
+
     @SerializedName("caregiver_id")
     val caregiverID: String,
 
@@ -18,5 +19,8 @@ data class SendChatCaregiverRequest(
 
     val message: String,
     val type: String,
-    val attachment: List<AttachmentCaregiver>
+    val attachment: List<AttachmentCaregiver>,
+
+    @SerializedName("send_id")
+    val sentID: String
 )

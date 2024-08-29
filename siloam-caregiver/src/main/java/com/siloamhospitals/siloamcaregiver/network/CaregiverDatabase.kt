@@ -7,10 +7,11 @@ import androidx.room.RoomDatabase
 import com.siloamhospitals.siloamcaregiver.ext.encryption.getMd5
 import com.siloamhospitals.siloamcaregiver.network.dao.CaregiverChatDao
 import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
+import com.siloamhospitals.siloamcaregiver.network.entity.FailedChatEntity
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [CaregiverChatEntity::class], version = 1)
+@Database(entities = [CaregiverChatEntity::class, FailedChatEntity::class], version = 2)
 abstract class CaregiverDatabase : RoomDatabase() {
 
     abstract fun caregiverChatDao(): CaregiverChatDao

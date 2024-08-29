@@ -12,6 +12,7 @@ import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
+import com.siloamhospitals.siloamcaregiver.network.entity.FailedChatEntity
 import com.siloamhospitals.siloamcaregiver.network.entity.toEntity
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
@@ -45,6 +46,9 @@ class ChatRoomCaregiverViewModel(
     val errorMessageList: LiveData<Event<String>> = _errorMessageList
     val _errorNewMessage = MutableLiveData<Event<String>>()
     val errorNewMessage: LiveData<Event<String>> = _errorNewMessage
+    val failedMessageSize = MutableLiveData<Int>()
+    val _pinChatMessage = MutableLiveData<BaseHandleResponse<List<CaregiverChatData>>>()
+    val pinChatMessage: LiveData<BaseHandleResponse<List<CaregiverChatData>>> = _pinChatMessage
 
     var caregiverId = ""
     var channelId = ""
@@ -68,8 +72,46 @@ class ChatRoomCaregiverViewModel(
     val _uploadFiles = MutableLiveData<BaseHandleResponse<AttachmentCaregiverResponse>>()
     val uploadFiles: LiveData<BaseHandleResponse<AttachmentCaregiverResponse>> = _uploadFiles
 
-    private val _chatMessages = MutableLiveData<Event<PairChats>>()
-    val chatMessages: LiveData<Event<PairChats>> = _chatMessages
+    private val _chatMessages = MutableLiveData<Event<TripleChats>>()
+    val chatMessages: LiveData<Event<TripleChats>> = _chatMessages
+
+    private val _pinChat = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
+    val pinChat: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _pinChat
+
+    fun pinChat(messageId: String, pin: Boolean) {
+        viewModelScope.launch {
+            try {
+                _pinChat.postValue(BaseHandleResponse.LOADING())
+                val response = repository.pinChatMessage(messageId, pin)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _pinChat.postValue(BaseHandleResponse.SUCCESS(it))
+                    }
+                } else {
+                    _pinChat.postValue(BaseHandleResponse.ERROR(response.message()))
+                }
+            } catch (e: Exception) {
+                _pinChat.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
+            }
+        }
+    }
+
+    fun emitGetPinChat() {
+        repository.emitGetPinMessage(channelId, caregiverId)
+    }
+
+    fun listenPinChat() {
+        viewModelScope.launch {
+            _pinChatMessage.postValue(BaseHandleResponse.LOADING())
+            repository.listenPinChat { data, error ->
+                if (error.isEmpty()) {
+                    _pinChatMessage.postValue(BaseHandleResponse.SUCCESS(data))
+                } else {
+                    _pinChatMessage.postValue(BaseHandleResponse.ERROR(error))
+                }
+            }
+        }
+    }
 
     fun getCaregiverChat() {
         viewModelScope.launch {
@@ -78,6 +120,32 @@ class ChatRoomCaregiverViewModel(
                     _chatMessages.postValue(Event(messages))
                 }
         }
+    }
+
+    fun insertFailedMessage(uuid: String, message: String, localuri: String = "", isVideo: Boolean = false) {
+        viewModelScope.launch {
+            repository.insertFailedMessage(
+                FailedChatEntity(
+                    channelId = channelId,
+                    caregiverId = caregiverId,
+                    sentId = uuid,
+                    message = message,
+                    localuri = localuri,
+                    isVideo = isVideo
+                )
+            )
+        }
+    }
+
+    fun deleteFailedMessage(sentId: String) {
+        viewModelScope.launch {
+            repository.deleteFailedMessage(sentId)
+        }
+    }
+
+    // get failed message size return integer with coroutine
+    fun getFailedMessagesSize() = viewModelScope.launch {
+        failedMessageSize.postValue(repository.getFailedMessagesSize(channelId, caregiverId))
     }
 
 
@@ -98,7 +166,11 @@ class ChatRoomCaregiverViewModel(
             }
         }
 
-    fun uploadFiles(documentFiles: List<File>, isVoiceNote: Boolean = false, isVideo: Boolean = false) =
+    fun uploadFiles(
+        documentFiles: List<File>,
+        isVoiceNote: Boolean = false,
+        isVideo: Boolean = false
+    ) =
         viewModelScope.launch {
             try {
                 _uploadFiles.postValue(BaseHandleResponse.LOADING())
@@ -170,12 +242,14 @@ class ChatRoomCaregiverViewModel(
     fun sendChat(
         message: String = "",
         type: Int = 1,
-        attachments: List<AttachmentCaregiver> = emptyList()
+        attachments: List<AttachmentCaregiver> = emptyList(),
+        sentId: String = ""
     ) =
         viewModelScope.launch {
             try {
                 _sendMessage.postValue(BaseHandleResponse.LOADING())
                 val response = repository.sendChatCaregiver(
+                    sentID = sentId,
                     caregiverID = caregiverId,
                     channelID = channelId,
                     senderID = doctorHopeId,
@@ -220,7 +294,7 @@ class ChatRoomCaregiverViewModel(
                     _errorNewMessage.postValue(Event(error))
                 }
             }
-            newData?.let {  repository.insertChatMessage(it.toEntity()) }
+            newData?.let { repository.insertChatMessage(it.toEntity()) }
         }
     }
 
@@ -293,11 +367,15 @@ class ChatRoomCaregiverViewModel(
             isVoiceNote = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
                 .last() == 'a' || this.attachment.get(0)?.uriExt.orEmpty().last() == 'c',
             isActive = this.isActive ?: false,
-            isVideo = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty().endsWith("mp4") || this.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
+            isVideo = if (this.attachment.isNullOrEmpty()) false else this.attachment.get(0)?.uriExt.orEmpty()
+                .endsWith("mp4") || this.attachment.get(0)?.uriExt.orEmpty().endsWith("mov")
         )
     }
 
-    fun List<CaregiverChatEntity>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
+    fun List<CaregiverChatEntity>.generateChatListUI(
+        lastData: CaregiverChatRoomUi?,
+        action: ((isSameDate: Boolean) -> Unit)?
+    ): List<CaregiverChatRoomUi> {
         com.orhanobut.logger.Logger.d(this)
         var isSameDate = false
         val dataUi = arrayListOf<CaregiverChatRoomUi>()
@@ -310,7 +388,7 @@ class ChatRoomCaregiverViewModel(
                 dataUi.add(
                     CaregiverChatRoomUi(
                         id = it.id.orEmpty(),
-                        name = if (roleId == 1) it.user.name else it.user.role.name+ " - " + it.user.name,
+                        name = if (roleId == 1) it.user.name else it.user.role.name + " - " + it.user.name,
                         message = it.message.orEmpty(),
                         time = it.createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),
                         date = it.createdAt.toLocalDateTime().withFormat("EEEE, dd MMM"),
@@ -319,15 +397,16 @@ class ChatRoomCaregiverViewModel(
                         isRead = it.isReaded,
                         isSelfSender = it.user.hopeUserId == doctorHopeId,
                         isUrgent = it.type == 2,
-                        isVoiceNote =if(it.attachment?.uriExt.isNullOrEmpty()) false else it.attachment?.uriExt.orEmpty()
+                        isVoiceNote = if (it.attachment?.uriExt.isNullOrEmpty()) false else it.attachment?.uriExt.orEmpty()
                             .last() == 'a' || it.attachment?.uriExt.orEmpty().last() == 'c',
-                        isActive = it.isActive ,
-                        isVideo = it.attachment?.uriExt.orEmpty().endsWith("mp4") || it.attachment?.uriExt.orEmpty().endsWith("mov")
+                        isActive = it.isActive,
+                        isVideo = it.attachment?.uriExt.orEmpty()
+                            .endsWith("mp4") || it.attachment?.uriExt.orEmpty().endsWith("mov")
                     )
                 )
             }
 
-            if(lastData?.date != dataGrouped.key){
+            if (lastData?.date != dataGrouped.key) {
                 dataUi.add(
                     CaregiverChatRoomUi(
                         isDateLimit = true, time = dataGrouped.key
@@ -336,7 +415,7 @@ class ChatRoomCaregiverViewModel(
             }
 
 
-            if(lastData?.isDateLimit ?: false && lastData?.time.orEmpty() == dataGrouped.key){
+            if (lastData?.isDateLimit ?: false && lastData?.time.orEmpty() == dataGrouped.key) {
                 isSameDate = true
             }
         }
@@ -358,15 +437,20 @@ class ChatRoomCaregiverViewModel(
             isRead = isReaded,
             isSelfSender = user.hopeUserId == doctorHopeId,
             isUrgent = type == 2,
-            isVoiceNote = if (this.attachment?.uriExt.orEmpty().isEmpty()) false else this.attachment?.uriExt
+            isVoiceNote = if (this.attachment?.uriExt.orEmpty()
+                    .isEmpty()
+            ) false else this.attachment?.uriExt
                 ?.last() == 'a' || this.attachment?.uriExt?.last() == 'c',
             isActive = this.isActive,
-            isVideo = if (this.attachment?.uriExt.orEmpty().isEmpty()) false else this.attachment?.uriExt?.endsWith("mp4") ?: false || this.attachment?.uriExt?.endsWith("mov") ?: false
+            isVideo = if (this.attachment?.uriExt.orEmpty()
+                    .isEmpty()
+            ) false else this.attachment?.uriExt?.endsWith("mp4") ?: false || this.attachment?.uriExt?.endsWith(
+                "mov"
+            ) ?: false
         )
     }
 
 
-
 }
 
-typealias PairChats = Pair<List<CaregiverChatEntity>, List<CaregiverChatEntity>>
+typealias TripleChats = Triple<List<CaregiverChatEntity>, List<CaregiverChatEntity>, List<FailedChatEntity>>

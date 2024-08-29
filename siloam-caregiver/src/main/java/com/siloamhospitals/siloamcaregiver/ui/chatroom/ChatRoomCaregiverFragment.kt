@@ -14,7 +14,6 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -26,6 +25,8 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.afollestad.recyclical.datasource.DataSource
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
 import com.bumptech.glide.Glide
@@ -38,15 +39,19 @@ import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.invisible
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
+import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatData
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
-import com.siloamhospitals.siloamcaregiver.ui.LinearLoadMoreListener
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.adapters.ChatRoomCaregiverAdapter
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.adapters.PinChatAdapter
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.AudioRecordListener
 import com.siloamhospitals.siloamcaregiver.ui.chatroom.recorder.Recorder
 import com.siloamhospitals.siloamcaregiver.ui.decoration.SpaceItemDecoration
 import com.siloamhospitals.siloamcaregiver.ui.groupdetail.GroupDetailActivity
 import com.siloamhospitals.siloamcaregiver.ui.player.VideoPlayerActivity
+import okhttp3.internal.filterList
 import java.io.File
+import java.util.UUID
 
 
 class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
@@ -60,12 +65,14 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private lateinit var adapterChatRoom: ChatRoomCaregiverAdapter
 
-    private var onProcess = false
-
     private lateinit var preferences: AppPreferences
 
-    lateinit var recorder: Recorder
+    private lateinit var recorder: Recorder
     private var positionDelete: Int? = null
+    private var fromRetry = false
+    private var lastMessagefromInput = ""
+    private var currentSentId = ""
+    private var chatPinnedList = listOf<CaregiverChatData>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -95,7 +102,10 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         setupObserver()
         setupView()
         setupCheckRecent()
+//        setupPinChat()
     }
+
+    private var targetPosition = 0
 
     private fun initRecorder() {
         recorder = Recorder(this, requireContext())
@@ -113,42 +123,119 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun setupAdapter() {
         adapterChatRoom = ChatRoomCaregiverAdapter(
-            action = { url, isWeb, isVideo ->
-                if (isWeb) {
-                    viewModel.urlEmrIpd = url
-                    findNavController().navigate(R.id.action_chatRoomCaregiverFragment2_to_chatRoomWebViewFragment)
-                } else if (isVideo) {
-                    VideoPlayerActivity.openPlayer(requireContext(), url)
-                } else {
-                    viewDetailImage(url)
+            action = { clicktype, item, position ->
+                when (clicktype) {
+                    ChatRoomCaregiverAdapter.ClickType.MEDiA -> {
+                        if (item.isVideo) {
+                            VideoPlayerActivity.openPlayer(requireContext(), item.url)
+                        } else {
+                            viewDetailImage(item.url)
+                        }
+                    }
+
+                    ChatRoomCaregiverAdapter.ClickType.LINK -> {
+                        viewModel.urlEmrIpd = item.url
+                        findNavController().navigate(R.id.action_chatRoomCaregiverFragment2_to_chatRoomWebViewFragment)
+                    }
+
+                    ChatRoomCaregiverAdapter.ClickType.DElETE_OR_PIN -> {
+                        showDeleteOrPinChatConfirmationDialog(item, position)
+                    }
+
+                    ChatRoomCaregiverAdapter.ClickType.RETRY -> {
+                        showResendMessageConfirmDialog(item, position)
+                    }
+
+                    ChatRoomCaregiverAdapter.ClickType.PIN -> {
+                        if(chatPinnedList.find { it.id == item.id } == null) {
+                            showPinChatConfirmationDialog(item)
+                        } else {
+                            showUnpinChatConfirmationDialog(item)
+                        }
+                    }
                 }
-            },
-            actionLongClick = { position ->
-                positionDelete = position
-//                Toast.makeText(requireContext(), "position: " + position.toString(), Toast.LENGTH_SHORT).show()
-                DeleteMessageBottomSheetDialog {
-                    viewModel.deleteMessage(adapterChatRoom.getList()[positionDelete!!].id)
-                }.show(childFragmentManager, "DeleteMessageBottomSheetDialog")
             }
         )
 
         binding.rvChatCaregiver.run {
             adapter = adapterChatRoom
             addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.medium)))
-//            addOnScrollListener(object : LinearLoadMoreListener(layoutManager) {
-//                override fun isLoading(): Boolean {
-//                    return onProcess
-//                }
-//
-//                override fun loadMoreItems() {
-//                    if (!viewModel.isLastPage || viewModel.sizeChat > 15) {
-//                        viewModel.emitGetMessage(loadMore = true)
-//                        onProcess = true
-//                    }
-//                }
-//
-//            })
         }
+    }
+
+    private fun showDeleteOrPinChatConfirmationDialog(item: CaregiverChatRoomUi, position: Int) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete or Pin Chat")
+        builder.setMessage("Apakah anda ingin menghapus atau mem-pin chat ini?")
+        builder.setPositiveButton("Delete") { dialog, _ ->
+            dialog.dismiss()
+            positionDelete = position
+            DeleteMessageBottomSheetDialog {
+                viewModel.deleteMessage(item.id)
+            }.show(childFragmentManager, "DeleteMessageBottomSheetDialog")
+        }
+
+        val isNotPin = chatPinnedList.find { it.id == item.id } == null
+        builder.setNegativeButton(if(isNotPin) "Pin" else "Unpin") { dialog, _ ->
+            dialog.dismiss()
+            if(isNotPin) {
+                showPinChatConfirmationDialog(item)
+            } else {
+                showUnpinChatConfirmationDialog(item)
+            }
+        }
+        builder.show()
+    }
+
+    private fun showResendMessageConfirmDialog(item: CaregiverChatRoomUi, itemPosition: Int) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Pesan Gagal Dikirim")
+        builder.setMessage("Silahkan pilih aksi untuk pesan ini")
+        builder.setPositiveButton("Kirim Ulang") { dialog, _ ->
+            if(item.url.isEmpty()) {
+                viewModel.sendChat(sentId = item.sentId, message = item.message)
+            } else {
+                viewModel.uploadFiles(listOf(File(item.url)))
+            }
+            fromRetry = true
+            currentSentId = item.sentId
+            positionDelete = itemPosition
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Hapus Pesan") { dialog, _ ->
+            adapterChatRoom.remove(itemPosition)
+            viewModel.deleteFailedMessage(item.sentId)
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
+    private fun showPinChatConfirmationDialog(item: CaregiverChatRoomUi) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Pin Chat")
+        builder.setMessage("Apakah anda yakin ingin mem-pin chat ini?")
+        builder.setPositiveButton("Ya") { dialog, _ ->
+            viewModel.pinChat(item.id, true)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Tidak") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
+    private fun showUnpinChatConfirmationDialog(item: CaregiverChatRoomUi) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Unpin Chat")
+        builder.setMessage("Apakah anda yakin ingin mem-unpin chat ini?")
+        builder.setPositiveButton("Ya") { dialog, _ ->
+            viewModel.pinChat(item.id, false)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Tidak") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
     }
 
     private fun setupInit() {
@@ -182,26 +269,75 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
     private fun callSocket() {
-//        viewModel.emitGetMessage {
-//            binding.run {
-//                lottieLoadingChatRoom.visible()
-//                rvChatCaregiver.gone()
-//            }
-//        }
+        viewModel.emitGetPinChat()
         viewModel.getCaregiverChat()
-//        viewModel.listenMessageList()
         viewModel.listenNewMessageList()
-//        viewModel.setReadMessage()
+        viewModel.listenPinChat()
     }
 
     private fun setupObserver() {
         observeSendChat()
-//        observeMessageList()
         observeNewMessage()
         observeUploadPhotos()
         observeConnection()
         observeDeleteMessage()
         observeChatMessages()
+        obsservePinMessage()
+        observeGetPinMessages()
+    }
+
+    private fun observeGetPinMessages() {
+        viewModel.pinChatMessage.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is BaseHandleResponse.ERROR -> {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is BaseHandleResponse.LOADING -> {}
+                is BaseHandleResponse.SUCCESS -> {
+                    chatPinnedList = response.data.orEmpty()
+                    if (chatPinnedList.isNotEmpty()) {
+                        binding.cardPinChat.visible()
+                        val adapter = PinChatAdapter { position ->
+                            adapterChatRoom.getList().find { it.id == chatPinnedList[position].id }
+                                ?.let {
+                                    binding.rvChatCaregiver.smoothScrollToPosition(
+                                        adapterChatRoom.getIndexOf(it)
+                                    )
+                                }
+                        }
+                        binding.viewpagerPinChat.adapter = adapter
+                        adapter.initialize(chatPinnedList.map { it.message.orEmpty() })
+                        binding.viewpagerPinChat.registerOnPageChangeCallback(object :
+                            ViewPager2.OnPageChangeCallback() {
+                            override fun onPageSelected(position: Int) {
+                                targetPosition = position
+                                binding.tvPinChatCount.text =
+                                    "${position + 1} of ${chatPinnedList.size}"
+                            }
+                        }
+                        )
+                    } else {
+                        binding.cardPinChat.gone()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun obsservePinMessage() {
+        viewModel.pinChat.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is BaseHandleResponse.ERROR -> {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is BaseHandleResponse.LOADING -> {}
+                is BaseHandleResponse.SUCCESS -> {
+                    Toast.makeText(requireContext(), "Message Pinned", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun observeDeleteMessage() {
@@ -222,12 +358,12 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun observeConnection() {
         viewModel.isConnected.observe(viewLifecycleOwner) { isConnected ->
-            if (!isConnected) {
+            if (isConnected) {
+                viewModel.listenNewMessageList()
+            } else {
                 Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT)
                     .show()
-                viewModel.getCaregiverChat()
-            } else {
-                viewModel.listenNewMessageList()
+//                viewModel.getCaregiverChat()
             }
         }
 
@@ -235,7 +371,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun observeChatMessages() {
         viewModel.run {
-            chatMessages.observe(viewLifecycleOwner) {
+            chatMessages.observe(viewLifecycleOwner) { it ->
                 it.getContentIfNotHandled()?.let { data ->
 
                     adapterChatRoom.initialize(data.first.generateChatListUI(adapterChatRoom.firstItem()) {
@@ -258,6 +394,22 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                         }
                     }
 
+                    if (data.third.isNotEmpty()) {
+                        data.third.map {
+                            adapterChatRoom.add(
+                                0, CaregiverChatRoomUi(
+                                    sentId = it.sentId,
+                                    message = it.message,
+                                    isFailed = true,
+                                    isSelfSender = true,
+                                    isActive = true,
+                                    url = it.localuri,
+                                    isVideo = it.isVideo
+                                )
+                            )
+                        }
+                    }
+
                     setReadMessage()
                 }
             }
@@ -266,12 +418,16 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
     private fun observeNewMessage() {
         viewModel.run {
-            newMessage.observe(viewLifecycleOwner) {
+
+            newMessage.observe(viewLifecycleOwner) { it ->
+
                 it.getContentIfNotHandled()?.let { data ->
+
+                    val size = adapterChatRoom.getList().filterList { isFailed }.size
                     if (data.channelId == viewModel.channelId && data.caregiverId == viewModel.caregiverId) {
                         val result = adapterChatRoom.getList().find { it.id == data.id }
                         if (result == null) {
-                            adapterChatRoom.add(0,data.generateNewChatUI())
+                            adapterChatRoom.add(size, data.generateNewChatUI())
                             binding.rvChatCaregiver.smoothScrollToPosition(0)
                             setReadMessage()
                         } else if (data.isActive!!.not() && positionDelete != null && data.senderID == viewModel.doctorHopeId) {
@@ -293,7 +449,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         viewModel.uploadFiles.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is BaseHandleResponse.ERROR -> {
-                    Logger.d(response.message)
+                    createFailedMessage(pathsFileWanttoUpload)
                 }
 
                 is BaseHandleResponse.LOADING -> {}
@@ -306,55 +462,66 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         }
     }
 
-
-//    private fun observeMessageList() {
-//        viewModel.run {
-//            messageList.observe(viewLifecycleOwner) {
-//
-//                binding.run {
-//                    lottieLoadingChatRoom.gone()
-//                    rvChatCaregiver.visible()
-//                }
-//
-//                it.getContentIfNotHandled()?.let { data ->
-//                    onProcess = false
-//                    if (data.data.orEmpty().isNotEmpty()) {
-////                        onMessageListLoadedBaseRv(
-////                            data.data.orEmpty().generateChatListUI(adapterChatRoom.lastItem()) {
-////                                if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-////                            })
-//                    } else {
-//                        resetCurrentPage()
-//                        isLastPage = true
-//                    }
-//                }
-//            }
-//
-//            errorMessageList.observe(viewLifecycleOwner) { error ->
-//                error.getContentIfNotHandled()?.let {
-//                    Logger.d(it)
-//                }
-//            }
-//        }
-//    }
-
     private fun observeSendChat() {
         viewModel.sendMessage.observe(viewLifecycleOwner) { response ->
             when (response) {
-                is BaseHandleResponse.ERROR -> {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
-                }
-
+                is BaseHandleResponse.ERROR -> createFailedMessage()
                 is BaseHandleResponse.LOADING -> {}
-                is BaseHandleResponse.SUCCESS -> {}
+                is BaseHandleResponse.SUCCESS -> {
+                    if (fromRetry) {
+                        viewModel.deleteFailedMessage(currentSentId)
+                        adapterChatRoom.remove(positionDelete!!)
+                    }
+                    currentSentId = ""
+                    positionDelete = null
+                    fromRetry = false
+                }
             }
 
         }
     }
 
+    fun createFailedMessage(pathsAttachment: Pair<Boolean, List<String>> = Pair(false, listOf())) {
+        if (!fromRetry) {
+            val randomUUID = UUID.randomUUID().toString()
+            adapterChatRoom.add(
+                0,
+                CaregiverChatRoomUi(
+                    sentId = randomUUID,
+                    message = lastMessagefromInput,
+                    isFailed = true,
+                    isSelfSender = true,
+                    isActive = true,
+                    url = if(pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
+                    isVideo = pathsAttachment.first
+                )
+            )
+            viewModel.insertFailedMessage(randomUUID, lastMessagefromInput, if(pathsAttachment.second.size == 1) pathsAttachment.second[0] else "", isVideo = pathsAttachment.first)
+        }
+        fromRetry = false
+        lastMessagefromInput = ""
+
+        binding.rvChatCaregiver.smoothScrollToPosition(0)
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListener() {
         binding.run {
+            rvChatCaregiver.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    // Check if the scroll has stopped
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        // Remove the scroll listener
+                        recyclerView.removeOnScrollListener(this)
+
+                        // Find the target item view
+                        val targetView = recyclerView.layoutManager?.findViewByPosition(targetPosition)
+                        targetView?.performClick()
+                    }
+                }
+            })
 
             ivCloseChatRoom.setOnClickListener {
                 requireActivity().run {
@@ -382,6 +549,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             ivBtnSend.setOnClickListener {
                 if (etInputChat.text.toString().isNotEmpty()) {
                     viewModel.sendChat(etInputChat.text.toString())
+                    lastMessagefromInput = etInputChat.text.toString()
                     etInputChat.setText("")
                     binding.rvChatCaregiver.smoothScrollToPosition(0)
                 }
@@ -438,22 +606,22 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             val recordVideoPath = bundle.getString(CaregiverAttachmentDialogFragment.KEY_VIDEO)
 
             if (recordVideoPath != null) {
-                viewModel.uploadFiles(listOf(File(recordVideoPath)), isVideo = true)
+                uploadFilesHandler(listOf(File(recordVideoPath)), isVideo = true)
             } else if (resCamera != null) {
                 File(resCamera.toString()).also { file = it }
                 val bitmap = BitmapFactory.decodeFile(file?.path)
                 BitmapUtils.getFileFromBitmap(bitmap, requireContext()).also {
-                    viewModel.uploadFiles(listOfNotNull(it))
+                    uploadFilesHandler(listOfNotNull(it))
                 }
 
             } else if (resGallery.orEmpty().isNotEmpty()) {
                 val fileUri: Uri = Uri.parse(resGallery)
                 BitmapUtils.uriToFile(fileUri, requireContext()).also {
-                    viewModel.uploadFiles(listOf(it))
+                    uploadFilesHandler(listOf(it))
                 }
             } else if (resGalleryPhotos.orEmpty().isNotEmpty()) {
-                Toast.makeText(requireContext(), "YIha", Toast.LENGTH_SHORT).show()
-                resGalleryPhotos.orEmpty().forEach {
+//                Toast.makeText(requireContext(), "YIha", Toast.LENGTH_SHORT).show()
+                resGalleryPhotos.orEmpty().forEach { it ->
                     val fileUri: Uri = Uri.parse(it)
                     if (isVideoUri(fileUri)) {
                         getRealPathFromURI(requireContext(), fileUri)?.let { path ->
@@ -467,6 +635,9 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 }
             }
 
+            //show photo from gallery using glide
+
+
         }
 
 
@@ -479,7 +650,13 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         }
     }
 
-    fun isVideoUri(uri: Uri): Boolean {
+    var pathsFileWanttoUpload = Pair(false, listOf(""))
+    private fun uploadFilesHandler(files: List<File>, isVideo: Boolean = false) {
+        pathsFileWanttoUpload = Pair(isVideo, files.map { it.path })
+        viewModel.uploadFiles(files)
+    }
+
+    private fun isVideoUri(uri: Uri): Boolean {
         val mimeType = requireContext().contentResolver.getType(uri)
         return mimeType?.startsWith("video") == true
     }
@@ -496,13 +673,13 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         }
     }
 
-    private fun onMessageListLoadedBaseRv(data: List<CaregiverChatRoomUi>) {
-        if (viewModel.currentPage == 1) {
-            adapterChatRoom.initialize(data)
-        } else if (adapterChatRoom.isNotEmpty() && !viewModel.isLastPage && viewModel.currentPage != 1) {
-            adapterChatRoom.addAll(data)
-        }
-    }
+//    private fun onMessageListLoadedBaseRv(data: List<CaregiverChatRoomUi>) {
+//        if (viewModel.currentPage == 1) {
+//            adapterChatRoom.initialize(data)
+//        } else if (adapterChatRoom.isNotEmpty() && !viewModel.isLastPage && viewModel.currentPage != 1) {
+//            adapterChatRoom.addAll(data)
+//        }
+//    }
 
 
     private lateinit var handler: Handler
