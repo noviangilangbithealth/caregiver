@@ -27,8 +27,8 @@ class RetrofitInstance {
             retrofit.create(ApiService::class.java)
         }
 
-//        private val BASE_URL = "https://uat-mysiloam-api.siloamhospitals.com"
-        private val BASE_URL = "http://10.85.139.102:3344"
+        private val BASE_URL = "https://uat-mysiloam-api.siloamhospitals.com"
+//        private val BASE_URL = "http://10.85.139.102:3344"
 //        private val BASE_URL = "https://mysiloam-api-staging.siloamhospitals.com"
 
     }

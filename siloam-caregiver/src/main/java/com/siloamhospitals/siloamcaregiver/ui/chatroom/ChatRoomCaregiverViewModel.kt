@@ -97,7 +97,7 @@ class ChatRoomCaregiverViewModel(
     }
 
     fun emitGetPinChat() {
-        repository.emitGetPinMessage(channelId, caregiverId)
+        repository.emitGetPinMessage(caregiverId, channelId)
     }
 
     fun listenPinChat() {
