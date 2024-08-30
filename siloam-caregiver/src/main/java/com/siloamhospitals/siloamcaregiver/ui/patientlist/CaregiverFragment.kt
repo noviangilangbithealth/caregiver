@@ -266,12 +266,12 @@ class CaregiverFragment : Fragment() {
                             viewModel.selectedHospital = hospital.hospitalHopeId.toLong()
                             viewModel.orgCode = hospital.alias
                             if (data?.specializationId != "7") {
-                                viewModel.emitGetCaregiver {
-                                    binding.run {
-                                        lottieLoadingPatientList.visible()
-                                        rvPatientListCaregiver.gone()
-                                    }
-                                }
+//                                viewModel.emitGetCaregiver {
+//                                    binding.run {
+//                                        lottieLoadingPatientList.visible()
+//                                        rvPatientListCaregiver.gone()
+//                                    }
+//                                }
                                 viewModel.emitGetBadgeNotif()
                                 viewModel.listenCaregiverList()
                             } else {
@@ -572,11 +572,12 @@ class CaregiverFragment : Fragment() {
         }
     }
 
+
     fun setupChip() {
         val ward = mutableListOf<ChipFilterPatientData>()
         viewModel.chipData.clear()
         viewModel.dialogFilterData.map { chipHospitalData ->
-            //mapping hospital
+            // mapping hospital
             viewModel.chipData.add(
                 ChipFilterPatientData(
                     name = chipHospitalData.hospitalAlias,
@@ -588,7 +589,7 @@ class CaregiverFragment : Fragment() {
                     wardId = -1
                 )
             )
-            //mapping ward
+            // mapping ward
             chipHospitalData.wards.map { chipWardData ->
                 ward.add(
                     ChipFilterPatientData(
@@ -602,36 +603,64 @@ class CaregiverFragment : Fragment() {
                     )
                 )
             }
-
         }
+
+        Log.d("setupChip", "Chip Data: ${viewModel.chipData}")
+        Log.d("setupChip", "Ward Data: $ward")
+
         val dataMap = mutableListOf<ChipFilterPatientData>()
         when {
             viewModel.isSpecialist -> {
                 val sortedData = viewModel.chipData.sortedBy { it.hospitalId }
-                val x =
-                    sortedData.first { it.hospitalId == viewModel.selectedHospital }
+                val x = sortedData.first().copy(isSelected = true)
+                Log.d("setupChip", "Specialist - Selected Hospital: $x")
                 val y = sortedData.filter { it.hospitalId != x.hospitalId }
                 dataMap.add(x)
                 dataMap.addAll(y)
                 viewModel.selectedHospital = x.hospitalId
+                viewModel.emitGetCaregiver()
             }
 
             !viewModel.isSpecialist -> {
                 val wardSorted = ward.sortedBy { it.hospitalId }.sortedBy { it.wardId }
+                Log.d("setupChip", "Non-Specialist - Ward Sorted: $wardSorted")
                 if (!viewModel.isFiltered) {
                     try {
-                        val x =
-                            viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
-                                .copy(isSelected = true, isHospital = true)
-                        val y =
-                            if (viewModel.role == ROLE_DOCTOR) {
-                                wardSorted.first { it.hospitalId == x.hospitalId }
-                                    .copy(isSelected = true, isHospital = false)
-                            } else {
-                                wardSorted.first { it.wardId == viewModel.selectedWard }
-                                    .copy(isSelected = true, isHospital = false)
-                            }
+                        val x = viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
+                            ?.copy(isSelected = true, isHospital = true)
+                        val y = if (viewModel.role == ROLE_DOCTOR) {
+                            wardSorted.firstOrNull { it.hospitalId == x?.hospitalId }
+                                ?.copy(isSelected = true, isHospital = false)
+                        } else {
+                            wardSorted.firstOrNull { it.wardId == viewModel.selectedWard }
+                                ?.copy(isSelected = true, isHospital = false)
+                        }
 
+                        Log.d("setupChip", "Non-Specialist - Selected Hospital: $x")
+                        Log.d("setupChip", "Non-Specialist - Selected Ward: $y")
+
+                        if (x != null && y != null) {
+                            dataMap.add(x)
+                            dataMap.add(y)
+                            viewModel.selectedHospital = x.hospitalId
+                            viewModel.selectedWard = y.wardId
+                            viewModel.bufferHospital = x.hospitalId
+                            viewModel.bufferWard = y.wardId
+                            viewModel.emitGetCaregiver()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    val x = viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
+                        ?.copy(isSelected = true, isHospital = true)
+                    val y = wardSorted.firstOrNull { it.hospitalId == viewModel.selectedHospital && it.wardId == viewModel.selectedWard }
+                        ?.copy(isSelected = true, isHospital = false)
+
+                    Log.d("setupChip", "Filtered - Selected Hospital: $x")
+                    Log.d("setupChip", "Filtered - Selected Ward: $y")
+
+                    if (x != null && y != null) {
                         dataMap.add(x)
                         dataMap.add(y)
                         viewModel.selectedHospital = x.hospitalId
@@ -639,27 +668,14 @@ class CaregiverFragment : Fragment() {
                         viewModel.bufferHospital = x.hospitalId
                         viewModel.bufferWard = y.wardId
                         viewModel.emitGetCaregiver()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
-                } else {
-                    val x = viewModel.chipData.first { it.hospitalId == viewModel.selectedHospital }
-                        .copy(isSelected = true, isHospital = true)
-                    val y =
-                        wardSorted.first { it.hospitalId == viewModel.selectedHospital && it.wardId == viewModel.selectedWard }
-                            .copy(isSelected = true, isHospital = false)
-                    dataMap.add(x)
-                    dataMap.add(y)
-                    viewModel.selectedHospital = x.hospitalId
-                    viewModel.selectedWard = y.wardId
-                    viewModel.bufferHospital = x.hospitalId
-                    viewModel.bufferWard = y.wardId
-                    viewModel.emitGetCaregiver()
                 }
             }
 
             else -> Unit
         }
+
+        Log.d("setupChip", "DataMap: $dataMap")
         setupRvChip(dataMap.distinct().toMutableList())
     }
 
