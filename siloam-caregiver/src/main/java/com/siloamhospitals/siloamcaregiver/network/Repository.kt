@@ -117,6 +117,7 @@ class Repository(
         try {
             val data = JSONObject()
             data.put("page", page)
+            data.put("limit", 100)
             data.put("keyword", keyword)
             data.put("user", user)
             data.put("organization_id", organizationId)
@@ -135,7 +136,7 @@ class Repository(
                     val caregiverList =
                         Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
                     val decryptedData = caregiverList.data.decrypt(IV, KEY)
-                    Log.e("decryptedData", "listenCaregiverList:$decryptedData", )
+                    Log.e("decryptedData", "listenCaregiverList:$decryptedData")
                     val adapter = Gson().getAdapter(CaregiverListData::class.java)
                     val newData = adapter.fromJson(decryptedData)
                     if (newData != null) {
@@ -217,7 +218,7 @@ class Repository(
     ) {
         try {
             mSocket.onEvent(ROOM_LIST_ON_EVENT) { data, error ->
-                Log.e("dataaaa", "listenRoomList: $data", )
+                Log.e("dataaaa", "listenRoomList: $data")
                 if (error.isEmpty()) {
                     val encryptedData = data as JSONObject
                     val decryptedData = encryptedData.getString("data").decrypt(IV, KEY)
@@ -480,26 +481,31 @@ class Repository(
         hospitalId: String,
         patientId: String
     ): Response<GroupInfoAdmissionHistoryResponse> {
-        Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId", )
+        Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId")
         return RetrofitInstance.getInstance.getAdmissionHistory(hospitalId, patientId)
     }
 
     // Pair first data is local data, second data is unread data
-    fun getChatMessagesFlow(channelId: String, caregiverId: String): Flow<Triple<List<CaregiverChatEntity>, List<CaregiverChatEntity>, List<FailedChatEntity>>> {
+    fun getChatMessagesFlow(
+        channelId: String,
+        caregiverId: String
+    ): Flow<Triple<List<CaregiverChatEntity>, List<CaregiverChatEntity>, List<FailedChatEntity>>> {
         return flow {
-            val messages = caregiverChatDao?.getChatMessages(channelId, caregiverId)?.first().orEmpty()
-            val failedMessages = caregiverChatDao?.getFailedMessages(channelId, caregiverId)?.first().orEmpty()
+            val messages =
+                caregiverChatDao?.getChatMessages(channelId, caregiverId)?.first().orEmpty()
+            val failedMessages =
+                caregiverChatDao?.getFailedMessages(channelId, caregiverId)?.first().orEmpty()
             val isLocalDataEmpty = messages.isEmpty()
-               try {
+            try {
                 val body = RetrofitInstance.getInstance.getListMessage(
                     preferences.userId.toString(),
                     caregiverId,
                     channelId,
-                    if(isLocalDataEmpty) "" else "true"
+                    if (isLocalDataEmpty) "" else "true"
                 ).body()
 
                 Logger.d(body)
-                if(body?.data.orEmpty().isNotEmpty()) {
+                if (body?.data.orEmpty().isNotEmpty()) {
                     val decryptedData = body?.data?.decrypt(IV, KEY)
                     Logger.d(decryptedData)
                     val builder =
@@ -507,7 +513,7 @@ class Repository(
                     val adapter = ListAdapter(CaregiverChatData::class.java, builder)
                     val newData = adapter.fromJson(decryptedData)
                     if (newData != null) {
-                        if(isLocalDataEmpty) {
+                        if (isLocalDataEmpty) {
                             insertChatMessages(newData.map { it.toEntity() })
                             emit(Triple(newData.map { it.toEntity() }, emptyList(), failedMessages))
                         } else {
@@ -548,7 +554,10 @@ class Repository(
         return RetrofitInstance.getInstance.sendMessage(request)
     }
 
-    suspend fun pinChatMessage(messageId: String, isPinned: Boolean): Response<BaseDataResponse<*>> {
+    suspend fun pinChatMessage(
+        messageId: String,
+        isPinned: Boolean
+    ): Response<BaseDataResponse<*>> {
         val request = PinChatRequest(messageId, preferences.userId.toString(), isPinned)
         return RetrofitInstance.getInstance.putPinMessage(request)
     }

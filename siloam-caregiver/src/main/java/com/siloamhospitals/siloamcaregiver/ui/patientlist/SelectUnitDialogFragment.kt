@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -134,54 +135,70 @@ class SelectUnitDialogFragment() : BottomSheetDialogFragment() {
     }
 
     private fun handlingDataHospital(hospitalId: Long, dataHospital: List<ChipHospitalData>) {
-        viewModel.bufferHospital = hospitalId
-        viewModel.bufferWard =
-            dataHospital.first { it.hospitalId == hospitalId }.wards.first().wardId
-        setupFilterHospitals()
+        try {
+            viewModel.bufferHospital = hospitalId
+            if (dataHospital.filter { it.hospitalId == viewModel.bufferHospital }.isNotEmpty()) {
+                viewModel.bufferWard =
+                    dataHospital.first { it.hospitalId == hospitalId }.wards.first().wardId
+                setupFilterHospitals()
+            }else{
+                viewModel.bufferWard = -1
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
 
     private fun setupFilterWards(dataHospital: List<ChipHospitalData>) {
-        val dataWard = dataHospital.first { it.isSelected }.wards.map {
-            it.copy(isSelected = it.wardId == viewModel.bufferWard)
-        }
-        val dataSource = dataSourceTypedOf(dataWard)
-        val layoutManager = FlexboxLayoutManager(requireContext()).apply {
-            flexDirection = FlexDirection.ROW
-            flexWrap = FlexWrap.WRAP
-            justifyContent = JustifyContent.FLEX_START
-        }
+        try {
 
-        binding.rvChipWard.setup {
-            withDataSource(dataSource)
-            withLayoutManager(
-                layoutManager
-            )
-            withItem<ChipWardData, ChipViewHolder>(R.layout.chip_filter) {
-                onBind(::ChipViewHolder) { _, item ->
-                    chip.visible()
-                    tvText.text = item.wardName
-                    if (item.isUrgent) {
-                        ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_urgent_caregiver_16))
-                    } else {
-                        if (item.showBadge) {
-                            ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
+
+            val dataWard = dataHospital.first { it.isSelected }.wards.map {
+                it.copy(isSelected = it.wardId == viewModel.bufferWard)
+            }
+            val dataSource = dataSourceTypedOf(dataWard)
+            val layoutManager = FlexboxLayoutManager(requireContext()).apply {
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
+                justifyContent = JustifyContent.FLEX_START
+            }
+
+            binding.rvChipWard.setup {
+                withDataSource(dataSource)
+                withLayoutManager(
+                    layoutManager
+                )
+                withItem<ChipWardData, ChipViewHolder>(R.layout.chip_filter) {
+                    onBind(::ChipViewHolder) { _, item ->
+                        chip.visible()
+                        tvText.text = item.wardName
+                        if (item.isUrgent) {
+                            ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_urgent_caregiver_16))
                         } else {
-                            ivChip.gone()
+                            if (item.showBadge) {
+                                ivChip.setImageDrawable(resources.getDrawable(R.drawable.ic_badge))
+                            } else {
+                                ivChip.gone()
+                            }
+                        }
+                        if (item.isSelected) {
+                            chip.setBackgroundResource(R.drawable.background_chip_secondary)
+                            tvText.setTextColor(resources.getColor(R.color.white))
+                        } else {
+                            chip.setBackgroundResource(R.drawable.background_chip_outline_secondary)
+                            tvText.setTextColor(resources.getColor(R.color.colorSecondaryBaseCaregiver))
                         }
                     }
-                    if (item.isSelected) {
-                        chip.setBackgroundResource(R.drawable.background_chip_secondary)
-                        tvText.setTextColor(resources.getColor(R.color.white))
-                    } else {
-                        chip.setBackgroundResource(R.drawable.background_chip_outline_secondary)
-                        tvText.setTextColor(resources.getColor(R.color.colorSecondaryBaseCaregiver))
+                    onClick {
+                        handlingDataWard(item.wardId, dataHospital)
                     }
                 }
-                onClick {
-                    handlingDataWard(item.wardId, dataHospital)
-                }
             }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), e.printStackTrace().toString(), Toast.LENGTH_SHORT)
+                .show()
         }
     }
 

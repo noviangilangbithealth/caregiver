@@ -348,7 +348,7 @@ class CaregiverFragment : Fragment() {
                 rvPatientListCaregiver.visible()
             }
             if (data.data.isNotEmpty()) {
-                Logger.d(data.data)
+                Logger.d(Gson().toJson(data))
                 val newData = data.data.map {
                     ListCaregiverPatient(
                         caregiverId = it.id ?: "",
@@ -371,6 +371,7 @@ class CaregiverFragment : Fragment() {
                         }
                     )
                 }
+
                 viewModel.roomPatientList.clear()
                 viewModel.roomPatientList.addAll(newData)
                 onDataLoaded()
@@ -435,21 +436,24 @@ class CaregiverFragment : Fragment() {
                         }
                     )
 
-                    rvTag.setup {
-                        withDataSource(dataSourceOf(item.notification))
-                        withLayoutManager(
-                            LinearLayoutManager(
-                                requireContext(),
-                                LinearLayoutManager.HORIZONTAL,
-                                false
+                    if (item.notification.isNotEmpty()){
+                        rvTag.setup {
+                            withDataSource(dataSourceOf(item.notification))
+                            withLayoutManager(
+                                LinearLayoutManager(
+                                    requireContext(),
+                                    LinearLayoutManager.HORIZONTAL,
+                                    false
+                                )
                             )
-                        )
-                        withItem<NotificationIcon, TagNotificationViewHolder>(R.layout.item_tag_chat) {
-                            onBind(::TagNotificationViewHolder) { _, item ->
-                                Glide.with(requireContext()).load(item.url).into(ivTag)
+                            withItem<NotificationIcon, TagNotificationViewHolder>(R.layout.item_tag_chat) {
+                                onBind(::TagNotificationViewHolder) { _, item ->
+                                    Glide.with(requireContext()).load(item.url).into(ivTag)
+                                }
                             }
                         }
                     }
+
                     rvTag.isVisible = item.notification.isNotEmpty()
                     ivPinned.isVisible = item.isPinned
                     ivNew.isVisible = item.isNew
