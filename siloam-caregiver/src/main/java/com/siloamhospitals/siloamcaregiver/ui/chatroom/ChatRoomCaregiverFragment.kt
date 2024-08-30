@@ -347,7 +347,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                                 }
                         }
                         binding.viewpagerPinChat.adapter = adapter
-                        adapter.initialize(chatPinnedList.map { it.message.orEmpty() })
+                        adapter.initialize(chatPinnedList.map { if(it.attachment.orEmpty().isEmpty()) it.message.orEmpty() else "attachment" })
                         binding.viewpagerPinChat.registerOnPageChangeCallback(object :
                             ViewPager2.OnPageChangeCallback() {
                             override fun onPageSelected(position: Int) {

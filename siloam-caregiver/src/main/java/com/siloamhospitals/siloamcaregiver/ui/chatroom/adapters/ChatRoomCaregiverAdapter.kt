@@ -191,7 +191,7 @@ class ChatRoomCaregiverAdapter(
                         action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkLeft.isVisible = item.message.contains("https://")
-                    if (item.message.contains("https://")) {
+                    if (item.message.contains("https://") || item.url.isNotEmpty()) {
                         tvChat.gone()
                     } else {
                         tvChat.visible()
@@ -279,7 +279,7 @@ class ChatRoomCaregiverAdapter(
                         action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkRight.isVisible = item.message.contains("https://")
-                    if (item.message.contains("https://")) {
+                    if (item.message.contains("https://") || item.url.isNotEmpty()) {
                         tvChat.gone()
                     } else {
                         tvChat.visible()
