@@ -592,6 +592,10 @@ class Repository(
         }
     }
 
+    suspend fun insertChatMessageWithoutExist(message: CaregiverChatEntity) {
+        caregiverChatDao?.insertChatMessage(message)
+    }
+
     suspend fun getUnreadMessages(messages: List<CaregiverChatEntity>): List<CaregiverChatEntity> {
         caregiverChatDao?.let {
             return messages.filter { message -> !it.exists(message.id) }

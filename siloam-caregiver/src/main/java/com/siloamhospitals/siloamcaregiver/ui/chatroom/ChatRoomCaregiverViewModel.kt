@@ -304,6 +304,12 @@ class ChatRoomCaregiverViewModel(
         }
     }
 
+    fun insertChatMessageWithoutCheck(message: CaregiverChatData) {
+        viewModelScope.launch {
+            repository.insertChatMessageWithoutExist(message.toEntity())
+        }
+    }
+
     var sizeChat = 0
 //    fun List<CaregiverChatData>.generateChatListUI(lastData: CaregiverChatRoomUi?, action: ((isSameDate: Boolean) -> Unit)?): List<CaregiverChatRoomUi> {
 //        com.orhanobut.logger.Logger.d(this)

@@ -19,6 +19,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -73,6 +74,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private var lastMessagefromInput = ""
     private var currentSentId = ""
     private var chatPinnedList = listOf<CaregiverChatData>()
+    private var inActionMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -147,7 +149,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     }
 
                     ChatRoomCaregiverAdapter.ClickType.PIN -> {
-                        if(chatPinnedList.find { it.id == item.id } == null) {
+                        if (chatPinnedList.find { it.id == item.id } == null) {
                             showPinChatConfirmationDialog(item)
                         } else {
                             showUnpinChatConfirmationDialog(item)
@@ -163,28 +165,66 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         }
     }
 
-    private fun showDeleteOrPinChatConfirmationDialog(item: CaregiverChatRoomUi, position: Int) {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Delete or Pin Chat")
-        builder.setMessage("Apakah anda ingin menghapus atau mem-pin chat ini?")
-        builder.setPositiveButton("Delete") { dialog, _ ->
-            dialog.dismiss()
-            positionDelete = position
-            DeleteMessageBottomSheetDialog {
-                viewModel.deleteMessage(item.id)
-            }.show(childFragmentManager, "DeleteMessageBottomSheetDialog")
+    private fun startActionMode() {
+        inActionMode = true
+        binding.run {
+            toolbarChatRoom.menu.clear()
+            toolbarChatRoom.inflateMenu(R.menu.action_mode_chat_room)
+            layoutToolbarChatRoom.invisible()
+            toolbarChatRoom.setNavigationIcon(R.drawable.ic_close)
         }
+    }
+
+    private fun endActionMode() {
+        inActionMode = false
+        binding.run {
+            toolbarChatRoom.menu.clear()
+            layoutToolbarChatRoom.visible()
+            toolbarChatRoom.setNavigationIcon(R.drawable.ic_arrow_back_primary)
+        }
+    }
+
+    private fun showDeleteOrPinChatConfirmationDialog(item: CaregiverChatRoomUi, position: Int) {
+
+        startActionMode()
 
         val isNotPin = chatPinnedList.find { it.id == item.id } == null
-        builder.setNegativeButton(if(isNotPin) "Pin" else "Unpin") { dialog, _ ->
-            dialog.dismiss()
-            if(isNotPin) {
-                showPinChatConfirmationDialog(item)
-            } else {
-                showUnpinChatConfirmationDialog(item)
-            }
+        val itemMenu = binding.toolbarChatRoom.menu.findItem(R.id.action_pin)
+        if (itemMenu != null) {
+            itemMenu.icon = ContextCompat.getDrawable(
+                requireContext(),
+                if (isNotPin) R.drawable.ic_pin else R.drawable.ic_unpin_primary
+            )
+        } else {
+            Toast.makeText(requireContext(), "Item not found", Toast.LENGTH_SHORT).show()
         }
-        builder.show()
+
+        binding.toolbarChatRoom.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_delete -> {
+                    positionDelete = position
+                    DeleteMessageBottomSheetDialog {
+                        viewModel.deleteMessage(item.id)
+                    }.show(childFragmentManager, "DeleteMessageBottomSheetDialog")
+                    endActionMode()
+                    true
+                }
+
+                R.id.action_pin -> {
+                    if (isNotPin) {
+                        showPinChatConfirmationDialog(item)
+                    } else {
+                        showUnpinChatConfirmationDialog(item)
+                    }
+                    endActionMode()
+                    true
+                }
+
+                else -> false
+            }
+
+        }
+
     }
 
     private fun showResendMessageConfirmDialog(item: CaregiverChatRoomUi, itemPosition: Int) {
@@ -192,7 +232,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         builder.setTitle("Pesan Gagal Dikirim")
         builder.setMessage("Silahkan pilih aksi untuk pesan ini")
         builder.setPositiveButton("Kirim Ulang") { dialog, _ ->
-            if(item.url.isEmpty()) {
+            if (item.url.isEmpty()) {
                 viewModel.sendChat(sentId = item.sentId, message = item.message)
             } else {
                 viewModel.uploadFiles(listOf(File(item.url)))
@@ -438,7 +478,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                                 data.generateNewChatUI()
                             )
                         }
-                        viewModel.insertChatMessage(data)
+                        viewModel.insertChatMessageWithoutCheck(data)
                     }
                 }
             }
@@ -492,11 +532,16 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     isFailed = true,
                     isSelfSender = true,
                     isActive = true,
-                    url = if(pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
+                    url = if (pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
                     isVideo = pathsAttachment.first
                 )
             )
-            viewModel.insertFailedMessage(randomUUID, lastMessagefromInput, if(pathsAttachment.second.size == 1) pathsAttachment.second[0] else "", isVideo = pathsAttachment.first)
+            viewModel.insertFailedMessage(
+                randomUUID,
+                lastMessagefromInput,
+                if (pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
+                isVideo = pathsAttachment.first
+            )
         }
         fromRetry = false
         lastMessagefromInput = ""
@@ -507,6 +552,32 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListener() {
         binding.run {
+
+            requireActivity()
+                .onBackPressedDispatcher
+                .addCallback(
+                    (activity as ChatroomCaregiverActivity),
+                    object : OnBackPressedCallback(true) {
+                        override fun handleOnBackPressed() {
+                            if (inActionMode) {
+                                endActionMode()
+                            } else {
+                                requireActivity().finish()
+                            }
+                        }
+                    }
+                )
+
+            toolbarChatRoom.setNavigationOnClickListener {
+                Toast.makeText(requireContext(), "Clicked", Toast.LENGTH_SHORT).show()
+                if (inActionMode) {
+                    endActionMode()
+                } else {
+//                    findNavController().navigateUp()
+                    requireActivity().finish()
+                }
+            }
+
             rvChatCaregiver.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
@@ -517,7 +588,8 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                         recyclerView.removeOnScrollListener(this)
 
                         // Find the target item view
-                        val targetView = recyclerView.layoutManager?.findViewByPosition(targetPosition)
+                        val targetView =
+                            recyclerView.layoutManager?.findViewByPosition(targetPosition)
                         targetView?.performClick()
                     }
                 }
@@ -560,11 +632,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     childFragmentManager,
                     "CaregiverAttachmentDialogFragment"
                 )
-            }
-
-            toolbarChatRoom.setNavigationOnClickListener {
-                findNavController().navigateUp()
-                requireActivity().finish()
             }
 
             ivMic.setOnLongClickListener {

@@ -191,12 +191,10 @@ class ChatRoomCaregiverAdapter(
                         action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkLeft.isVisible = item.message.contains("https://")
-                    var title = ""
-                    var urlWeb = ""
                     if (item.message.contains("https://")) {
-                        var x = item.message.split(" ")
-                        title = x.first()
-                        urlWeb = x.last()
+                        tvChat.gone()
+                    } else {
+                        tvChat.visible()
                     }
                     tvLink.text = "Go to link"
                     layoutLinkLeft.setOnClickListener {
@@ -281,12 +279,10 @@ class ChatRoomCaregiverAdapter(
                         action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
                     layoutLinkRight.isVisible = item.message.contains("https://")
-                    var title = ""
-                    var urlWeb = ""
                     if (item.message.contains("https://")) {
-                        var x = item.message.split(" ")
-                        title = x.first()
-                        urlWeb = x.last()
+                        tvChat.gone()
+                    } else {
+                        tvChat.visible()
                     }
                     tvLink.text = "Go to link"
                     layoutLinkRight.setOnClickListener {
