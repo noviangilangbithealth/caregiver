@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 2000000979,
+            userId = 2000000886,
             organizationId = 0,
             wardId = 0,
             context = this,

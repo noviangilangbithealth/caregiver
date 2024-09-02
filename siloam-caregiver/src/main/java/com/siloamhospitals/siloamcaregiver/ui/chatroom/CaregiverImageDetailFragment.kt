@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
-import com.siloamhospitals.siloamcaregiver.databinding.FragmentImageDetailBinding
+import com.siloamhospitals.siloamcaregiver.databinding.FragmentImageDetailCaregiverBinding
 
 class CaregiverImageDetailFragment : DialogFragment() {
 
-    private var _binding: FragmentImageDetailBinding? = null
+    private var _binding: FragmentImageDetailCaregiverBinding? = null
     private val binding get() = _binding!!
     private lateinit var pickImage: String
 
@@ -19,7 +19,7 @@ class CaregiverImageDetailFragment : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentImageDetailBinding.inflate(inflater, container, false)
+        _binding = FragmentImageDetailCaregiverBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -27,7 +27,7 @@ class CaregiverImageDetailFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        binding.layoutImageViewNpwp.setOnClickListener {
+        binding.layoutImageViewCaregiver.setOnClickListener {
             dialog?.dismiss()
         }
 
@@ -37,7 +37,7 @@ class CaregiverImageDetailFragment : DialogFragment() {
                 Glide.with(requireActivity())
                     .load(pickImage)
                     .fitCenter()
-                    .into(binding.detailImage)
+                    .into(binding.detailImageCaregiver)
 
             } catch (e: Exception) {
 //                Timber.d(e)
@@ -51,7 +51,7 @@ class CaregiverImageDetailFragment : DialogFragment() {
         _binding = null
     }
 
-    companion object{
+    companion object {
         const val DATA = "IMAGE_DATA"
     }
 }
