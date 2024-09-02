@@ -336,7 +336,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
 
                 is BaseHandleResponse.LOADING -> {}
                 is BaseHandleResponse.SUCCESS -> {
-                    chatPinnedList = response.data.orEmpty()
+                    chatPinnedList = response.data.orEmpty().reversed().filter { it.caregiverId == viewModel.caregiverId && it.channelId == viewModel.channelId}
                     if (chatPinnedList.isNotEmpty()) {
                         binding.cardPinChat.visible()
                         val adapter = PinChatAdapter { position ->
@@ -349,7 +349,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                         }
                         binding.viewpagerPinChat.adapter = adapter
                         adapter.initialize(
-                            chatPinnedList.reversed().map {
+                            chatPinnedList.map {
                                 if (it.attachment.orEmpty()
                                         .isEmpty()
                                 ) it.message.orEmpty() else "attachment"
@@ -970,15 +970,15 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private fun viewDetailImage(imageDetail: String) {
         val bundle = Bundle()
         bundle.putString(
-            ImageDetailFragment.DATA,
+            CaregiverImageDetailFragment.DATA,
             imageDetail
         )
-        val viewDialogFragment = ImageDetailFragment()
+        val viewDialogFragment = CaregiverImageDetailFragment()
         viewDialogFragment.arguments = bundle
         val mFragmentManager = parentFragmentManager
         viewDialogFragment.show(
             mFragmentManager,
-            ImageDetailFragment::class.java.simpleName
+            CaregiverImageDetailFragment::class.java.simpleName
         )
     }
 

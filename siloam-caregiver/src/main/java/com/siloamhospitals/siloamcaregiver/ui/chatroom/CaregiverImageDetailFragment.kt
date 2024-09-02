@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentImageDetailBinding
 
-class ImageDetailFragment : DialogFragment() {
+class CaregiverImageDetailFragment : DialogFragment() {
 
     private var _binding: FragmentImageDetailBinding? = null
     private val binding get() = _binding!!
