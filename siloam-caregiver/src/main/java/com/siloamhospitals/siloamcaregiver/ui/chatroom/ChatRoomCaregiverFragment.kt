@@ -39,6 +39,7 @@ import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils.getRealPathFro
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
 import com.siloamhospitals.siloamcaregiver.ext.view.invisible
 import com.siloamhospitals.siloamcaregiver.ext.view.visible
+import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatData
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
@@ -347,7 +348,12 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                                 }
                         }
                         binding.viewpagerPinChat.adapter = adapter
-                        adapter.initialize(chatPinnedList.map { if(it.attachment.orEmpty().isEmpty()) it.message.orEmpty() else "attachment" })
+                        adapter.initialize(
+                            chatPinnedList.reversed().map {
+                                if (it.attachment.orEmpty()
+                                        .isEmpty()
+                                ) it.message.orEmpty() else "attachment"
+                            })
                         binding.viewpagerPinChat.registerOnPageChangeCallback(object :
                             ViewPager2.OnPageChangeCallback() {
                             override fun onPageSelected(position: Int) {
@@ -357,6 +363,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                             }
                         }
                         )
+                        binding.viewpagerPinChat.setCurrentItem(chatPinnedList.size - 1, true)
                     } else {
                         binding.cardPinChat.gone()
                     }
@@ -412,45 +419,67 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     private fun observeChatMessages() {
         viewModel.run {
             chatMessages.observe(viewLifecycleOwner) { it ->
-                it.getContentIfNotHandled()?.let { data ->
-
-                    adapterChatRoom.initialize(data.first.generateChatListUI(adapterChatRoom.firstItem()) {
-                        if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-                    })
-
-
-                    if (data.second.isNotEmpty()) {
-                        adapterChatRoom.add(
-                            0,
-                            CaregiverChatRoomUi(
-                                isUnread = true,
-                                unreadCount = data.second.size
-                            )
-                        )
-                        data.second.generateChatListUI(adapterChatRoom.secondItem()) {
-                            if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
-                        }.reversed().map {
-                            adapterChatRoom.add(0, it)
+                it.getContentIfNotHandled()?.let { response ->
+                    when (response) {
+                        is BaseHandleResponse.ERROR -> {
+                            binding.lottieLoadingChatRoom.gone()
+                            Toast.makeText(
+                                requireContext(),
+                                response.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    }
+                        is BaseHandleResponse.LOADING -> {
+                            binding.lottieLoadingChatRoom.visible()
+                        }
 
-                    if (data.third.isNotEmpty()) {
-                        data.third.map {
-                            adapterChatRoom.add(
-                                0, CaregiverChatRoomUi(
-                                    sentId = it.sentId,
-                                    message = it.message,
-                                    isFailed = true,
-                                    isSelfSender = true,
-                                    isActive = true,
-                                    url = it.localuri,
-                                    isVideo = it.isVideo
+                        is BaseHandleResponse.SUCCESS -> {
+                            binding.lottieLoadingChatRoom.gone()
+                            val data = response.data
+                            adapterChatRoom.initialize(
+                                data?.first.orEmpty()
+                                    .generateChatListUI(adapterChatRoom.firstItem()) {
+                                        if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                                    })
+
+
+                            if (data?.second.orEmpty().isNotEmpty()) {
+                                adapterChatRoom.add(
+                                    0,
+                                    CaregiverChatRoomUi(
+                                        isUnread = true,
+                                        unreadCount = data?.second?.size ?: 0
+                                    )
                                 )
-                            )
+                                data?.second?.generateChatListUI(adapterChatRoom.secondItem()) {
+                                    if (it) adapterChatRoom.remove(adapterChatRoom.getSize() - 1)
+                                }?.reversed()?.map {
+                                    adapterChatRoom.add(0, it)
+                                }
+                            }
+
+                            if (data?.third.orEmpty().isNotEmpty()) {
+                                data?.third?.map {
+                                    adapterChatRoom.add(
+                                        0, CaregiverChatRoomUi(
+                                            sentId = it.sentId,
+                                            message = it.message,
+                                            isFailed = true,
+                                            isSelfSender = true,
+                                            isActive = true,
+                                            url = it.localuri,
+                                            isVideo = it.isVideo
+                                        )
+                                    )
+                                }
+                            }
+
+                            setReadMessage()
+                            binding.rvChatCaregiver.smoothScrollToPosition(0)
+                            binding.rvChatCaregiver.smoothScrollToPosition(0)
+                            binding.rvChatCaregiver.smoothScrollToPosition(0)
                         }
                     }
-
-                    setReadMessage()
                 }
             }
         }
@@ -489,10 +518,26 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
         viewModel.uploadFiles.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is BaseHandleResponse.ERROR -> {
-                    createFailedMessage(pathsFileWanttoUpload)
+                    binding.run {
+                        lottieLoadingSendChat.gone()
+                        ivBtnSend.isEnabled = true
+                        addAttach.isEnabled = true
+                    }
+                    response.data?.let {
+                        if (it.data.isNotEmpty()) {
+                            createFailedMessage(it.data.first())
+                        }
+                    }
+
                 }
 
-                is BaseHandleResponse.LOADING -> {}
+                is BaseHandleResponse.LOADING -> {
+                    binding.run {
+                        lottieLoadingSendChat.visible()
+                        ivBtnSend.isEnabled = false
+                        addAttach.isEnabled = false
+                    }
+                }
                 is BaseHandleResponse.SUCCESS -> {
                     Logger.d(response.data)
                     viewModel.sendChat(attachments = response.data?.data.orEmpty())
@@ -503,25 +548,58 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
     }
 
     private fun observeSendChat() {
-        viewModel.sendMessage.observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is BaseHandleResponse.ERROR -> createFailedMessage()
-                is BaseHandleResponse.LOADING -> {}
-                is BaseHandleResponse.SUCCESS -> {
-                    if (fromRetry) {
-                        viewModel.deleteFailedMessage(currentSentId)
-                        adapterChatRoom.remove(positionDelete!!)
+        viewModel.run {
+            sendMessage.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is BaseHandleResponse.ERROR -> {
+                        binding.run {
+                            lottieLoadingSendChat.gone()
+                            ivBtnSend.isEnabled = true
+                            addAttach.isEnabled = true
+                            etInputChat.setText("")
+                        }
+                        Logger.d(response.message)
+                        createFailedMessage()
                     }
-                    currentSentId = ""
-                    positionDelete = null
-                    fromRetry = false
+
+                    is BaseHandleResponse.LOADING -> {
+                        binding.run {
+                            ivBtnSend.isEnabled = false
+                        }
+                    }
+                    is BaseHandleResponse.SUCCESS -> {
+                        binding.run {
+                            lottieLoadingSendChat.gone()
+                            ivBtnSend.isEnabled = true
+                            addAttach.isEnabled = true
+                            etInputChat.setText("")
+                        }
+                        if (response.data != null && adapterChatRoom.getList()
+                                .find { it.id == response.data.id } == null
+                        ) {
+
+                            adapterChatRoom.add(
+                                adapterChatRoom.getList().filter { it.isFailed }.size,
+                                response.data.generateNewChatUI()
+                            )
+                            binding.rvChatCaregiver.smoothScrollToPosition(
+                                adapterChatRoom.getList().filter { it.isFailed }.size
+                            )
+                        }
+                        if (fromRetry) {
+                            viewModel.deleteFailedMessage(currentSentId)
+                            adapterChatRoom.remove(positionDelete!!)
+                        }
+                        currentSentId = ""
+                        positionDelete = null
+                        fromRetry = false
+                    }
                 }
             }
-
         }
     }
 
-    fun createFailedMessage(pathsAttachment: Pair<Boolean, List<String>> = Pair(false, listOf())) {
+    fun createFailedMessage(attachment: AttachmentCaregiver? = null) {
         if (!fromRetry) {
             val randomUUID = UUID.randomUUID().toString()
             adapterChatRoom.add(
@@ -532,15 +610,15 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                     isFailed = true,
                     isSelfSender = true,
                     isActive = true,
-                    url = if (pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
-                    isVideo = pathsAttachment.first
+                    url = if (attachment != null) attachment.uri else "",
+                    isVideo = if (attachment != null) if (attachment.name == "video") true else false else false
                 )
             )
             viewModel.insertFailedMessage(
                 randomUUID,
                 lastMessagefromInput,
-                if (pathsAttachment.second.size == 1) pathsAttachment.second[0] else "",
-                isVideo = pathsAttachment.first
+                if (attachment != null) attachment.uri else "",
+                isVideo = if (attachment != null) if (attachment.name == "video") true else false else false
             )
         }
         fromRetry = false
@@ -622,7 +700,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                 if (etInputChat.text.toString().isNotEmpty()) {
                     viewModel.sendChat(etInputChat.text.toString())
                     lastMessagefromInput = etInputChat.text.toString()
-                    etInputChat.setText("")
                     binding.rvChatCaregiver.smoothScrollToPosition(0)
                 }
             }
@@ -673,18 +750,18 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             val recordVideoPath = bundle.getString(CaregiverAttachmentDialogFragment.KEY_VIDEO)
 
             if (recordVideoPath != null) {
-                uploadFilesHandler(listOf(File(recordVideoPath)), isVideo = true)
+                viewModel.uploadFiles(listOf(File(recordVideoPath)), isVideo = true)
             } else if (resCamera != null) {
                 File(resCamera.toString()).also { file = it }
                 val bitmap = BitmapFactory.decodeFile(file?.path)
                 BitmapUtils.getFileFromBitmap(bitmap, requireContext()).also {
-                    uploadFilesHandler(listOfNotNull(it))
+                    viewModel.uploadFiles(listOfNotNull(it))
                 }
 
             } else if (resGallery.orEmpty().isNotEmpty()) {
                 val fileUri: Uri = Uri.parse(resGallery)
                 BitmapUtils.uriToFile(fileUri, requireContext()).also {
-                    uploadFilesHandler(listOf(it))
+                    viewModel.uploadFiles(listOf(it))
                 }
             } else if (resGalleryPhotos.orEmpty().isNotEmpty()) {
 //                Toast.makeText(requireContext(), "YIha", Toast.LENGTH_SHORT).show()
@@ -715,12 +792,6 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
             binding.llChatRoomClosed.gone()
             binding.clInputText.visible()
         }
-    }
-
-    var pathsFileWanttoUpload = Pair(false, listOf(""))
-    private fun uploadFilesHandler(files: List<File>, isVideo: Boolean = false) {
-        pathsFileWanttoUpload = Pair(isVideo, files.map { it.path })
-        viewModel.uploadFiles(files)
     }
 
     private fun isVideoUri(uri: Uri): Boolean {

@@ -27,7 +27,7 @@ interface ApiService {
     @POST(PostSendMessage)
     suspend fun sendMessage(
         @Body sendChatRequestBody: SendChatCaregiverRequest
-    ): Response<BaseDataResponse<*>>
+    ): Response<BaseDataResponse<String>>
 
     @DELETE(DeleteMessage)
     suspend fun deleteMessage(

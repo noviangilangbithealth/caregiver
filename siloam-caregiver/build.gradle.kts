@@ -199,6 +199,8 @@ dependencies {
     // SQLite
     val sqliteVersion = "2.3.0"
     implementation("androidx.sqlite:sqlite:$sqliteVersion")
+
+    implementation("com.github.chrisbanes:PhotoView:2.2.0")
 }
 
 publishing {

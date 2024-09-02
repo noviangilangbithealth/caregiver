@@ -22,6 +22,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatListDat
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverChatRoomUi
 import com.siloamhospitals.siloamcaregiver.ui.Event
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -32,8 +33,8 @@ class ChatRoomCaregiverViewModel(
 
     var urlEmrIpd = ""
 
-    val _sendMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
-    val sendMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _sendMessage
+    val _sendMessage = MutableLiveData<BaseHandleResponse<CaregiverChatData>>()
+    val sendMessage: LiveData<BaseHandleResponse<CaregiverChatData>> = _sendMessage
 
     val _deleteMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
     val deleteMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _deleteMessage
@@ -72,8 +73,8 @@ class ChatRoomCaregiverViewModel(
     val _uploadFiles = MutableLiveData<BaseHandleResponse<AttachmentCaregiverResponse>>()
     val uploadFiles: LiveData<BaseHandleResponse<AttachmentCaregiverResponse>> = _uploadFiles
 
-    private val _chatMessages = MutableLiveData<Event<TripleChats>>()
-    val chatMessages: LiveData<Event<TripleChats>> = _chatMessages
+    private val _chatMessages = MutableLiveData<Event<BaseHandleResponse<TripleChats>>>()
+    val chatMessages: LiveData<Event<BaseHandleResponse<TripleChats>>> = _chatMessages
 
     private val _pinChat = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
     val pinChat: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _pinChat
@@ -116,13 +117,19 @@ class ChatRoomCaregiverViewModel(
     fun getCaregiverChat() {
         viewModelScope.launch {
             repository.getChatMessagesFlow(channelId, caregiverId)
+                .onStart { emit(BaseHandleResponse.LOADING()) }
                 .collect { messages ->
                     _chatMessages.postValue(Event(messages))
                 }
         }
     }
 
-    fun insertFailedMessage(uuid: String, message: String, localuri: String = "", isVideo: Boolean = false) {
+    fun insertFailedMessage(
+        uuid: String,
+        message: String,
+        localuri: String = "",
+        isVideo: Boolean = false
+    ) {
         viewModelScope.launch {
             repository.insertFailedMessage(
                 FailedChatEntity(
@@ -183,10 +190,33 @@ class ChatRoomCaregiverViewModel(
                 } else {
                     val message = response.message()
                     val error = response.errorBody()?.string()
-                    _uploadFiles.postValue(BaseHandleResponse.ERROR(response.message()))
+                    _uploadFiles.postValue(
+                        BaseHandleResponse.ERROR(
+                            "message: $message, error; $error",
+                            data = AttachmentCaregiverResponse(
+                                listOf(
+                                    AttachmentCaregiver(
+                                        uri = documentFiles.first().path,
+                                        name = if (isVideo) "video" else "image"
+                                    )
+                                )
+                            )
+                        )
+                    )
                 }
             } catch (e: Exception) {
-                _uploadFiles.postValue(BaseHandleResponse.ERROR(e.message.orEmpty()))
+                _uploadFiles.postValue(
+                    BaseHandleResponse.ERROR(
+                        e.message.orEmpty(), data = AttachmentCaregiverResponse(
+                            listOf(
+                                AttachmentCaregiver(
+                                    uri = documentFiles.first().path,
+                                    name = if (isVideo) "video" else "image"
+                                )
+                            )
+                        )
+                    )
+                )
             }
         }
 
@@ -244,31 +274,26 @@ class ChatRoomCaregiverViewModel(
         type: Int = 1,
         attachments: List<AttachmentCaregiver> = emptyList(),
         sentId: String = ""
-    ) =
+    ) {
         viewModelScope.launch {
-            try {
-                _sendMessage.postValue(BaseHandleResponse.LOADING())
-                val response = repository.sendChatCaregiver(
-                    sentID = sentId,
-                    caregiverID = caregiverId,
-                    channelID = channelId,
-                    senderID = doctorHopeId,
-                    sentAt = NOW.withFormat("yyyy-MM-dd HH:mm:ss"),
-                    message = message,
-                    type = type.toString(),
-                    attachment = attachments
-                )
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        _sendMessage.postValue(BaseHandleResponse.SUCCESS(it))
-                    }
-                } else {
-                    _sendMessage.postValue(BaseHandleResponse.ERROR(response.message()))
+
+            _sendMessage.postValue(BaseHandleResponse.LOADING())
+            repository.sendChatCaregiver(
+                sentID = sentId,
+                caregiverID = caregiverId,
+                channelID = channelId,
+                senderID = doctorHopeId,
+                sentAt = NOW.withFormat("yyyy-MM-dd HH:mm:ss"),
+                message = message,
+                type = type.toString(),
+                attachment = attachments
+            )
+                .onStart { emit(BaseHandleResponse.LOADING()) }
+                .collect {
+                    _sendMessage.value = it
                 }
-            } catch (e: Exception) {
-                _sendMessage.postValue(BaseHandleResponse.ERROR("No Internet Connection"))
-            }
         }
+    }
 
 
 //    fun listenMessageList() {
