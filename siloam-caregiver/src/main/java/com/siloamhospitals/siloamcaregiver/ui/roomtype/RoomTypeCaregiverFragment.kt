@@ -307,6 +307,7 @@ class RoomTypeCaregiverFragment : Fragment() {
         super.onResume()
         viewModel.emitRoom()
         viewModel.listenRoom()
+        Log.d("Test","TEst")
     }
 
     override fun onDestroyView() {
