@@ -108,6 +108,18 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <ProgressBar
+                android:id="@+id/progress_attachment"
+                app:layout_constraintTop_toBottomOf="@id/card_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimaryCaregiver"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
+
             <ImageView
                 android:id="@+id/iv_play_media"
                 android:layout_width="wrap_content"

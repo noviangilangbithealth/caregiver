@@ -21,6 +21,6 @@ data class SendChatCaregiverRequest(
     val type: String,
     val attachment: List<AttachmentCaregiver>,
 
-    @SerializedName("send_id")
+    @SerializedName("sent_id")
     val sentID: String
 )

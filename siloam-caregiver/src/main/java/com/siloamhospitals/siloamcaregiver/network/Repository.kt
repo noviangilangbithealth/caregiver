@@ -601,24 +601,24 @@ class Repository(
                         if (newData != null) {
                             if (newData.isNotEmpty()) {
                                 insertChatMessage(newData.first().toEntity())
-                                emit(BaseHandleResponse.SUCCESS(newData.first()))
+                                emit(BaseHandleResponse.SUCCESS(newData.first(), sentId = sentID))
                             } else {
-                                emit(BaseHandleResponse.ERROR("Empty Data"))
+                                emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
                             }
                         } else {
-                            emit(BaseHandleResponse.ERROR("Empty Data"))
+                            emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
                         }
                     } else {
-                        emit(BaseHandleResponse.ERROR("Empty Data"))
+                        emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
                     }
                 } else {
-                    emit(BaseHandleResponse.ERROR(body?.message ?: "Error"))
+                    emit(BaseHandleResponse.ERROR(body?.message ?: "Error", sentId = sentID))
                 }
             } else {
-                emit(BaseHandleResponse.ERROR(response.message()))
+                emit(BaseHandleResponse.ERROR(response.message(), sentId = sentID))
             }
         } catch (e: Exception) {
-            emit(BaseHandleResponse.ERROR(e.toString()))
+            emit(BaseHandleResponse.ERROR(e.toString(), sentId = sentID))
         }
 
     }

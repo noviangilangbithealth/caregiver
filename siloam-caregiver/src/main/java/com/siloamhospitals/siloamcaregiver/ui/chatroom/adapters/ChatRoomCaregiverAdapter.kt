@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.target.Target
 import com.orhanobut.logger.Logger
@@ -178,6 +179,7 @@ class ChatRoomCaregiverAdapter(
                                     return false
                                 }
                             })
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into(imageChat)
                         tvChat.gone()
                         cardImage.visible()
@@ -216,10 +218,11 @@ class ChatRoomCaregiverAdapter(
                     tvLink.gone()
                     cardImage.gone()
                     tvRetrySend.gone()
+                    progressAttachment.gone()
                 } else {
                     tvChatDeleted.gone()
                     if (item.url.isNotEmpty()) {
-                        if(item.isFailed) {
+                        if(item.isFailed || item.isLoading) {
                             Glide.with(adapterContext)
                                 .load(File(item.url))
                                 .into(imageChat)
@@ -250,6 +253,7 @@ class ChatRoomCaregiverAdapter(
                                         return false
                                     }
                                 })
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(imageChat)
                         }
                         tvChat.gone()
@@ -278,12 +282,7 @@ class ChatRoomCaregiverAdapter(
                     imageChat.setOnClickListener {
                         action?.invoke(ClickType.MEDiA, item, holder.bindingAdapterPosition)
                     }
-                    layoutLinkRight.isVisible = item.message.contains("https://")
-                    if (item.message.contains("https://") || item.url.isNotEmpty()) {
-                        tvChat.gone()
-                    } else {
-                        tvChat.visible()
-                    }
+
                     tvLink.text = "Go to link"
                     layoutLinkRight.setOnClickListener {
                         action?.invoke(ClickType.LINK, item, holder.bindingAdapterPosition)
@@ -295,15 +294,23 @@ class ChatRoomCaregiverAdapter(
                         return@setOnLongClickListener true
                     }
 
-                    if (item.isFailed) {
-                        tvRetrySend.visible()
+                    layoutLinkRight.isVisible = item.message.contains("https://")
+                    if (item.message.contains("https://") || item.url.isNotEmpty()) {
+                        tvChat.gone()
+                    } else {
+                        tvChat.visible()
+                    }
+
+                    if (item.isFailed || item.isLoading) {
                         ivRead.gone()
                         tvDate.gone()
                     } else {
-                        tvRetrySend.gone()
                         ivRead.visible()
                         tvDate.visible()
                     }
+
+                    if(item.isFailed) tvRetrySend.visible() else tvRetrySend.gone()
+                    if(item.isLoading) progressAttachment.visible() else progressAttachment.gone()
 
                     holder.binding.tvRetrySend.setOnClickListener {
                         action?.invoke(ClickType.RETRY, item, holder.bindingAdapterPosition)

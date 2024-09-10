@@ -176,45 +176,43 @@ class ChatRoomCaregiverViewModel(
     fun uploadFiles(
         documentFiles: List<File>,
         isVoiceNote: Boolean = false,
-        isVideo: Boolean = false
+        isVideo: Boolean = false,
+        sentId: String = ""
     ) =
         viewModelScope.launch {
+            val dataDefault = AttachmentCaregiverResponse(
+                listOf(
+                    AttachmentCaregiver(
+                        uri = documentFiles.first().path,
+                        name = if (isVideo) "video" else "image"
+                    )
+                )
+            )
             try {
-                _uploadFiles.postValue(BaseHandleResponse.LOADING())
+                _uploadFiles.postValue(BaseHandleResponse.LOADING(data = dataDefault, sentId = sentId))
                 val response = repository.postUploadAttachment(documentFiles, isVoiceNote, isVideo)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         com.orhanobut.logger.Logger.d(it)
-                        _uploadFiles.postValue(BaseHandleResponse.SUCCESS(it))
+                        _uploadFiles.postValue(BaseHandleResponse.SUCCESS(it, sentId))
                     }
                 } else {
                     val message = response.message()
                     val error = response.errorBody()?.string()
                     _uploadFiles.postValue(
                         BaseHandleResponse.ERROR(
-                            "message: $message, error; $error",
-                            data = AttachmentCaregiverResponse(
-                                listOf(
-                                    AttachmentCaregiver(
-                                        uri = documentFiles.first().path,
-                                        name = if (isVideo) "video" else "image"
-                                    )
-                                )
-                            )
+                            message= "message: $message, error; $error",
+                            data = dataDefault,
+                            sentId = sentId
                         )
                     )
                 }
             } catch (e: Exception) {
                 _uploadFiles.postValue(
                     BaseHandleResponse.ERROR(
-                        e.message.orEmpty(), data = AttachmentCaregiverResponse(
-                            listOf(
-                                AttachmentCaregiver(
-                                    uri = documentFiles.first().path,
-                                    name = if (isVideo) "video" else "image"
-                                )
-                            )
-                        )
+                        message = e.message.orEmpty(),
+                        data = dataDefault,
+                        sentId = sentId
                     )
                 )
             }
@@ -386,6 +384,7 @@ class ChatRoomCaregiverViewModel(
         val roleId = user?.role?.id?.toInt() ?: 1
         return CaregiverChatRoomUi(
             id = this.id.orEmpty(),
+            sentId = this.sentId.orEmpty(),
             name = if (roleId == 1) user?.name.orEmpty() else user?.role?.name.orEmpty() + " - " + user?.name.orEmpty(),
             message = message.orEmpty(),
             time = createdAt?.toLocalDateTimeOrNow()?.withFormat("HH:mm") ?: "",
@@ -419,6 +418,7 @@ class ChatRoomCaregiverViewModel(
                 dataUi.add(
                     CaregiverChatRoomUi(
                         id = it.id.orEmpty(),
+                        sentId = it.sentId,
                         name = if (roleId == 1) it.user.name else it.user.role.name + " - " + it.user.name,
                         message = it.message.orEmpty(),
                         time = it.createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),
@@ -460,6 +460,7 @@ class ChatRoomCaregiverViewModel(
         val roleId = user.role.id
         return CaregiverChatRoomUi(
             id = this.id,
+            sentId = this.sentId,
             name = if (roleId == 1) user.name else user.role.name + " - " + user.name,
             message = message,
             time = createdAt.toLocalDateTimeOrNow().withFormat("HH:mm"),

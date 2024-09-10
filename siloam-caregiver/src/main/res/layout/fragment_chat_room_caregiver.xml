@@ -136,31 +136,25 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingTop="@dimen/medium"
-        android:paddingBottom="@dimen/medium"
+        android:paddingBottom="@dimen/medium_fit"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/lottie_loading_send_chat"
+        app:layout_constraintBottom_toTopOf="@id/ll_input_chat"
         app:layout_constraintTop_toBottomOf="@id/card_pin_chat"
         app:layout_constraintVertical_bias="1"
         app:reverseLayout="true"
         tools:itemCount="13"
         tools:listitem="@layout/item_chat_left" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie_loading_send_chat"
-        android:layout_width="@dimen/large_fit"
-        android:layout_height="@dimen/large_fit"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
+    <ProgressBar
+        android:id="@+id/progress_send_chat_attachment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rv_chat_caregiver"
-        app:layout_constraintBottom_toTopOf="@id/ll_input_chat"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/loading_animation"
-        tools:ignore="ContentDescription" />
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorPrimaryCaregiver"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        app:layout_constraintBottom_toTopOf="@id/ll_input_chat"/>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie_loading_chat_room"

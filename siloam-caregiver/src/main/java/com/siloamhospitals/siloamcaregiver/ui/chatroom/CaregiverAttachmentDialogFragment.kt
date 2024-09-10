@@ -26,6 +26,8 @@ import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.SheetCaregiverChatBinding
 import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils
 import com.siloamhospitals.siloamcaregiver.ext.bitmap.BitmapUtils.getRealPathFromURI
+import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import com.siloamhospitals.siloamcaregiver.ui.patientlist.ROLE_NURSE
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.io.File
 
@@ -38,6 +40,8 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var currentPhotoPath: String
     private var getFile: File? = null
+
+    private val preferences by lazy { AppPreferences(requireContext()) }
 
     private val launcherIntentPhotoCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -177,7 +181,7 @@ class CaregiverAttachmentDialogFragment : BottomSheetDialogFragment() {
         BitmapUtils.createTempFile(requireActivity()).also {
             val photoUri = FileProvider.getUriForFile(
                 requireActivity(),
-                binding.root.context.packageName + ".provider",
+                binding.root.context.packageName + if(preferences.role == ROLE_NURSE) ".fileprovider" else ".provider",
                 it
             )
             currentPhotoPath = it.absolutePath

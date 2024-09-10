@@ -67,5 +67,6 @@ data class CaregiverChatRoomUi(
     val date: String = "",
     val isFailed: Boolean = false,
     val sentId: String = "",
+    val isLoading: Boolean = false
 )
 

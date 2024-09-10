@@ -11,7 +11,7 @@ import com.siloamhospitals.siloamcaregiver.network.entity.FailedChatEntity
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [CaregiverChatEntity::class, FailedChatEntity::class], version = 2)
+@Database(entities = [CaregiverChatEntity::class, FailedChatEntity::class], version = 3)
 abstract class CaregiverDatabase : RoomDatabase() {
 
     abstract fun caregiverChatDao(): CaregiverChatDao

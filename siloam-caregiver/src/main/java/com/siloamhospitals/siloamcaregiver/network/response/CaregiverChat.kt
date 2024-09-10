@@ -19,6 +19,9 @@ data class CaregiverChatListData(
 data class CaregiverChatData (
     val id: String? = "",
 
+    @SerializedName("sent_id")
+    val sentId: String? = "",
+
     @SerializedName("sender_id")
     val senderID: String? = "",
 
