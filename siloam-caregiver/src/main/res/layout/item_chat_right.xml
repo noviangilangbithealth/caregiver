@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/small"
@@ -16,6 +17,7 @@
         app:layout_constraintGuide_percent="0.4" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/colorLavenderCaregiver"
@@ -106,6 +108,18 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <ProgressBar
+                android:id="@+id/progress_attachment"
+                app:layout_constraintTop_toBottomOf="@id/card_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimaryCaregiver"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
+
             <ImageView
                 android:id="@+id/iv_play_media"
                 android:layout_width="wrap_content"
@@ -115,7 +129,7 @@
                 app:layout_constraintEnd_toEndOf="@id/card_image"
                 app:layout_constraintTop_toTopOf="@id/card_image"
                 app:layout_constraintBottom_toBottomOf="@id/card_image"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:translationZ="2dp"
                 tools:ignore="UseAppTint" />
 
@@ -145,5 +159,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_retry_send"
+        style="@style/TextAppearance.MaterialComponents.Overline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/very_small"
+        android:visibility="gone"
+        android:drawableStart="@drawable/ic_retry"
+        android:drawablePadding="@dimen/very_small"
+        android:text="gagal kirim"
+        android:textColor="@color/colorRedVibrantCaregiver"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_chat" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

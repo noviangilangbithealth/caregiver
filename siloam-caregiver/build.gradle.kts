@@ -199,6 +199,8 @@ dependencies {
     // SQLite
     val sqliteVersion = "2.3.0"
     implementation("androidx.sqlite:sqlite:$sqliteVersion")
+
+    implementation("com.github.chrisbanes:PhotoView:2.2.0")
 }
 
 publishing {
@@ -206,7 +208,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.noviangilangbithealth"
             artifactId = "caregiver"
-            version = "1.36"
+            version = "1.45"
 
             pom {
                 description.set("Caregiver Library")

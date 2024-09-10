@@ -17,10 +17,12 @@
             android:id="@+id/toolbar_chat_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/medium"
             app:buttonGravity="center_vertical"
             app:navigationIcon="@drawable/ic_arrow_back_primary">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_toolbar_chat_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/small_fit">
@@ -61,7 +63,6 @@
                     android:id="@+id/iv_close_chat_room"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/medium"
                     android:src="@drawable/ic_close_caregiver"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -73,22 +74,87 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_pin_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="0dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/app_bar_chat_room">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_pin_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/medium"
+                android:layout_marginTop="@dimen/small_fit"
+                android:src="@drawable/ic_pin_chat"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_pin_chat_count"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/smaller"
+                android:layout_marginBottom="@dimen/small_fit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/iv_pin_chat"
+                app:layout_constraintStart_toStartOf="@id/iv_pin_chat"
+                app:layout_constraintTop_toBottomOf="@id/iv_pin_chat"
+                tools:text="1 of 2" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewpager_pin_chat"
+                style="@style/TextAppearance.AppCompat.Body2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/smaller"
+                android:layout_marginTop="@dimen/small_fit"
+                android:layout_marginEnd="@dimen/medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_pin_chat_count"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat_caregiver"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingTop="@dimen/medium"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/medium"
+        android:paddingBottom="@dimen/medium_fit"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/ll_input_chat"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_chat_room"
+        app:layout_constraintTop_toBottomOf="@id/card_pin_chat"
         app:layout_constraintVertical_bias="1"
         app:reverseLayout="true"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_chat_left"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        tools:itemCount="13"
+        tools:listitem="@layout/item_chat_left" />
+
+    <ProgressBar
+        android:id="@+id/progress_send_chat_attachment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorPrimaryCaregiver"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        app:layout_constraintBottom_toTopOf="@id/ll_input_chat"/>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie_loading_chat_room"
@@ -210,6 +276,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/medium"
                 android:src="@drawable/ic_microphone"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

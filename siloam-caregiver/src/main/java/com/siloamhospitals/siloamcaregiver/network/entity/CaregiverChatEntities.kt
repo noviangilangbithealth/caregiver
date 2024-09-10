@@ -12,6 +12,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatUser
 @Entity
 data class CaregiverChatEntity(
     @PrimaryKey val id: String,
+    @ColumnInfo(name = "sent_id") val sentId: String = "",
     @ColumnInfo(name = "sender_id") val senderId: String,
     @ColumnInfo(name = "message") val message: String,
     @ColumnInfo(name = "type") val type: Int,
@@ -33,6 +34,7 @@ typealias CaregiverChatEntities = List<CaregiverChatEntity>
 
 fun CaregiverChatData.toEntity() = CaregiverChatEntity(
     id = id.orEmpty(),
+    sentId = sentId.orEmpty(),
     senderId = senderID.orEmpty(),
     message = message.orEmpty(),
     type = type?.toInt() ?: 0,

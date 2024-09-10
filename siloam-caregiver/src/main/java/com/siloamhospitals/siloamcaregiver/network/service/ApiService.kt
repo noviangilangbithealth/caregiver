@@ -1,5 +1,6 @@
 package com.siloamhospitals.siloamcaregiver.network.service
 
+import com.siloamhospitals.siloamcaregiver.network.request.PinChatRequest
 import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
@@ -16,6 +17,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -25,7 +27,7 @@ interface ApiService {
     @POST(PostSendMessage)
     suspend fun sendMessage(
         @Body sendChatRequestBody: SendChatCaregiverRequest
-    ): Response<BaseDataResponse<*>>
+    ): Response<BaseDataResponse<String>>
 
     @DELETE(DeleteMessage)
     suspend fun deleteMessage(
@@ -100,6 +102,11 @@ interface ApiService {
         @Query("unread") unread: String
     ): Response<BaseDataResponse<String>>
 
+    @PUT(PutPinMessage)
+    suspend fun putPinMessage(
+        @Body pinChatRequest: PinChatRequest
+    ): Response<BaseDataResponse<*>>
+
     companion object {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
@@ -119,6 +126,7 @@ interface ApiService {
         const val GetAdmissionHistory = "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
         const val DeleteMessage = "/caregiver/api/v1/messages/{message_id}"
         const val GetListMessage = "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}"
+        const val PutPinMessage = "/caregiver/api/v1/messages/pin"
     }
 
 }

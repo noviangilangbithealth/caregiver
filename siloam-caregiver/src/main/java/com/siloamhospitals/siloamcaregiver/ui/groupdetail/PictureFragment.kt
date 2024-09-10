@@ -23,7 +23,7 @@ import com.siloamhospitals.siloamcaregiver.databinding.FragmentPictureBinding
 import com.siloamhospitals.siloamcaregiver.ext.datetime.toLocalDate
 import com.siloamhospitals.siloamcaregiver.ext.datetime.withFormat
 import com.siloamhospitals.siloamcaregiver.ext.view.gone
-import com.siloamhospitals.siloamcaregiver.ui.chatroom.ImageDetailFragment
+import com.siloamhospitals.siloamcaregiver.ui.chatroom.CaregiverImageDetailFragment
 import com.siloamhospitals.siloamcaregiver.ui.player.VideoPlayerActivity
 import java.time.LocalDate
 
@@ -173,15 +173,15 @@ class PictureFragment : Fragment() {
     private fun viewDetailImage(imageDetail: String) {
         val bundle = Bundle()
         bundle.putString(
-            ImageDetailFragment.DATA,
+            CaregiverImageDetailFragment.DATA,
             imageDetail
         )
-        val viewDialogFragment = ImageDetailFragment()
+        val viewDialogFragment = CaregiverImageDetailFragment()
         viewDialogFragment.arguments = bundle
         val mFragmentManager = parentFragmentManager
         viewDialogFragment.show(
             mFragmentManager,
-            ImageDetailFragment::class.java.simpleName
+            CaregiverImageDetailFragment::class.java.simpleName
         )
     }
 

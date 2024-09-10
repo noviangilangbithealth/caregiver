@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.network.ConnectivityLiveData
 import com.siloamhospitals.siloamcaregiver.network.Repository
@@ -80,7 +81,7 @@ class CaregiverPatientListViewModel(
         viewModelScope.launch {
             repository.listenCaregiverList() { data, error ->
                 if (error.isEmpty()) {
-                    Logger.d(data)
+                    Logger.d(Gson().toJson(data))
                     _caregiverList.postValue(data)
                     errorHasBeenConsumed = false
                 } else {

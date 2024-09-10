@@ -10,6 +10,7 @@ import com.siloamhospitals.siloamcaregiver.network.AttachmentCaregiver
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
+import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatData
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
@@ -17,6 +18,7 @@ import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoA
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResultResponse
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class GroupDetailViewModel(
@@ -100,8 +102,8 @@ class GroupDetailViewModel(
         }
     }
 
-    val _sendMessage = MutableLiveData<BaseHandleResponse<BaseDataResponse<*>>>()
-    val sendMessage: LiveData<BaseHandleResponse<BaseDataResponse<*>>> = _sendMessage
+    val _sendMessage = MutableLiveData<BaseHandleResponse<CaregiverChatData>>()
+    val sendMessage: LiveData<BaseHandleResponse<CaregiverChatData>> = _sendMessage
 
     val doctorHopeId get() = preferences.userId.toString()
     var channelId = ""
@@ -109,11 +111,14 @@ class GroupDetailViewModel(
     fun sendChat(
         message: String = "",
         type: Int = 1,
-        attachments: List<AttachmentCaregiver> = emptyList()
-    ) =
+        attachments: List<AttachmentCaregiver> = emptyList(),
+        sentId: String = ""
+    ) {
         viewModelScope.launch {
+
             _sendMessage.postValue(BaseHandleResponse.LOADING())
-            val response = repository.sendChatCaregiver(
+            repository.sendChatCaregiver(
+                sentID = sentId,
                 caregiverID = caregiverId,
                 channelID = channelId,
                 senderID = doctorHopeId,
@@ -122,13 +127,11 @@ class GroupDetailViewModel(
                 type = type.toString(),
                 attachment = attachments
             )
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    _sendMessage.postValue(BaseHandleResponse.SUCCESS(it))
+                .onStart { emit(BaseHandleResponse.LOADING()) }
+                .collect {
+                    _sendMessage.value = it
                 }
-            } else {
-                _sendMessage.postValue(BaseHandleResponse.ERROR(response.message()))
-            }
         }
+    }
 
 }

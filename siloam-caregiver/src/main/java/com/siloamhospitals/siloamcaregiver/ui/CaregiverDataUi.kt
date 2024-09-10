@@ -65,5 +65,8 @@ data class CaregiverChatRoomUi(
     val isUnread: Boolean = false,
     val unreadCount: Int = 0,
     val date: String = "",
+    val isFailed: Boolean = false,
+    val sentId: String = "",
+    val isLoading: Boolean = false
 )
 

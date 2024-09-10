@@ -35,11 +35,11 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId =  29000000134,
-            organizationId = 2,
+            userId = 2000000886,
+            organizationId = 0,
             wardId = 0,
             context = this,
-            role = SiloamCaregiver.ROLE_NURSE
+            role = SiloamCaregiver.ROLE_DOCTOR
         )
         SiloamCaregiver.seFirebaseToken(this, "1234567")
 //        30 Siloam 10F
@@ -48,6 +48,13 @@ class MainActivity : AppCompatActivity() {
 //        2000000827 tiur
 //        2000000761 andreas
 //        29000000134 amsal nurse
+//        2000000886 anggun
+
+        //production
+//        2000000012501 tansol
+//        1109 bernard
+
+
         binding.buttonOpenCaregiver.setOnClickListener {
             //this function call is for open caregiver history chat
 //            SiloamCaregiverUI().openChatHistory(

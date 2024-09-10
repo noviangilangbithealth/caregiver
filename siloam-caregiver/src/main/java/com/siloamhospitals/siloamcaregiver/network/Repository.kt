@@ -7,11 +7,14 @@ import com.google.gson.reflect.TypeToken
 import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.ext.encryption.decrypt
 import com.siloamhospitals.siloamcaregiver.network.entity.CaregiverChatEntity
+import com.siloamhospitals.siloamcaregiver.network.entity.FailedChatEntity
 import com.siloamhospitals.siloamcaregiver.network.entity.toEntity
+import com.siloamhospitals.siloamcaregiver.network.request.PinChatRequest
 import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
+import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChat
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatData
 import com.siloamhospitals.siloamcaregiver.network.response.CaregiverChatListData
@@ -47,6 +50,8 @@ class Repository(
     private val caregiverDatabase: CaregiverDatabase? = null
 ) {
     companion object {
+        private const val EMIT_GET_PIN_MESSAGE = "get-pin-message"
+        private const val PIN_MESSAGE_ON_EVENT = "pin-message-listener"
         private const val GET_CAREGIVER_EMIT_EVENT = "get-caregiver"
         private const val CAREGIVER_LIST_ON_EVENT = "caregiver-listener"
         private const val NEW_CAREGIVER_LISTENER = "new-caregiver-listener"
@@ -73,6 +78,36 @@ class Repository(
 
     private val caregiverChatDao by lazy { caregiverDatabase?.caregiverChatDao() }
 
+    fun emitGetPinMessage(caregiverId: String, channelId: String) {
+        val data = JSONObject()
+        data.put("caregiverID", caregiverId)
+        data.put("channelID", channelId)
+        mSocket.emitEvent(EMIT_GET_PIN_MESSAGE, data)
+    }
+
+    fun listenPinChat(action: (List<CaregiverChatData>, String) -> Unit) {
+        try {
+            mSocket.onEvent(PIN_MESSAGE_ON_EVENT) { data, error ->
+                if (error.isEmpty()) {
+                    val caregiverList =
+                        Gson().getAdapter(CaregiverChat::class.java).fromJson(data.toString())
+                    val decryptedData = caregiverList.data.decrypt(IV, KEY)
+                    val listType = object : TypeToken<List<CaregiverChatData>>() {}.type
+                    val newData = Gson().fromJson<List<CaregiverChatData>>(decryptedData, listType)
+                    if (newData != null) {
+                        action.invoke(newData, "")
+                    } else {
+                        action.invoke(emptyList(), "Empty Data")
+                    }
+                } else {
+                    action.invoke(emptyList(), error)
+                }
+            }
+        } catch (e: Exception) {
+            action.invoke(emptyList(), e.toString())
+        }
+    }
+
     fun emitGetCaregiver(
         page: Int,
         keyword: String,
@@ -83,6 +118,7 @@ class Repository(
         try {
             val data = JSONObject()
             data.put("page", page)
+            data.put("limit", 100)
             data.put("keyword", keyword)
             data.put("user", user)
             data.put("organization_id", organizationId)
@@ -101,7 +137,7 @@ class Repository(
                     val caregiverList =
                         Gson().getAdapter(CaregiverList::class.java).fromJson(data.toString())
                     val decryptedData = caregiverList.data.decrypt(IV, KEY)
-                    Log.e("decryptedData", "listenCaregiverList:$decryptedData", )
+                    Log.e("decryptedData", "listenCaregiverList:$decryptedData")
                     val adapter = Gson().getAdapter(CaregiverListData::class.java)
                     val newData = adapter.fromJson(decryptedData)
                     if (newData != null) {
@@ -183,7 +219,7 @@ class Repository(
     ) {
         try {
             mSocket.onEvent(ROOM_LIST_ON_EVENT) { data, error ->
-                Log.e("dataaaa", "listenRoomList: $data", )
+                Log.e("dataaaa", "listenRoomList: $data")
                 if (error.isEmpty()) {
                     val encryptedData = data as JSONObject
                     val decryptedData = encryptedData.getString("data").decrypt(IV, KEY)
@@ -352,26 +388,6 @@ class Repository(
         }
     }
 
-    suspend fun sendChatCaregiver(
-        caregiverID: String,
-        channelID: String,
-        senderID: String,
-        sentAt: String,
-        message: String,
-        type: String,
-        attachment: List<AttachmentCaregiver>
-    ): Response<BaseDataResponse<*>> {
-        val request = SendChatCaregiverRequest(
-            caregiverID,
-            channelID,
-            senderID,
-            sentAt,
-            message,
-            type,
-            attachment
-        )
-        return RetrofitInstance.getInstance.sendMessage(request)
-    }
 
     suspend fun deleteMessage(messageId: String): Response<BaseDataResponse<*>> {
         return RetrofitInstance.getInstance.deleteMessage(messageId)
@@ -466,48 +482,178 @@ class Repository(
         hospitalId: String,
         patientId: String
     ): Response<GroupInfoAdmissionHistoryResponse> {
-        Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId", )
+        Log.e("Request", "getAdmissionHistory: $hospitalId ---- $patientId")
         return RetrofitInstance.getInstance.getAdmissionHistory(hospitalId, patientId)
     }
 
     // Pair first data is local data, second data is unread data
-    fun getChatMessagesFlow(channelId: String, caregiverId: String): Flow<Pair<List<CaregiverChatEntity>, List<CaregiverChatEntity>>> {
+    fun getChatMessagesFlow(
+        channelId: String,
+        caregiverId: String
+    ): Flow<BaseHandleResponse<Triple<List<CaregiverChatEntity>, List<CaregiverChatEntity>, List<FailedChatEntity>>>> {
         return flow {
-            val messages = caregiverChatDao?.getChatMessages(channelId, caregiverId)?.first().orEmpty()
-            val isLocalDataEmpty = messages.isEmpty()
-               try {
-                val body = RetrofitInstance.getInstance.getListMessage(
+            var messages: List<CaregiverChatEntity> = emptyList()
+            var failedMessages: List<FailedChatEntity> = emptyList()
+            try {
+                messages =
+                    caregiverChatDao?.getChatMessages(channelId, caregiverId)?.first().orEmpty()
+                failedMessages =
+                    caregiverChatDao?.getFailedMessages(channelId, caregiverId)?.first().orEmpty()
+                val isLocalDataEmpty = messages.isEmpty()
+                val response = RetrofitInstance.getInstance.getListMessage(
                     preferences.userId.toString(),
                     caregiverId,
                     channelId,
-                    if(isLocalDataEmpty) "" else "true"
-                ).body()
+                    if (isLocalDataEmpty) "" else "true"
+                )
 
-                Logger.d(body)
-                if(body?.data.orEmpty().isNotEmpty()) {
-                    val decryptedData = body?.data?.decrypt(IV, KEY)
-                    Logger.d(decryptedData)
-                    val builder =
-                        GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
-                    val adapter = ListAdapter(CaregiverChatData::class.java, builder)
-                    val newData = adapter.fromJson(decryptedData)
-                    if (newData != null) {
-                        if(isLocalDataEmpty) {
-                            insertChatMessages(newData.map { it.toEntity() })
-                            emit(Pair(newData.map { it.toEntity() }, emptyList()))
-                        } else {
-                            val unreadData = newData.map { it.toEntity() }
-                            insertChatMessages(unreadData)
-                            emit(Pair(messages, unreadData))
+                Logger.d(response.body())
+                if (response.isSuccessful) {
+                    if (response.body() == null || response.body()?.data.orEmpty().isEmpty()) {
+                        emit(BaseHandleResponse.ERROR("Empty Message"))
+                    } else {
+                        val decryptedData = response.body()?.data?.decrypt(IV, KEY)
+                        Logger.d(decryptedData)
+                        val builder =
+                            GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
+                        val adapter = ListAdapter(CaregiverChatData::class.java, builder)
+                        val newData = adapter.fromJson(decryptedData)
+                        if (newData != null) {
+                            if (isLocalDataEmpty) {
+                                if(newData.isEmpty()) {
+                                    emit(BaseHandleResponse.ERROR("Empty Message"))
+                                    return@flow
+                                }
+                                insertChatMessages(newData.map { it.toEntity() })
+                                emit(
+                                    BaseHandleResponse.SUCCESS(
+                                        Triple(
+                                            newData.map { it.toEntity() },
+                                            emptyList(),
+                                            failedMessages
+                                        )
+                                    )
+                                )
+                            } else {
+                                val unreadData = newData.map { it.toEntity() }
+                                insertChatMessages(unreadData)
+                                emit(
+                                    BaseHandleResponse.SUCCESS(
+                                        Triple(
+                                            messages,
+                                            unreadData,
+                                            failedMessages
+                                        )
+                                    )
+                                )
+                            }
                         }
                     }
+                } else {
+                    Logger.d(response.message())
+                    emit(BaseHandleResponse.ERROR("Failed to load message"))
                 }
 
             } catch (e: Exception) {
                 Logger.d(e)
-                emit(Pair(messages, emptyList()))
+                if (messages.isEmpty()) {
+                    Logger.d(e.toString())
+                    emit(BaseHandleResponse.ERROR("Failed to load message"))
+                } else {
+                    emit(BaseHandleResponse.SUCCESS(Triple(messages, emptyList(), failedMessages)))
+                }
             }
         }
+    }
+
+    suspend fun sendChatCaregiver(
+        caregiverID: String,
+        channelID: String,
+        senderID: String,
+        sentAt: String,
+        message: String,
+        type: String,
+        attachment: List<AttachmentCaregiver>,
+        sentID: String = "",
+    ): Flow<BaseHandleResponse<CaregiverChatData>> = flow {
+        try {
+            val request = SendChatCaregiverRequest(
+                caregiverID,
+                channelID,
+                senderID,
+                sentAt,
+                message,
+                type,
+                attachment,
+                sentID
+            )
+            val response = RetrofitInstance.getInstance.sendMessage(request)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (response.isSuccessful) {
+                    val data = body?.data
+                    if (data != null) {
+                        val decryptedData = data.decrypt(IV, KEY)
+                        val builder =
+                            GsonBuilder().registerTypeAdapterFactory(ListAdapterFactory()).create()
+                        val adapter = ListAdapter(CaregiverChatData::class.java, builder)
+                        val newData = adapter.fromJson(decryptedData)
+                        if (newData != null) {
+                            if (newData.isNotEmpty()) {
+                                insertChatMessage(newData.first().toEntity())
+                                emit(BaseHandleResponse.SUCCESS(newData.first(), sentId = sentID))
+                            } else {
+                                emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
+                            }
+                        } else {
+                            emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
+                        }
+                    } else {
+                        emit(BaseHandleResponse.ERROR("Empty Data", sentId = sentID))
+                    }
+                } else {
+                    emit(BaseHandleResponse.ERROR(body?.message ?: "Error", sentId = sentID))
+                }
+            } else {
+                emit(BaseHandleResponse.ERROR(response.message(), sentId = sentID))
+            }
+        } catch (e: Exception) {
+            emit(BaseHandleResponse.ERROR(e.toString(), sentId = sentID))
+        }
+
+    }
+//        flow<> {  }
+//        val request = SendChatCaregiverRequest(
+//            caregiverID,
+//            channelID,
+//            senderID,
+//            sentAt,
+//            message,
+//            type,
+//            attachment,
+//            sentID
+//        )
+//        return RetrofitInstance.getInstance.sendMessage(request)
+//    }
+
+    suspend fun pinChatMessage(
+        messageId: String,
+        isPinned: Boolean
+    ): Response<BaseDataResponse<*>> {
+        val request = PinChatRequest(messageId, preferences.userId.toString(), isPinned)
+        return RetrofitInstance.getInstance.putPinMessage(request)
+    }
+
+    suspend fun insertFailedMessage(message: FailedChatEntity) {
+        caregiverChatDao?.insertFailedMessage(message)
+    }
+
+    suspend fun deleteFailedMessage(sentid: String) {
+        caregiverChatDao?.deleteFailedMessage(sentid)
+    }
+
+    suspend fun getFailedMessagesSize(channelId: String, caregiverId: String): Int {
+        return caregiverChatDao?.getFailedMessagesSize(channelId, caregiverId) ?: 0
     }
 
     private suspend fun insertChatMessages(messages: List<CaregiverChatEntity>) {
@@ -526,6 +672,10 @@ class Repository(
                 caregiverChatDao.insertChatMessage(message)
             }
         }
+    }
+
+    suspend fun insertChatMessageWithoutExist(message: CaregiverChatEntity) {
+        caregiverChatDao?.insertChatMessage(message)
     }
 
     suspend fun getUnreadMessages(messages: List<CaregiverChatEntity>): List<CaregiverChatEntity> {
