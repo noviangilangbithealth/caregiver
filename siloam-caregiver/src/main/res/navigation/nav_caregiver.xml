@@ -15,5 +15,22 @@
         android:name="com.siloamhospitals.siloamcaregiver.ui.patientlist.CaregiverFragment"
         android:label="fragment_caregiver"
         tools:layout="@layout/fragment_caregiver" >
-       </fragment>
+        <action
+            android:id="@+id/action_caregiverFragment_to_rmoListFragment"
+            app:destination="@id/rmoListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addRmoFragment"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.patientlist.rmo.AddRmoFragment"
+        android:label="fragment_add_rmo"
+        tools:layout="@layout/fragment_add_rmo" />
+    <fragment
+        android:id="@+id/rmoListFragment"
+        android:name="com.siloamhospitals.siloamcaregiver.ui.patientlist.rmo.RmoListFragment"
+        android:label="fragment_rmo_list"
+        tools:layout="@layout/fragment_rmo_list" >
+        <action
+            android:id="@+id/action_rmoListFragment_to_addRmoFragment"
+            app:destination="@id/addRmoFragment" />
+    </fragment>
 </navigation>

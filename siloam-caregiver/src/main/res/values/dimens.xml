@@ -44,4 +44,6 @@
     <dimen name="text_margin">4dp</dimen>
     <dimen name="badge_margin">8dp</dimen>
 
+    <dimen name="image_size_40">40dp</dimen>
+
 </resources>

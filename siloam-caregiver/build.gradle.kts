@@ -28,6 +28,9 @@ buildscript {
     }
 }
 
+    //Prod : "\"https://doctor-apps-caregiver.siloamhospitals.com/caregiver/\""
+    //Staging :  "\"https://mysiloam-api-staging.siloamhospitals.com/caregiver/\""
+
 android {
     namespace = "com.siloamhospitals.siloamcaregiver"
     compileSdk = 34
@@ -201,6 +204,10 @@ dependencies {
     implementation("androidx.sqlite:sqlite:$sqliteVersion")
 
     implementation("com.github.chrisbanes:PhotoView:2.2.0")
+
+    //civ
+
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }
 
 publishing {
@@ -208,7 +215,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.noviangilangbithealth"
             artifactId = "caregiver"
-            version = "1.45"
+            version = "1.46"
 
             pom {
                 description.set("Caregiver Library")

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.siloamhospitals.caregiverapp.databinding.ActivityMainBinding
@@ -35,15 +34,16 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 2000000886,
-            organizationId = 0,
+            userId = 2000000979,
+            organizationId = 2,
             wardId = 0,
             context = this,
             role = SiloamCaregiver.ROLE_DOCTOR
         )
         SiloamCaregiver.seFirebaseToken(this, "1234567")
 //        30 Siloam 10F
-//        2000000834 ekajanti
+//        2000000834 ekajanti rmo
+//        2000000979 marlina rmo
 //        2000000732 prof eka
 //        2000000827 tiur
 //        2000000761 andreas

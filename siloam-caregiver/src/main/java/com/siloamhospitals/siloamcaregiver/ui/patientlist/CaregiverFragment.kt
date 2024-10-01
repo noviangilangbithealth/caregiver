@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.datasource.dataSourceTypedOf
@@ -38,6 +39,7 @@ import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.CaregiverActivity
 import com.siloamhospitals.siloamcaregiver.ui.ListCaregiverPatient
 import com.siloamhospitals.siloamcaregiver.ui.NotificationIcon
+import com.siloamhospitals.siloamcaregiver.ui.patientlist.rmo.RmoViewModel
 import com.siloamhospitals.siloamcaregiver.ui.roomtype.RoomTypeCaregiverActivity
 
 
@@ -47,6 +49,7 @@ class CaregiverFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: CaregiverPatientListViewModel by activityViewModels()
+    private val viewModelRmo: RmoViewModel by activityViewModels()
 
     private val preferences by lazy {
         AppPreferences(requireContext())
@@ -73,6 +76,8 @@ class CaregiverFragment : Fragment() {
             }
             preferences.isFromRecent = false
         } else {
+            Logger.d(viewModel.selectedWard)
+            Logger.d(viewModel.selectedHospital)
             viewModel.emitGetCaregiver()
         }
     }
@@ -104,6 +109,14 @@ class CaregiverFragment : Fragment() {
                     }
                 }
             )
+
+        binding.chipRmoList.setSingleOnClickListener {
+            viewModelRmo.wardId = viewModel.selectedWard.toString()
+            viewModelRmo.orgId = viewModel.selectedHospital.toString()
+            viewModelRmo.wardName = viewModel.wardName
+            viewModelRmo.userId = viewModel.doctorId.toString()
+            findNavController().navigate(R.id.action_caregiverFragment_to_rmoListFragment)
+        }
 
         viewModel.run {
 //            emitGetCaregiver()
@@ -150,7 +163,7 @@ class CaregiverFragment : Fragment() {
     }
 
     private fun setupFirebaseToken() {
-        if(preferences.role == SiloamCaregiver.ROLE_NURSE && preferences.firebaseToken.isNotEmpty()) {
+        if (preferences.role == SiloamCaregiver.ROLE_NURSE && preferences.firebaseToken.isNotEmpty()) {
             viewModel.setFirebaseToken(preferences.firebaseToken)
             preferences.firebaseToken = ""
         }
@@ -218,9 +231,9 @@ class CaregiverFragment : Fragment() {
 
             topBarCaregiver.setNavigationOnClickListener {
                 if (viewModel.isOnHold) {
-                    binding.topBarCaregiver.menu.setGroupVisible(0, false)
-                    binding.topBarCaregiver.setNavigationIcon(resources.getDrawable(R.drawable.ic_close_caregiver))
                     viewModel.isOnHold = false
+                    binding.topBarCaregiver.setNavigationIcon(resources.getDrawable(R.drawable.ic_close_caregiver))
+                    binding.topBarCaregiver.menu.setGroupVisible(0, false)
                     onDataLoaded()
                 } else {
                     requireActivity().finish()
@@ -276,7 +289,6 @@ class CaregiverFragment : Fragment() {
                                 viewModel.listenCaregiverList()
                             } else {
                                 viewModel.isSpecialist = false
-                                viewModel.selectedWard = hospital.hospitalHopeId.toLong()
                                 viewModel.getWard(hospital.hospitalHopeId.toLong())
                             }
                         }
@@ -343,6 +355,7 @@ class CaregiverFragment : Fragment() {
 
     private fun observerCaregiverList() {
         viewModel.caregiverList.observe(viewLifecycleOwner) { data ->
+            binding.chipRmoList.isVisible = !viewModel.isSpecialist
             binding.run {
                 lottieLoadingPatientList.gone()
                 rvPatientListCaregiver.visible()
@@ -436,7 +449,7 @@ class CaregiverFragment : Fragment() {
                         }
                     )
 
-                    if (item.notification.isNotEmpty()){
+                    if (item.notification.isNotEmpty()) {
                         rvTag.setup {
                             withDataSource(dataSourceOf(item.notification))
                             withLayoutManager(
@@ -630,8 +643,9 @@ class CaregiverFragment : Fragment() {
                 Log.d("setupChip", "Non-Specialist - Ward Sorted: $wardSorted")
                 if (!viewModel.isFiltered) {
                     try {
-                        val x = viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
-                            ?.copy(isSelected = true, isHospital = true)
+                        val x =
+                            viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
+                                ?.copy(isSelected = true, isHospital = true)
                         val y = if (viewModel.role == ROLE_DOCTOR) {
                             wardSorted.firstOrNull { it.hospitalId == x?.hospitalId }
                                 ?.copy(isSelected = true, isHospital = false)
@@ -656,10 +670,12 @@ class CaregiverFragment : Fragment() {
                         e.printStackTrace()
                     }
                 } else {
-                    val x = viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
-                        ?.copy(isSelected = true, isHospital = true)
-                    val y = wardSorted.firstOrNull { it.hospitalId == viewModel.selectedHospital && it.wardId == viewModel.selectedWard }
-                        ?.copy(isSelected = true, isHospital = false)
+                    val x =
+                        viewModel.chipData.firstOrNull { it.hospitalId == viewModel.selectedHospital }
+                            ?.copy(isSelected = true, isHospital = true)
+                    val y =
+                        wardSorted.firstOrNull { it.hospitalId == viewModel.selectedHospital && it.wardId == viewModel.selectedWard }
+                            ?.copy(isSelected = true, isHospital = false)
 
                     Log.d("setupChip", "Filtered - Selected Hospital: $x")
                     Log.d("setupChip", "Filtered - Selected Ward: $y")

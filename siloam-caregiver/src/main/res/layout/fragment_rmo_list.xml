@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.patientlist.rmo.RmoListFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_rmo_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:elevation="@dimen/empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_rmo_list"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/white"
+            android:theme="@style/Widget.App.Toolbar.MenuButton"
+            app:menu="@menu/menu_rmo"
+            app:navigationIcon="@drawable/ic_arrow_back_primary"
+            app:title="@string/rmo_ward"
+            app:titleMarginTop="@dimen/small_fit" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_count_rmo_participants"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/medium"
+        android:layout_marginVertical="@dimen/medium"
+        android:textColor="@color/colorBlack54Caregiver"
+        tools:text="@string/participants" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_rmo_participants"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/medium"
+        tools:listitem="@layout/item_group_detail_partisipan" />
+
+
+</LinearLayout>

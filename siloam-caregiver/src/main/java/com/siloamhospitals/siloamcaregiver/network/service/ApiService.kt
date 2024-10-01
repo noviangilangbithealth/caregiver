@@ -3,6 +3,7 @@ package com.siloamhospitals.siloamcaregiver.network.service
 import com.siloamhospitals.siloamcaregiver.network.request.PinChatRequest
 import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
+import com.siloamhospitals.siloamcaregiver.network.request.rmo.SubmitRmoRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.EmrIpdWebViewResponse
@@ -10,6 +11,8 @@ import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
 import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
+import com.siloamhospitals.siloamcaregiver.network.response.rmo.RmoMasterDataResponse
+import com.siloamhospitals.siloamcaregiver.network.response.rmo.RmoParticipantsResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -107,6 +110,25 @@ interface ApiService {
         @Body pinChatRequest: PinChatRequest
     ): Response<BaseDataResponse<*>>
 
+    @POST(PostParticipants)
+    suspend fun postParticipantsRmo(
+        @Body pinChatRequest: SubmitRmoRequest
+    ): Response<BaseDataResponse<*>>
+
+    @GET(GetMasterRmO)
+    suspend fun getMasterRmo(
+        @Path(value = PathHospitalId) hospitalId: String,
+        @Path(value = PathWardId) wardId: String,
+        @Path(value = PathUserId) userId: String
+    ): Response<RmoMasterDataResponse>
+
+    @GET(GetRmoParticipantsList)
+    suspend fun getMasterRmoParticipants(
+        @Path(value = PathHospitalId) hospitalId: String,
+        @Path(value = PathWardId) wardId: String,
+        @Path(value = PathUserId) userId: String
+    ): Response<RmoParticipantsResponse>
+
     companion object {
         const val PathCaregiverId = "caregiver_id"
         const val PathUserId = "doctor_hope_id"
@@ -114,6 +136,7 @@ interface ApiService {
         const val PathPatientId = "patient_id"
         const val PathMessageId = "message_id"
         const val PathChannelId = "channel_id"
+        const val PathWardId = "ward_id"
         const val PathUnread = "unread"
 
         const val PostUpload = "/caregiver/api/v1/messages/upload"
@@ -123,10 +146,16 @@ interface ApiService {
         const val GetWard = "/caregiver/api/v1/ward/{$PathHospitalId}"
         const val GetEmrIpdWebView = "/caregiver/api/v1/caregivers/summary/{$PathCaregiverId}"
         const val PostPinMessage = "/caregiver/api/v1/caregivers/pin"
-        const val GetAdmissionHistory = "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
+        const val GetAdmissionHistory =
+            "/caregiver/api/v1/caregiver/list/{$PathHospitalId}/{$PathPatientId}"
         const val DeleteMessage = "/caregiver/api/v1/messages/{message_id}"
-        const val GetListMessage = "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}"
+        const val GetListMessage =
+            "/caregiver/api/v1/message/user/{$PathUserId}/caregiver/{$PathCaregiverId}/channel/{$PathChannelId}"
         const val PutPinMessage = "/caregiver/api/v1/messages/pin"
+        const val PostParticipants = "/caregiver/api/v1/participant"
+        const val GetMasterRmO = "/caregiver/api/v1/rmo/organization/{$PathHospitalId}/ward/{$PathWardId}/user/{$PathUserId}"
+        const val GetRmoParticipantsList =
+            "/caregiver/api/v1/roster/organization/{$PathHospitalId}/ward/{$PathWardId}/user/{$PathUserId}"
     }
 
 }

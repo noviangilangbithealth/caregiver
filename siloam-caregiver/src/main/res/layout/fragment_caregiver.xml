@@ -69,6 +69,9 @@
         android:hint="@string/search_patient_name"
         app:endIconDrawable="@drawable/ic_search_text_input"
         app:endIconMode="custom"
+        app:hintTextColor="@color/colorPrimaryCaregiver"
+        app:endIconTint="@color/til_endicon_color"
+        app:boxStrokeColor="@color/colorPrimaryCaregiver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_chip_caregiver_dashboard">
@@ -80,6 +83,40 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <LinearLayout
+        android:id="@+id/chip_rmo_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/medium"
+        android:layout_marginTop="@dimen/medium"
+        android:background="@drawable/background_chip_outline_primary"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/small_fit"
+        android:paddingVertical="@dimen/smaller"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/til_search">
+
+        <ImageView
+            android:id="@+id/iv_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_people_rmo_caregiver"
+            tools:ignore="ContentDescription" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/chip_text"
+            style="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small"
+            android:text="@string/rmo_ward"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryCaregiver"
+            android:textSize="@dimen/text_very_small" />
+
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_patient_list_caregiver"
         android:layout_width="@dimen/match_constraint"
@@ -88,7 +125,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/til_search"
+        app:layout_constraintTop_toBottomOf="@id/chip_rmo_list"
         tools:listitem="@layout/item_patient_list_caregiver" />
 
     <com.airbnb.lottie.LottieAnimationView
