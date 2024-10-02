@@ -32,9 +32,15 @@ class CaregiverButtons private constructor(app: Application) :
     private val mPreference by lazy { AppPreferences(app) }
     private val repository by lazy { Repository(mPreference) }
     private lateinit var caregiverButtonViewModel: CaregiverButtonViewModel
+    private var isDragging = false
 
     init {
         app.registerActivityLifecycleCallbacks(this)
+    }
+
+    override fun onActivityPostResumed(activity: Activity) {
+        super.onActivityPostResumed(activity)
+        isDragging = false
     }
 
 
@@ -79,8 +85,6 @@ class CaregiverButtons private constructor(app: Application) :
                 // Add FAB to the layout
                 decorView.addView(this, fabParams)
 
-                var isDragging = false
-
                 setOnClickListener {
                     if (!isDragging) {
                         SiloamCaregiverUI.getInstances().openCaregiver(activity)
@@ -103,18 +107,24 @@ class CaregiverButtons private constructor(app: Application) :
                                 dY = initialY - event.rawY
                                 view.postDelayed({
                                     isDragging = true
-                                }, 300) // Long press duration
+                                }, 100) // Long press duration
                                 return false // Allow click event to be processed
                             }
 
                             MotionEvent.ACTION_MOVE -> {
                                 if (isDragging) {
-                                    view.animate()
-                                        .x(event.rawX + dX)
-                                        .y(event.rawY + dY)
-                                        .setDuration(0)
-                                        .start()
-                                    return true // Handle drag event
+                                    val deltaX = event.rawX - initialX
+                                    val deltaY = event.rawY - initialY
+
+                                    // Only return true if the button has moved a significant distance
+                                    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                                        view.animate()
+                                            .x(event.rawX + dX)
+                                            .y(event.rawY + dY)
+                                            .setDuration(0)
+                                            .start()
+                                        return true // Handle drag event
+                                    }
                                 }
                             }
 
