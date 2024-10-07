@@ -15,6 +15,7 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.orhanobut.logger.Logger
 import com.siloamhospitals.siloamcaregiver.R
 import com.siloamhospitals.siloamcaregiver.databinding.FragmentAddRmoBinding
 import com.siloamhospitals.siloamcaregiver.ext.view.setSingleOnClickListener
@@ -134,6 +135,7 @@ class AddRmoFragment : Fragment() {
         viewModel.rmoDataUi.observe(viewLifecycleOwner) { data ->
             loadRmo(data)
             setTitle(viewModel.rmoUiList.filter { it.isChecked }.size)
+            Logger.d(data)
         }
     }
 
