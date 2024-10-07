@@ -522,7 +522,6 @@ class CaregiverFragment : Fragment() {
             }
         }
 
-        binding.ibFilterPatient.isVisible = !viewModel.isSpecialist && viewModel.role == ROLE_DOCTOR
         binding.ibFilterPatient.setSingleOnClickListener {
             SelectUnitDialogFragment().show(childFragmentManager, "FilterUnitDialog")
         }
@@ -700,6 +699,7 @@ class CaregiverFragment : Fragment() {
     }
 
     private fun setupRvChip(data: MutableList<ChipFilterPatientData>) {
+        binding.ibFilterPatient.isVisible = !viewModel.isSpecialist && viewModel.role == ROLE_DOCTOR
         val dataSource = dataSourceTypedOf(data)
         binding.rvChipPatientList.setup {
             withDataSource(dataSource)

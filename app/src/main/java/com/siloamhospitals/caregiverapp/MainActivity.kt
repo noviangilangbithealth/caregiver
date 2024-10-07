@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.init(this)
         SiloamCaregiver.init(this)
         SiloamCaregiver.initUser(
-            userId = 2000000979,
+            userId = 2000000906,
             organizationId = 2,
             wardId = 0,
             context = this,
@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         SiloamCaregiver.seFirebaseToken(this, "1234567")
 //        30 Siloam 10F
 //        2000000834 ekajanti rmo
+//        2000000906 Ronald rmo
 //        2000000979 marlina rmo
 //        2000000732 prof eka
 //        2000000827 tiur

@@ -119,6 +119,7 @@ class AddRmoFragment : Fragment() {
                     data?.sortedBy { e -> e.name }
                     data?.sortedByDescending { e -> e.isChecked }
                     if (data != null) {
+                        viewModel.rmoUiList.clear()
                         viewModel.rmoUiList.addAll(data)
                         val ids = viewModel.rmoParticipantsList.map { e -> e.id }
                         viewModel.setSelectedRmo(ids)
