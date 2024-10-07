@@ -221,7 +221,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.noviangilangbithealth"
             artifactId = "caregiver"
-            version = "1.46"
+            version = "1.47"
 
             pom {
                 description.set("Caregiver Library")
