@@ -9,7 +9,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.findNavController
 import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.siloamhospitals.siloamcaregiver.R
@@ -17,11 +16,13 @@ import com.siloamhospitals.siloamcaregiver.databinding.ActivityCaregiverBinding
 import com.siloamhospitals.siloamcaregiver.network.Repository
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
 import com.siloamhospitals.siloamcaregiver.ui.patientlist.CaregiverPatientListViewModel
+import com.siloamhospitals.siloamcaregiver.ui.patientlist.rmo.RmoViewModel
 
 
 class CaregiverActivity : AppCompatActivity() {
 
     private lateinit var caregiverPatientListViewModel: CaregiverPatientListViewModel
+    private lateinit var rmoViewModel: RmoViewModel
 
     private val binding by lazy {
         ActivityCaregiverBinding.inflate(layoutInflater)
@@ -67,6 +68,18 @@ class CaregiverActivity : AppCompatActivity() {
             this,
             caregiverPatientListViewModelFactory
         )[CaregiverPatientListViewModel::class.java]
+
+        val rmoViewModelFactory = viewModelFactory {
+            initializer {
+                RmoViewModel(repository, mPreference)
+            }
+
+        }
+        rmoViewModel = ViewModelProvider(
+            this,
+            rmoViewModelFactory
+        )[RmoViewModel::class.java]
+
 
     }
 

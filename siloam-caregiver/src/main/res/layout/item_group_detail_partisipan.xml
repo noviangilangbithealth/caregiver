@@ -6,15 +6,16 @@
     android:layout_height="wrap_content"
     android:paddingVertical="@dimen/small">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_partisipan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/circle_image_view_background"
-        android:src="@drawable/ic_atom_icon_a_icon_hospital_primary"
+        android:layout_width="@dimen/image_size_40"
+        android:layout_height="@dimen/image_size_40"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/round_people_24"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="ContentDescription" />
 
     <com.google.android.material.textview.MaterialTextView

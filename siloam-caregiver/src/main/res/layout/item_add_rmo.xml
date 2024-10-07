@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/medium">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/cb_rmo"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/large_fit"
+        android:layout_marginVertical="@dimen/small"
+        android:textColor="@color/colorBlack87Caregiver"
+        android:textSize="@dimen/text_medium"
+        app:buttonTint="@color/check_box_color"
+        tools:text="RMO - dr. Amsal Bani" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/very_tiny"
+        android:background="@color/colorBlack12Caregiver" />
+
+
+</LinearLayout>

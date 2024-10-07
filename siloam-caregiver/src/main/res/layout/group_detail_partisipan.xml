@@ -14,7 +14,7 @@
         style="@style/TextAppearance.MaterialComponents.Subtitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/partisipan"
+        android:text="@string/participants"
         android:textColor="@color/colorBlack54Caregiver"
         android:textSize="@dimen/text_medium"
         android:textStyle="bold" />

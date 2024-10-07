@@ -83,4 +83,5 @@ class SocketIoManager(
 
 const val URLS = "wss://uat-mysiloam-api.siloamhospitals.com/"
 //const val URLS = "wss://mysiloam-api-staging.siloamhospitals.com/"
+//const val URLS PROD = "wss://doctor-apps-caregiver.siloamhospitals.com/"
 //const val URLS = "ws://10.85.139.102:3344/"

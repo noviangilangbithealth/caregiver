@@ -12,6 +12,8 @@ import com.siloamhospitals.siloamcaregiver.network.entity.toEntity
 import com.siloamhospitals.siloamcaregiver.network.request.PinChatRequest
 import com.siloamhospitals.siloamcaregiver.network.request.PinMessageRequest
 import com.siloamhospitals.siloamcaregiver.network.request.SendChatCaregiverRequest
+import com.siloamhospitals.siloamcaregiver.network.request.rmo.SubmitRmoMembersRequest
+import com.siloamhospitals.siloamcaregiver.network.request.rmo.SubmitRmoRequest
 import com.siloamhospitals.siloamcaregiver.network.response.AttachmentCaregiverResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseDataResponse
 import com.siloamhospitals.siloamcaregiver.network.response.BaseHandleResponse
@@ -32,8 +34,11 @@ import com.siloamhospitals.siloamcaregiver.network.response.UserShowResponse
 import com.siloamhospitals.siloamcaregiver.network.response.WardResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoAdmissionHistoryResponse
 import com.siloamhospitals.siloamcaregiver.network.response.groupinfo.GroupInfoResponse
+import com.siloamhospitals.siloamcaregiver.network.response.rmo.RmoMasterDataResponse
+import com.siloamhospitals.siloamcaregiver.network.response.rmo.RmoParticipantsResponse
 import com.siloamhospitals.siloamcaregiver.network.service.RetrofitInstance
 import com.siloamhospitals.siloamcaregiver.shared.AppPreferences
+import com.siloamhospitals.siloamcaregiver.ui.patientlist.rmo.RmoList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -520,7 +525,7 @@ class Repository(
                         val newData = adapter.fromJson(decryptedData)
                         if (newData != null) {
                             if (isLocalDataEmpty) {
-                                if(newData.isEmpty()) {
+                                if (newData.isEmpty()) {
                                     emit(BaseHandleResponse.ERROR("Empty Message"))
                                     return@flow
                                 }
@@ -644,6 +649,7 @@ class Repository(
         return RetrofitInstance.getInstance.putPinMessage(request)
     }
 
+
     suspend fun insertFailedMessage(message: FailedChatEntity) {
         caregiverChatDao?.insertFailedMessage(message)
     }
@@ -685,4 +691,42 @@ class Repository(
         return emptyList()
     }
 
+    suspend fun addRmoParticipants(
+        orgId: String,
+        wardId: String,
+        members: List<RmoList>,
+    ): Response<BaseDataResponse<*>> {
+        val request = SubmitRmoRequest(
+            orgId,
+            wardId,
+            members = members.map {
+                SubmitRmoMembersRequest(
+                    hopeUserId = it.id,
+                    name = it.name,
+                    roleId = it.roleId
+                )
+            }
+        )
+        return RetrofitInstance.getInstance.postParticipantsRmo(request)
+    }
+
+    suspend fun getMasterRMo(
+        orgId: String,
+        wardId: String,
+        userId: String,
+    ): Response<RmoMasterDataResponse> {
+        return RetrofitInstance.getInstance.getMasterRmo(orgId, wardId, userId)
+    }
+
+    suspend fun getRmoListParticipants(
+        orgId: String,
+        wardId: String,
+        userId: String,
+    ): Response<RmoParticipantsResponse> {
+        return RetrofitInstance.getInstance.getMasterRmoParticipants(orgId, wardId, userId)
+    }
+
+
 }
+
+

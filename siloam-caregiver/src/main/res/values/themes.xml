@@ -65,7 +65,7 @@
     <style name="Widget.App.Toolbar.MenuButton" parent="Widget.MaterialComponents.Toolbar">
         <item name="colorPrimary">@color/colorPrimaryCaregiver</item>
         <item name="android:textStyle">bold</item>
-        <item name="actionMenuTextColor">@color/menu_color</item>
+        <item name="actionMenuTextColor">@color/colorPrimaryCaregiver</item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.AppCompat.Subhead</item>
     </style>
     <!-- region datePicker-->

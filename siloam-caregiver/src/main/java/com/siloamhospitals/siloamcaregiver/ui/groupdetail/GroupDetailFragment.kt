@@ -162,7 +162,7 @@ class GroupDetailFragment : Fragment() {
 
             //region partisipan
             with(groupDetailPartisipan) {
-                tvCountPartisipan.text = getString(R.string.partisipan, participan.size.toString())
+                tvCountPartisipan.text = getString(R.string.participants, participan.size.toString())
                 val dataSource = dataSourceTypedOf(participan)
                 rvPartisipan.setup {
                     withDataSource(dataSource)
