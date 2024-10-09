@@ -246,8 +246,8 @@ class ChatRoomCaregiverViewModel(
         }
     }
 
-    fun setReadMessage() {
-        repository.setReadMessage(caregiverId = caregiverId, channelId = channelId)
+    fun setReadMessage(messagesId: List<String>) {
+        repository.setReadMessage(caregiverId = caregiverId, channelId = channelId, messagesId = messagesId)
     }
 
     fun resetCurrentPage() {

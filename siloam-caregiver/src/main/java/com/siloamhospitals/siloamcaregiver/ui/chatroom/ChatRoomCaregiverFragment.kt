@@ -477,8 +477,11 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                                     )
                                 }
                             }
-
-                            setReadMessage()
+                            if(data?.second.orEmpty().isNotEmpty()) {
+                                setReadMessage(data?.second?.map { it.id }.orEmpty())
+                            } else {
+                                setReadMessage(emptyList())
+                            }
                         }
                     }
                 }
@@ -499,7 +502,9 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                         if (result == null) {
                             adapterChatRoom.add(size, data.generateNewChatUI())
                             binding.rvChatCaregiver.smoothScrollToPosition(size)
-                            setReadMessage()
+                            if(data.id.orEmpty().isNotEmpty()) {
+                                setReadMessage(listOf(data.id.orEmpty()))
+                            }
                         } else if (data.isActive!!.not() && positionDelete != null && data.senderID == viewModel.doctorHopeId) {
                             adapterChatRoom.update(positionDelete!!, data.generateNewChatUI())
                         } else if (data.isActive.not()) {
@@ -582,7 +587,7 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                         }
 
                         val resultDatawithSentId =
-                            adapterChatRoom.getList().find { it.sentId == response.data?.id }
+                            adapterChatRoom.getList().find { (it.sentId == response.data?.sentId) && (it.isFailed || it.isLoading) }
                         if (resultDatawithSentId != null) {
                             adapterChatRoom.update(
                                 adapterChatRoom.getIndexOf(resultDatawithSentId),
@@ -601,8 +606,9 @@ class ChatRoomCaregiverFragment : Fragment(), AudioRecordListener {
                             )
                         }
 
-                        adapterChatRoom.getList().find { it.sentId == response.sentId }?.let {
+                        adapterChatRoom.getList().find { (it.sentId == response.sentId) && (it.isFailed || it.isLoading) }?.let {
                             adapterChatRoom.remove(adapterChatRoom.getIndexOf(it))
+                            deleteFailedMessage(it.sentId)
                         }
                     }
                 }

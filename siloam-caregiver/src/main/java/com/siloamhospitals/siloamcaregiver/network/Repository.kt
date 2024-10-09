@@ -46,6 +46,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Response
 import java.io.File
@@ -282,10 +283,11 @@ class Repository(
         mSocket.emitEvent(GET_MESSAGE_EMIT_EVENT, data)
     }
 
-    fun setReadMessage(caregiverId: String, channelId: String) {
+    fun setReadMessage(caregiverId: String, channelId: String, messagesId: List<String>) {
         val data = JSONObject()
         data.put("caregiverID", caregiverId)
         data.put("channelID", channelId)
+        data.put("messages", JSONArray(messagesId))
         mSocket.emitEvent(SET_READ_MESSAGE, data)
     }
 
